@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Person {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  role       Role
+  name       String
+  email      String    @unique
+  rut        String    @unique
+  password   String    @db.Char(60)
+  assigned   Ticket[]  @relation(name: "UserToTicket")
+  created    Ticket[]  @relation(name: "ClientToTicket")
+  companyRut String?
+  messages   Message[]
+}
+
+enum Role {
+  Admin
+  User
+  Client
+}
+
+model Ticket {
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String    @db.Text
+  description String    @db.Text
+  status      Status    @default(Open)
+  type        Type
+  priority    Priority
+  user        Person?   @relation(name: "UserToTicket", fields: [userId], references: [id])
+  userId      Int?
+  client      Person    @relation(name: "ClientToTicket", fields: [clientId], references: [id])
+  clientId    Int
+  messages    Message[]
+}
+
+enum Status {
+  Open
+  InProgress
+  Closed
+}
+
+enum Type {
+  Hardware
+  Software
+  Other
+}
+
+enum Priority {
+  Low
+  Medium
+  High
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String   @db.Text
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  ticketId  Int
+  person    Person   @relation(fields: [personId], references: [id])
+  personId  Int
+}
