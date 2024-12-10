@@ -17,6 +17,7 @@ import {
   UserIcon,
   ClipboardDocumentCheckIcon,
   Cog6ToothIcon,
+  ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
 export default function MainMenu() {
@@ -52,6 +53,12 @@ export default function MainMenu() {
       description: "Configura las preferencias de tu cuenta",
       icon: Cog6ToothIcon,
       href: "",
+    },
+    {
+      title: "Dashboard",
+      description: "Ver datos relevantes",
+      icon: ChartBarIcon,
+      href: "/admin/dashboard",
     },
   ];
 
