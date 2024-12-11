@@ -1,4 +1,4 @@
-//api/stats.ts
+//api/tickets/stats.ts
 import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from "@/lib/db";
 
