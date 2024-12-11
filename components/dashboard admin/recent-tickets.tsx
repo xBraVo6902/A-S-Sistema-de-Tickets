@@ -1,3 +1,4 @@
+// components/RecentTickets.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -12,28 +13,15 @@ interface Ticket {
 
 export function RecentTickets() {
   const [tickets, setTickets] = useState<Ticket[]>([])
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchTickets() {
-      try {
-        const res = await fetch('/api/tickets/dashboard/recent')
-        if (!res.ok) {
-          throw new Error('Failed to fetch recent tickets')
-        }
-        const data = await res.json()
-        setTickets(data)
-      } catch (error) {
-        console.error('Error fetching recent tickets:', error)
-        setError('Error al cargar los tickets recientes')
-      }
+      const res = await fetch('/api/tickets/recent')
+      const data = await res.json()
+      setTickets(data)
     }
     fetchTickets()
   }, [])
-
-  if (error) {
-    return <div className="text-center text-red-500">{error}</div>
-  }
 
   return (
     <Table>
