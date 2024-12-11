@@ -1,41 +1,52 @@
 'use client'
 
-import { Suspense, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Overview } from "@/components/dashboard admin/overview"
-import { RecentTickets } from "@/components/dashboard admin/recent-tickets"
-import { TicketStats } from "@/components/dashboard admin/ticket-stats"
-import { CategoryBreakdown } from "@/components/dashboard admin/category-breakdown"
-import { TechnicianPerformance } from "@/components/dashboard admin/technician-performance"
-import { CompanyOverview } from "@/components/dashboard admin/company-overview"
-import { LoadingSpinner } from "@/components/dashboard admin/loading-spinner"
+import { Overview } from "@/components/dashboard-admin/overview"
+import { RecentTickets } from "@/components/dashboard-admin/recent-tickets"
+import { TicketStats } from "@/components/dashboard-admin/ticket-stats"
+import { TechnicianPerformance } from "@/components/dashboard-admin/technician-performance"
+import { CompanyOverview } from "@/components/dashboard-admin/company-overview"
+import { LoadingSpinner } from "@/components/dashboard-admin/loading-spinner"
+
+interface TechnicianData {
+  name: string
+  completed: number
+  pending: number
+}
+
+interface CompanyData {
+  name: string
+  completed: number
+  pending: number
+}
+
+interface MonthlyData {
+  month: string
+  tickets: number
+}
 
 interface DashboardData {
   totalTickets: number
   pendingTickets: number
   completedTickets: number
-  ticketsByCategory: Array<{ category: string; count: number }>
-  ticketsByTechnician: Array<{ name: string; completed: number; pending: number }>
-  ticketsByCompany: Array<{ name: string; completed: number; pending: number }>
-  monthlyData: Array<{ month: string; tickets: number }>
+  ticketsByTechnician: TechnicianData[]
+  ticketsByCompany: CompanyData[]
+  monthlyData: MonthlyData[]
 }
+
 async function getAdminDashboardData(): Promise<DashboardData> {
-  const [ticketsByCategory, ticketsByTechnician, ticketsByCompany, monthlyData] = await Promise.all([
-    fetch('/api/tickets/category-breakdown').then(res => res.json()),
-    fetch('/api/tickets/performance').then(res => res.json()),
-    fetch('/api/tickets/company-overview').then(res => res.json()),
-    fetch('/api/tickets/overview').then(res => res.json()),
+  const [ticketsByTechnician, ticketsByCompany, monthlyData] = await Promise.all([
+    fetch('/api/tickets/dashboard/performance').then(res => res.json()) as Promise<TechnicianData[]>,
+    fetch('/api/tickets/dashboard/company-overview').then(res => res.json()) as Promise<CompanyData[]>,
+    fetch('/api/tickets/dashboard/overview').then(res => res.json()) as Promise<MonthlyData[]>,
   ])
 
   return {
-    totalTickets: ticketsByCategory.reduce((acc: number, item: { count: number }) => acc + item.count, 0),
-    pendingTickets: ticketsByTechnician.reduce((acc: number, item: { pending: number }) => acc + item.pending, 0),
-    completedTickets: ticketsByTechnician.reduce((acc: number, item: { completed: number }) => acc + item.completed, 0),
-    ticketsByCategory: ticketsByCategory.map((item: { category: string; count: number }) => ({
-      name: item.category,
-      value: item.count,
-    })),
+    totalTickets: monthlyData.reduce((acc: number, item: MonthlyData) => acc + item.tickets, 0),
+    pendingTickets: ticketsByTechnician.reduce((acc: number, item: TechnicianData) => acc + item.pending, 0),
+    completedTickets: ticketsByTechnician.reduce((acc: number, item: TechnicianData) => acc + item.completed, 0),
     ticketsByTechnician,
     ticketsByCompany,
     monthlyData,
@@ -44,14 +55,24 @@ async function getAdminDashboardData(): Promise<DashboardData> {
 
 export default function AdminDashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchData() {
-      const dashboardData = await getAdminDashboardData()
-      setData(dashboardData)
+      try {
+        const dashboardData = await getAdminDashboardData()
+        setData(dashboardData)
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error)
+        setError('Error al cargar los datos del dashboard')
+      }
     }
     fetchData()
   }, [])
+
+  if (error) {
+    return <div className="text-center text-red-500">{error}</div>
+  }
 
   if (!data) {
     return <LoadingSpinner />
@@ -64,7 +85,6 @@ export default function AdminDashboardPage() {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="recent-tickets">Recent Tickets</TabsTrigger>
           <TabsTrigger value="ticket-stats">Ticket Stats</TabsTrigger>
-          <TabsTrigger value="category-breakdown">Category Breakdown</TabsTrigger>
           <TabsTrigger value="technician-performance">Technician Performance</TabsTrigger>
           <TabsTrigger value="company-overview">Company Overview</TabsTrigger>
         </TabsList>
@@ -94,17 +114,7 @@ export default function AdminDashboardPage() {
               <CardTitle>Ticket Stats</CardTitle>
             </CardHeader>
             <CardContent>
-              <TicketStats data={data.ticketsByCategory.map(item => ({ name: item.category, value: item.count }))} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="category-breakdown">
-          <Card>
-            <CardHeader>
-              <CardTitle>Category Breakdown</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CategoryBreakdown data={data.ticketsByCategory} />
+              <TicketStats data={data.monthlyData} />
             </CardContent>
           </Card>
         </TabsContent>
