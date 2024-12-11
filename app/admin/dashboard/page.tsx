@@ -37,33 +37,19 @@ interface DashboardData {
 }
 
 async function getAdminDashboardData(): Promise<DashboardData> {
-  try {
-    const [ticketsByTechnician, ticketsByCompany, monthlyData] = await Promise.all([
-      fetch('/api/technicians/performance').then(res => {
-        if (!res.ok) throw new Error(`Error fetching technicians performance: ${res.statusText}`);
-        return res.json();
-      }),
-      fetch('/api/company/overview').then(res => {
-        if (!res.ok) throw new Error(`Error fetching company overview: ${res.statusText}`);
-        return res.json();
-      }),
-      fetch('/api/overview').then(res => {
-        if (!res.ok) throw new Error(`Error fetching overview: ${res.statusText}`);
-        return res.json();
-      }),
-    ]);
+  const [ticketsByTechnician, ticketsByCompany, monthlyData] = await Promise.all([
+    fetch('/api/technicians/performance').then(res => res.json()) as Promise<TechnicianData[]>,
+    fetch('/api/company/overview').then(res => res.json()) as Promise<CompanyData[]>,
+    fetch('/api/overview').then(res => res.json()) as Promise<MonthlyData[]>,
+  ])
 
-    return {
-      totalTickets: monthlyData.reduce((acc: number, item: MonthlyData) => acc + item.tickets, 0),
-      pendingTickets: ticketsByTechnician.reduce((acc: number, item: TechnicianData) => acc + item.pending, 0),
-      completedTickets: ticketsByTechnician.reduce((acc: number, item: TechnicianData) => acc + item.completed, 0),
-      ticketsByTechnician,
-      ticketsByCompany,
-      monthlyData,
-    };
-  } catch (error) {
-    console.error('Error in getAdminDashboardData:', error);
-    throw error;
+  return {
+    totalTickets: monthlyData.reduce((acc, item) => acc + item.tickets, 0),
+    pendingTickets: ticketsByTechnician.reduce((acc, item) => acc + item.pending, 0),
+    completedTickets: ticketsByTechnician.reduce((acc, item) => acc + item.completed, 0),
+    ticketsByTechnician,
+    ticketsByCompany,
+    monthlyData,
   }
 }
 
