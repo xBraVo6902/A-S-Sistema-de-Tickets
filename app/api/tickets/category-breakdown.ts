@@ -1,4 +1,3 @@
-// pages/api/tickets/category-breakdown.ts
 import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from "@/lib/db";
 
