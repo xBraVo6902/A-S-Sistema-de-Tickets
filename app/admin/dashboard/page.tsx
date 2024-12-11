@@ -38,15 +38,15 @@ interface DashboardData {
 
 async function getAdminDashboardData(): Promise<DashboardData> {
   const [ticketsByTechnician, ticketsByCompany, monthlyData] = await Promise.all([
-    fetch('/api/technicians/performance').then(res => res.json()) as Promise<TechnicianData[]>,
-    fetch('/api/company/overview').then(res => res.json()) as Promise<CompanyData[]>,
-    fetch('/api/overview').then(res => res.json()) as Promise<MonthlyData[]>,
+    fetch('/api/tickets/dashboard/performance').then(res => res.json()) as Promise<TechnicianData[]>,
+    fetch('/api/tickets/dashboard/company-overview').then(res => res.json()) as Promise<CompanyData[]>,
+    fetch('/api/tickets/dashboard/overview').then(res => res.json()) as Promise<MonthlyData[]>,
   ])
 
   return {
-    totalTickets: monthlyData.reduce((acc, item) => acc + item.tickets, 0),
-    pendingTickets: ticketsByTechnician.reduce((acc, item) => acc + item.pending, 0),
-    completedTickets: ticketsByTechnician.reduce((acc, item) => acc + item.completed, 0),
+    totalTickets: monthlyData.reduce((acc: number, item: MonthlyData) => acc + item.tickets, 0),
+    pendingTickets: ticketsByTechnician.reduce((acc: number, item: TechnicianData) => acc + item.pending, 0),
+    completedTickets: ticketsByTechnician.reduce((acc: number, item: TechnicianData) => acc + item.completed, 0),
     ticketsByTechnician,
     ticketsByCompany,
     monthlyData,
