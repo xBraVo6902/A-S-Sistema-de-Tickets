@@ -23,9 +23,9 @@ interface DashboardData {
 async function getAdminDashboardData(): Promise<DashboardData> {
   const [ticketsByCategory, ticketsByTechnician, ticketsByCompany, monthlyData] = await Promise.all([
     fetch('/api/tickets/category-breakdown').then(res => res.json()),
-    fetch('/api/technicians/performance').then(res => res.json()),
-    fetch('/api/company/overview').then(res => res.json()),
-    fetch('/api/overview').then(res => res.json()),
+    fetch('/api/tickets/performance').then(res => res.json()),
+    fetch('/api/tickets/company-overview').then(res => res.json()),
+    fetch('/api/tickets/overview').then(res => res.json()),
   ])
 
   return {
