@@ -1,27 +1,21 @@
+// components/TicketStats.tsx
 'use client'
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
-interface TicketStatsData {
-  totalTickets: number
-  pendingTickets: number
-  completedTickets: number
+interface TicketStat {
+  name: string
+  value: number
 }
 
 interface TicketStatsProps {
-  data: TicketStatsData
+  data: TicketStat[]
 }
 
 export function TicketStats({ data }: TicketStatsProps) {
-  const chartData = [
-    { name: 'Total', value: data.totalTickets },
-    { name: 'Pendientes', value: data.pendingTickets },
-    { name: 'Completados', value: data.completedTickets },
-  ]
-
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={chartData}>
+      <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis />

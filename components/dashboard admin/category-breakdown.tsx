@@ -1,6 +1,7 @@
+// components/CategoryBreakdown.tsx
 'use client'
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts' //npm install recharts
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
 
 interface CategoryData {
   category: string

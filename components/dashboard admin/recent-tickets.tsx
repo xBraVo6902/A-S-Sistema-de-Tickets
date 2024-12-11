@@ -1,14 +1,28 @@
+// components/RecentTickets.tsx
+'use client'
+
+import { useEffect, useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
-const recentTickets = [
-  { id: 1, title: "Problema con impresora", status: "Pendiente", date: "2023-06-01" },
-  { id: 2, title: "Error en software de contabilidad", status: "En progreso", date: "2023-05-31" },
-  { id: 3, title: "Actualización de sistema operativo", status: "Completado", date: "2023-05-30" },
-  { id: 4, title: "Configuración de nuevo router", status: "Pendiente", date: "2023-05-29" },
-  { id: 5, title: "Recuperación de datos", status: "En progreso", date: "2023-05-28" },
-]
+interface Ticket {
+  id: number
+  title: string
+  status: string
+  date: string
+}
 
 export function RecentTickets() {
+  const [tickets, setTickets] = useState<Ticket[]>([])
+
+  useEffect(() => {
+    async function fetchTickets() {
+      const res = await fetch('/api/tickets/recent')
+      const data = await res.json()
+      setTickets(data)
+    }
+    fetchTickets()
+  }, [])
+
   return (
     <Table>
       <TableHeader>
@@ -20,7 +34,7 @@ export function RecentTickets() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {recentTickets.map((ticket) => (
+        {tickets.map((ticket) => (
           <TableRow key={ticket.id}>
             <TableCell>{ticket.id}</TableCell>
             <TableCell>{ticket.title}</TableCell>

@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Overview } from "@/components/dashboard admin/overview"
@@ -20,165 +20,112 @@ interface DashboardData {
 }
 
 async function getAdminDashboardData(): Promise<DashboardData> {
-  // Simulando una llamada a API
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  
+  const [ticketsByCategory, ticketsByTechnician, ticketsByCompany, monthlyData] = await Promise.all([
+    fetch('/api/tickets/category-breakdown').then(res => res.json()),
+    fetch('/api/technicians/performance').then(res => res.json()),
+    fetch('/api/company/overview').then(res => res.json()),
+    fetch('/api/overview').then(res => res.json()),
+  ])
+
   return {
-    totalTickets: 1234,
-    pendingTickets: 123,
-    completedTickets: 1111,
-    ticketsByCategory: [
-      { category: "Hardware", count: 450 },
-      { category: "Software", count: 350 },
-      { category: "Network", count: 250 },
-      { category: "Other", count: 184 },
-    ],
-    ticketsByTechnician: [
-      { name: "Alice", completed: 300, pending: 20 },
-      { name: "Bob", completed: 250, pending: 15 },
-      { name: "Charlie", completed: 200, pending: 10 },
-    ],
-    ticketsByCompany: [
-      { name: "Acme Inc", completed: 400, pending: 30 },
-      { name: "Globex Corp", completed: 350, pending: 25 },
-      { name: "Initech", completed: 300, pending: 20 },
-    ],
-    monthlyData: [
-      { month: "Ene", tickets: 100 },
-      { month: "Feb", tickets: 120 },
-      { month: "Mar", tickets: 150 },
-      { month: "Abr", tickets: 180 },
-      { month: "May", tickets: 200 },
-      { month: "Jun", tickets: 220 },
-    ],
+    totalTickets: ticketsByCategory.reduce((acc: number, item: { count: number }) => acc + item.count, 0),
+    pendingTickets: ticketsByTechnician.reduce((acc: number, item: { pending: number }) => acc + item.pending, 0),
+    completedTickets: ticketsByTechnician.reduce((acc: number, item: { completed: number }) => acc + item.completed, 0),
+    ticketsByCategory: ticketsByCategory.map((item: { category: string; count: number }) => ({
+      name: item.category,
+      value: item.count,
+    })),
+    ticketsByTechnician,
+    ticketsByCompany,
+    monthlyData,
   }
 }
 
-export default async function AdminDashboard() {
-  const dashboardData = await getAdminDashboardData()
+export default function AdminDashboardPage() {
+  const [data, setData] = useState<DashboardData | null>(null)
+
+  useEffect(() => {
+    async function fetchData() {
+      const dashboardData = await getAdminDashboardData()
+      setData(dashboardData)
+    }
+    fetchData()
+  }, [])
+
+  if (!data) {
+    return <LoadingSpinner />
+  }
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard de Administrador</h2>
-      </div>
-      <Tabs defaultValue="overview" className="space-y-4">
+    <div className="container mx-auto py-10 md:px-10">
+      <Tabs defaultValue="overview">
         <TabsList>
-          <TabsTrigger value="overview">Resumen</TabsTrigger>
-          <TabsTrigger value="analytics">Análisis</TabsTrigger>
-          <TabsTrigger value="reports">Informes</TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="recent-tickets">Recent Tickets</TabsTrigger>
+          <TabsTrigger value="ticket-stats">Ticket Stats</TabsTrigger>
+          <TabsTrigger value="category-breakdown">Category Breakdown</TabsTrigger>
+          <TabsTrigger value="technician-performance">Technician Performance</TabsTrigger>
+          <TabsTrigger value="company-overview">Company Overview</TabsTrigger>
         </TabsList>
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total de Tickets
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.totalTickets}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Tickets Pendientes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.pendingTickets}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Tickets Completados
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.completedTickets}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Tasa de Resolución
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {((dashboardData.completedTickets / dashboardData.totalTickets) * 100).toFixed(2)}%
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle>Resumen de Tickets</CardTitle>
-              </CardHeader>
-              <CardContent className="pl-2">
-                <Suspense fallback={<LoadingSpinner />}>
-                  <Overview data={dashboardData.monthlyData} />
-                </Suspense>
-              </CardContent>
-            </Card>
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>Tickets Recientes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <RecentTickets />
-                </Suspense>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle>Estadísticas de Tickets</CardTitle>
-              </CardHeader>
-              <CardContent className="pl-2">
-                <Suspense fallback={<LoadingSpinner />}>
-                  <TicketStats data={dashboardData} />
-                </Suspense>
-              </CardContent>
-            </Card>
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>Desglose por Categoría</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <CategoryBreakdown data={dashboardData.ticketsByCategory} />
-                </Suspense>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle>Rendimiento de Técnicos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <TechnicianPerformance data={dashboardData.ticketsByTechnician} />
-                </Suspense>
-              </CardContent>
-            </Card>
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>Resumen por Empresa</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <CompanyOverview data={dashboardData.ticketsByCompany} />
-                </Suspense>
-              </CardContent>
-            </Card>
-          </div>
+        <TabsContent value="overview">
+          <Card>
+            <CardHeader>
+              <CardTitle>Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Overview data={data.monthlyData} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="recent-tickets">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Tickets</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RecentTickets />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="ticket-stats">
+          <Card>
+            <CardHeader>
+              <CardTitle>Ticket Stats</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TicketStats data={data.ticketsByCategory.map(item => ({ name: item.category, value: item.count }))} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="category-breakdown">
+          <Card>
+            <CardHeader>
+              <CardTitle>Category Breakdown</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CategoryBreakdown data={data.ticketsByCategory} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="technician-performance">
+          <Card>
+            <CardHeader>
+              <CardTitle>Technician Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TechnicianPerformance data={data.ticketsByTechnician} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="company-overview">
+          <Card>
+            <CardHeader>
+              <CardTitle>Company Overview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CompanyOverview data={data.ticketsByCompany} />
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
