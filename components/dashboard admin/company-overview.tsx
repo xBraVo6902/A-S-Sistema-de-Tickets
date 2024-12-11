@@ -1,8 +1,6 @@
-// components/CompanyOverview.tsx
 'use client'
 
-import { useEffect, useState } from 'react'
-import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 interface CompanyData {
   name: string

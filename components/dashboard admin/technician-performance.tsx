@@ -1,7 +1,5 @@
-// components/TechnicianPerformance.tsx
 'use client'
 
-import { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 interface TechnicianData {
