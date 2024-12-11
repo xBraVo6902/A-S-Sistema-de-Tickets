@@ -1,4 +1,4 @@
-// api/company-overview.ts
+// pages/api/company/overview.ts
 import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from "@/lib/db";
 
