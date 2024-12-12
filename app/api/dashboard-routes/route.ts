@@ -2,6 +2,7 @@ import { authOptions } from "@/auth";
 import { getServerSession } from "next-auth";
 import prisma from "@/lib/db";
 import { Status } from "@prisma/client";
+import { Type } from "@prisma/client"
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -29,11 +30,35 @@ export async function GET(request: Request) {
       return getTechnicianPerformance();
     case "company-summary":
       return getCompanySummary();
+    case "recent-tickets":
+      return getRecentTickets();
     default:
       return new Response(JSON.stringify({ message: "Invalid route" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
+  }
+}
+
+async function getRecentTickets() {
+  try {
+    const tickets = await prisma.ticket.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 5, // Obtener los 5 tickets más recientes
+    });
+
+    return new Response(JSON.stringify(tickets), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error(error);
+    return new Response(
+      JSON.stringify({ message: "Hubo un error al obtener los tickets recientes" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
 
@@ -113,7 +138,13 @@ async function getByCategory() {
       },
     });
 
-    return new Response(JSON.stringify(ticketsByCategory), {
+    // Asegúrate de que 'type' contenga los nombres correctos de las categorías
+    const result = ticketsByCategory.map((item) => ({
+      type: item.type === Type.Hardware ? 'Hardware' : item.type === Type.Software ? 'Software' : 'Other',
+      _count: item._count,
+    }));
+
+    return new Response(JSON.stringify(result), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -135,7 +166,33 @@ async function getTechnicianPerformance() {
       },
     });
 
-    return new Response(JSON.stringify(ticketsByTechnician), {
+    const result = await Promise.all(ticketsByTechnician.map(async (item) => {
+      if (item.userId === null) {
+        return null;
+      }
+      const user = await prisma.person.findUnique({
+        where: { id: item.userId },
+      });
+      const completedTickets = await prisma.ticket.count({
+        where: {
+          userId: item.userId,
+          status: Status.Closed,
+        },
+      });
+      const pendingTickets = await prisma.ticket.count({
+        where: {
+          userId: item.userId,
+          status: Status.Open,
+        },
+      });
+      return {
+        name: user?.name || 'Unknown',
+        completed: completedTickets,
+        pending: pendingTickets,
+      };
+    }));
+
+    return new Response(JSON.stringify(result.filter(Boolean)), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -154,10 +211,34 @@ async function getCompanySummary() {
       by: ['clientId'],
       _count: {
         _all: true,
+        status: true,
       },
     });
 
-    return new Response(JSON.stringify(ticketsByCompany), {
+    const result = await Promise.all(ticketsByCompany.map(async (item) => {
+      const client = await prisma.person.findUnique({
+        where: { id: item.clientId },
+      });
+      const completedTickets = await prisma.ticket.count({
+        where: {
+          clientId: item.clientId,
+          status: Status.Closed,
+        },
+      });
+      const pendingTickets = await prisma.ticket.count({
+        where: {
+          clientId: item.clientId,
+          status: Status.Open,
+        },
+      });
+      return {
+        name: client?.name || 'Unknown',
+        completed: completedTickets,
+        pending: pendingTickets,
+      };
+    }));
+
+    return new Response(JSON.stringify(result), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

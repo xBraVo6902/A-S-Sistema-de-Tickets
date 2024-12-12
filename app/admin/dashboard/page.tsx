@@ -23,12 +23,12 @@ type DashboardData = {
 
 async function fetchDashboardData(): Promise<DashboardData> {
   const [summary, resolutionRate, monthlySummary, byCategory, technicianPerformance, companySummary] = await Promise.all([
-    fetch('/api/dashboard?route=summary').then(res => res.json()),
-    fetch('/api/dashboard?route=resolution-rate').then(res => res.json()),
-    fetch('/api/dashboard?route=monthly-summary').then(res => res.json()),
-    fetch('/api/dashboard?route=by-category').then(res => res.json()),
-    fetch('/api/dashboard?route=technician-performance').then(res => res.json()),
-    fetch('/api/dashboard?route=company-summary').then(res => res.json()),
+    fetch('/api/dashboard-routes?route=summary').then(res => res.json()),
+    fetch('/api/dashboard-routes?route=resolution-rate').then(res => res.json()),
+    fetch('/api/dashboard-routes?route=monthly-summary').then(res => res.json()),
+    fetch('/api/dashboard-routes?route=by-category').then(res => res.json()),
+    fetch('/api/dashboard-routes?route=technician-performance').then(res => res.json()),
+    fetch('/api/dashboard-routes?route=company-summary').then(res => res.json()),
   ]);
 
   return {
@@ -40,14 +40,14 @@ async function fetchDashboardData(): Promise<DashboardData> {
       count: item._count._all,
     })),
     ticketsByTechnician: technicianPerformance.map((item: any) => ({
-      name: item.userId, // Assuming you have a way to get the technician's name from userId
-      completed: item._count._all, // Assuming completed tickets are counted here
-      pending: 0, // You might need to adjust this based on your data structure
+      name: item.name, // Assuming you have a way to get the technician's name from userId
+      completed: item.complete, // Assuming completed tickets are counted here
+      pending: item.pending, // You might need to adjust this based on your data structure
     })),
     ticketsByCompany: companySummary.map((item: any) => ({
-      name: item.clientId, // Assuming you have a way to get the company's name from clientId
-      completed: item._count._all, // Assuming completed tickets are counted here
-      pending: 0, // You might need to adjust this based on your data structure
+      name: item.name, // Use the name of the company
+      completed: item.completed, // Assuming completed tickets are counted here
+      pending: item.pending, // Assuming pending tickets are counted here
     })),
     monthlyData: monthlySummary.map((item: any) => ({
       month: new Date(item.createdAt).toLocaleString('es-ES', { month: 'short' }),

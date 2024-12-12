@@ -1,17 +1,15 @@
-'use client'
-
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts' //npm install recharts
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 interface CategoryData {
-  category: string
-  count: number
+  category: string;
+  count: number;
 }
 
 interface CategoryBreakdownProps {
-  data: CategoryData[]
+  data: CategoryData[];
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
   return (
@@ -25,6 +23,7 @@ export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
           outerRadius={80}
           fill="#8884d8"
           dataKey="count"
+          nameKey="category" // Asegúrate de usar 'category' como la clave del nombre
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -34,5 +33,5 @@ export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
         <Legend />
       </PieChart>
     </ResponsiveContainer>
-  )
+  );
 }
