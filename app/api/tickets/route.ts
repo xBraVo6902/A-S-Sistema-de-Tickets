@@ -105,7 +105,7 @@ export async function GET(request: Request) {
         client: { select: { name: true, email: true } },
         user: { select: { name: true, email: true } },
       },
-    });console.log(tickets);
+    });
 
     const translatedTickets = tickets.map((ticket) => {
       return {
