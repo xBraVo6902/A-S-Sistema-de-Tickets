@@ -1,4 +1,6 @@
-import { Suspense } from 'react';
+"use client";
+
+import { Suspense, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "@/components/dashboard admin/overview";
@@ -19,48 +21,72 @@ type DashboardData = {
   monthlyData: Array<{ month: string; tickets: number }>;
 };
 
-async function getAdminDashboardData(): Promise<DashboardData> {
-  try {
-    const [summary, resolutionRate, monthlySummary, byCategory, technicianPerformance, companySummary] = await Promise.all([
-      fetch('/api/dashboard-routes?route=summary').then(res => res.json()),
-      fetch('/api/dashboard-routes?route=resolution-rate').then(res => res.json()),
-      fetch('/api/dashboard-routes?route=monthly-summary').then(res => res.json()),
-      fetch('/api/dashboard-routes?route=by-category').then(res => res.json()),
-      fetch('/api/dashboard-routes?route=technician-performance').then(res => res.json()),
-      fetch('/api/dashboard-routes?route=company-summary').then(res => res.json()),
-    ]);
+async function fetchDashboardData(): Promise<DashboardData> {
+  const [summary, resolutionRate, monthlySummary, byCategory, technicianPerformance, companySummary] = await Promise.all([
+    fetch('/api/dashboard-routes?route=summary').then(res => res.json()),
+    fetch('/api/dashboard-routes?route=resolution-rate').then(res => res.json()),
+    fetch('/api/dashboard-routes?route=monthly-summary').then(res => res.json()),
+    fetch('/api/dashboard-routes?route=by-category').then(res => res.json()),
+    fetch('/api/dashboard-routes?route=technician-performance').then(res => res.json()),
+    fetch('/api/dashboard-routes?route=company-summary').then(res => res.json()),
+  ]);
 
-    return {
-      totalTickets: summary.totalTickets,
-      pendingTickets: summary.pendingTickets,
-      completedTickets: summary.completedTickets,
-      ticketsByCategory: byCategory.map((item: any) => ({
-        category: item.type,
-        count: item._count._all,
-      })),
-      ticketsByTechnician: technicianPerformance.map((item: any) => ({
-        name: item.userId, // Assuming you have a way to get the technician's name from userId
-        completed: item._count._all, // Assuming completed tickets are counted here
-        pending: 0, // You might need to adjust this based on your data structure
-      })),
-      ticketsByCompany: companySummary.map((item: any) => ({
-        name: item.clientId, // Assuming you have a way to get the company's name from clientId
-        completed: item._count._all, // Assuming completed tickets are counted here
-        pending: 0, // You might need to adjust this based on your data structure
-      })),
-      monthlyData: monthlySummary.map((item: any) => ({
-        month: new Date(item.createdAt).toLocaleString('es-ES', { month: 'short' }),
-        tickets: item._count._all,
-      })),
-    };
-  } catch (error) {
-    console.error('Error fetching dashboard data:', error);
-    throw new Error('Error fetching dashboard data');
-  }
+  return {
+    totalTickets: summary.totalTickets,
+    pendingTickets: summary.pendingTickets,
+    completedTickets: summary.completedTickets,
+    ticketsByCategory: byCategory.map((item: any) => ({
+      category: item.type,
+      count: item._count._all,
+    })),
+    ticketsByTechnician: technicianPerformance.map((item: any) => ({
+      name: item.userId, // Assuming you have a way to get the technician's name from userId
+      completed: item._count._all, // Assuming completed tickets are counted here
+      pending: 0, // You might need to adjust this based on your data structure
+    })),
+    ticketsByCompany: companySummary.map((item: any) => ({
+      name: item.clientId, // Assuming you have a way to get the company's name from clientId
+      completed: item._count._all, // Assuming completed tickets are counted here
+      pending: 0, // You might need to adjust this based on your data structure
+    })),
+    monthlyData: monthlySummary.map((item: any) => ({
+      month: new Date(item.createdAt).toLocaleString('es-ES', { month: 'short' }),
+      tickets: item._count._all,
+    })),
+  };
 }
 
-export default async function AdminDashboard() {
-  const dashboardData = await getAdminDashboardData();
+export default function AdminDashboard() {
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchDashboardData();
+        setDashboardData(data);
+      } catch (error) {
+        setError('Error fetching dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!dashboardData) {
+    return null;
+  }
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
