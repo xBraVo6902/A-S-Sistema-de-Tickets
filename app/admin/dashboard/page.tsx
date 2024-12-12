@@ -1,13 +1,13 @@
-import { Suspense } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Overview } from "@/components/dashboard admin/overview"
-import { RecentTickets } from "@/components/dashboard admin/recent-tickets"
-import { TicketStats } from "@/components/dashboard admin/ticket-stats"
-import { CategoryBreakdown } from "@/components/dashboard admin/category-breakdown"
-import { TechnicianPerformance } from "@/components/dashboard admin/technician-performance"
-import { CompanyOverview } from "@/components/dashboard admin/company-overview"
-import { LoadingSpinner } from "@/components/dashboard admin/loading-spinner"
+import { Suspense } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Overview } from "@/components/dashboard admin/overview";
+import { RecentTickets } from "@/components/dashboard admin/recent-tickets";
+import { TicketStats } from "@/components/dashboard admin/ticket-stats";
+import { CategoryBreakdown } from "@/components/dashboard admin/category-breakdown";
+import { TechnicianPerformance } from "@/components/dashboard admin/technician-performance";
+import { CompanyOverview } from "@/components/dashboard admin/company-overview";
+import { LoadingSpinner } from "@/components/dashboard admin/loading-spinner";
 
 type DashboardData = {
   totalTickets: number;
@@ -60,7 +60,7 @@ async function getAdminDashboardData(): Promise<DashboardData> {
 }
 
 export default async function AdminDashboard() {
-  const dashboardData = await getAdminDashboardData()
+  const dashboardData = await getAdminDashboardData();
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
