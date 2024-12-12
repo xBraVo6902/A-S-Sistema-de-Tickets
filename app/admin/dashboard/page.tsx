@@ -23,12 +23,12 @@ type DashboardData = {
 
 async function fetchDashboardData(): Promise<DashboardData> {
   const [summary, resolutionRate, monthlySummary, byCategory, technicianPerformance, companySummary] = await Promise.all([
-    fetch('/api/dashboard-routes?route=summary').then(res => res.json()),
-    fetch('/api/dashboard-routes?route=resolution-rate').then(res => res.json()),
-    fetch('/api/dashboard-routes?route=monthly-summary').then(res => res.json()),
-    fetch('/api/dashboard-routes?route=by-category').then(res => res.json()),
-    fetch('/api/dashboard-routes?route=technician-performance').then(res => res.json()),
-    fetch('/api/dashboard-routes?route=company-summary').then(res => res.json()),
+    fetch('/api/dashboard?route=summary').then(res => res.json()),
+    fetch('/api/dashboard?route=resolution-rate').then(res => res.json()),
+    fetch('/api/dashboard?route=monthly-summary').then(res => res.json()),
+    fetch('/api/dashboard?route=by-category').then(res => res.json()),
+    fetch('/api/dashboard?route=technician-performance').then(res => res.json()),
+    fetch('/api/dashboard?route=company-summary').then(res => res.json()),
   ]);
 
   return {
