@@ -17,7 +17,7 @@ export type TicketInfoProps = {
       name: string;
       email: string;
       avatar: string | null;
-    };
+    } | null;
     client: {
       name: string;
       email: string;
@@ -85,26 +85,30 @@ export default function TicketInfo(props: TicketInfoProps) {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2">Asignado a</h3>
-              <div className="flex items-center space-x-2">
-                <Avatar>
-                  <AvatarImage
-                    src={props.data.user.avatar ?? ""}
-                    alt={props.data.user.name}
-                  />
-                  <AvatarFallback>
-                    {props.data.user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium">{props.data.user.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {props.data.user.email}
-                  </p>
+              {props.data.user ? (
+                <div className="flex items-center space-x-2">
+                  <Avatar>
+                    <AvatarImage
+                      src={props.data.user.avatar ?? ""}
+                      alt={props.data.user.name}
+                    />
+                    <AvatarFallback>
+                      {props.data.user.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">{props.data.user.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {props.data.user.email}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Sin asignar</p>
+              )}
             </div>
           </div>
         </div>
