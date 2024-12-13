@@ -21,6 +21,11 @@ type DashboardData = {
   monthlyData: Array<{ month: string; tickets: number }>;
 };
 
+interface MonthlyData {
+  month: string;
+  tickets: number;
+}
+
 async function fetchDashboardData(): Promise<DashboardData> {
   const [summary, resolutionRate, monthlySummary, byCategory, technicianPerformance, companySummary] = await Promise.all([
     fetch('/api/dashboard-routes?route=summary').then(res => res.json()),
@@ -31,6 +36,24 @@ async function fetchDashboardData(): Promise<DashboardData> {
     fetch('/api/dashboard-routes?route=company-summary').then(res => res.json()),
   ]);
 
+  const monthlyDataMap: { [key: string]: number } = {};
+
+  monthlySummary.forEach((item: any) => {
+    const month = new Date(item.createdAt).toLocaleString('es-ES', { month: 'short', year: 'numeric' });
+    if (!monthlyDataMap[month]) {
+      monthlyDataMap[month] = 0;
+    }
+    monthlyDataMap[month] += item._count._all;
+  });
+
+  const monthlyData: MonthlyData[] = Object.keys(monthlyDataMap).map(month => ({
+    month,
+    tickets: monthlyDataMap[month],
+  }));
+
+  // Ordenar los meses cronológicamente
+  monthlyData.sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
+
   return {
     totalTickets: summary.totalTickets,
     pendingTickets: summary.pendingTickets,
@@ -40,19 +63,16 @@ async function fetchDashboardData(): Promise<DashboardData> {
       count: item._count._all,
     })),
     ticketsByTechnician: technicianPerformance.map((item: any) => ({
-      name: item.name, // Assuming you have a way to get the technician's name from userId
-      completed: item.complete, // Assuming completed tickets are counted here
-      pending: item.pending, // You might need to adjust this based on your data structure
+      name: item.name,
+      completed: item.completed,
+      pending: item.pending,
     })),
     ticketsByCompany: companySummary.map((item: any) => ({
-      name: item.name, // Use the name of the company
-      completed: item.completed, // Assuming completed tickets are counted here
-      pending: item.pending, // Assuming pending tickets are counted here
+      name: item.name,
+      completed: item.completed,
+      pending: item.pending,
     })),
-    monthlyData: monthlySummary.map((item: any) => ({
-      month: new Date(item.createdAt).toLocaleString('es-ES', { month: 'short' }),
-      tickets: item._count._all,
-    })),
+    monthlyData,
   };
 }
 
@@ -62,18 +82,15 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchDashboardData();
+    fetchDashboardData()
+      .then((data) => {
         setDashboardData(data);
-      } catch (error) {
-        setError('Error fetching dashboard data');
-      } finally {
         setLoading(false);
-      }
-    };
-    fetchData();
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
   }, []);
 
   if (loading) {

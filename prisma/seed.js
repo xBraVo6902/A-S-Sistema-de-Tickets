@@ -5,13 +5,13 @@
  */
 
 import { PrismaClient } from "@prisma/client";
-import { people, tickets } from "./data.js";
+import { persons, tickets } from "./data.js";
 import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  for (const person of people) {
+  for (const person of persons) {
     const hashedPassword = await bcrypt.hash(person.password, 10);
     person.password = hashedPassword;
 
@@ -29,7 +29,10 @@ async function main() {
         description: ticket.description,
         type: ticket.type,
         priority: ticket.priority,
-        client: { connect: { id: ticket.id } },
+        status: ticket.status,
+        createdAt: ticket.createdAt,
+        client: { connect: { id: ticket.clientId } },
+        user: ticket.userId ? { connect: { id: ticket.userId } } : undefined,
       },
     });
   }
