@@ -46,7 +46,7 @@ export default function MainMenu() {
       title: "Usuarios",
       description: "Gestiona los usuarios del sistema",
       icon: UserIcon,
-      href: "",
+      href: "/admin/view-users",
     },
     {
       title: "Preferencias de la cuenta",
