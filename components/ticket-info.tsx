@@ -18,16 +18,25 @@ export type TicketInfoProps = {
       name: string;
       email: string;
       avatar: string | null;
+      phone: string;
     } | null;
     client: {
       name: string;
       email: string;
       avatar: string | null;
+      phone: string;
     };
   };
 };
 
 export default function TicketInfo(props: TicketInfoProps) {
+  const whatsappData = {
+    name: props.data.client.name,
+    phone: props.data.user.phone,
+    title: props.data.title,
+    id: props.data.id,
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -115,7 +124,7 @@ export default function TicketInfo(props: TicketInfoProps) {
           <Separator />
           <div>
             <h3 className="text-lg font-semibold mb-2">Contacta al técnico</h3>
-            <TicketMessageButton />
+            <TicketMessageButton data={whatsappData} />
           </div>
         </div>
       </CardContent>
