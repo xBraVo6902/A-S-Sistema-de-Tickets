@@ -217,13 +217,21 @@ export default function Page() {
       },
       cell: ({ row }) => <div>{row.getValue("createdAt")}</div>,
     },
-    {
-      accessorKey: "assignedTo",
+    {      accessorKey: "assignedTo",
       header: "Asignado a",
       cell: ({ row }) => {
         const assignedTo = row.original.assignedTo || "";
 
         const handleValueChange = async (value: string) => {
+          const selectedUserName =
+          users.find((user) => user.id === value)?.name || "Sin asignar";
+    
+        const confirmation = window.confirm(
+          `¿Estás seguro de que quieres asignar el ticket "${row.original.title}" a ${selectedUserName}?`
+        );
+    
+        if (!confirmation) return;
+        
           try {
             await updateTicketAssignment(row.original.id, value);
             console.log(`Asignando ticket ${row.original.id} a ${value}`);
@@ -254,6 +262,7 @@ export default function Page() {
           </Select>
         );
       },
+
     },
     {
       id: "actions",
