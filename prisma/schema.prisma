@@ -8,18 +8,17 @@ datasource db {
 }
 
 model Person {
-  id         Int       @id @default(autoincrement())
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
   role       Role
   name       String
-  email      String    @unique
-  rut        String    @unique
-  password   String    @db.Char(60)
-  assigned   Ticket[]  @relation(name: "UserToTicket")
-  created    Ticket[]  @relation(name: "ClientToTicket")
+  email      String   @unique
+  rut        String   @unique
+  password   String   @db.Char(60)
+  assigned   Ticket[] @relation(name: "UserToTicket")
+  created    Ticket[] @relation(name: "ClientToTicket")
   companyRut String?
-  messages   Message[]
 }
 
 enum Role {
@@ -29,19 +28,18 @@ enum Role {
 }
 
 model Ticket {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  title       String    @db.Text
-  description String    @db.Text
-  status      Status    @default(Open)
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String   @db.Text
+  description String   @db.Text
+  status      Status   @default(Open)
   type        Type
   priority    Priority
-  user        Person?   @relation(name: "UserToTicket", fields: [userId], references: [id])
+  user        Person?  @relation(name: "UserToTicket", fields: [userId], references: [id])
   userId      Int?
-  client      Person    @relation(name: "ClientToTicket", fields: [clientId], references: [id])
+  client      Person   @relation(name: "ClientToTicket", fields: [clientId], references: [id])
   clientId    Int
-  messages    Message[]
 }
 
 enum Status {
@@ -60,15 +58,4 @@ enum Priority {
   Low
   Medium
   High
-}
-
-model Message {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  content   String   @db.Text
-  ticket    Ticket   @relation(fields: [ticketId], references: [id])
-  ticketId  Int
-  person    Person   @relation(fields: [personId], references: [id])
-  personId  Int
 }
