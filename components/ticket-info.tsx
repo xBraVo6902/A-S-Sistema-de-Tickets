@@ -121,11 +121,17 @@ export default function TicketInfo(props: TicketInfoProps) {
               )}
             </div>
           </div>
-          <Separator />
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Contacta al técnico</h3>
-            <TicketMessageButton data={whatsappData} />
-          </div>
+          {props.data.user && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="text-lg font-semibold mb-2">
+                  Contacta al técnico
+                </h3>
+                <TicketMessageButton data={whatsappData} />
+              </div>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
