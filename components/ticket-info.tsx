@@ -1,3 +1,4 @@
+import TicketMessageButton from "./ticket-message-button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -110,6 +111,11 @@ export default function TicketInfo(props: TicketInfoProps) {
                 <p className="text-sm text-muted-foreground">Sin asignar</p>
               )}
             </div>
+          </div>
+          <Separator />
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Contacta al técnico</h3>
+            <TicketMessageButton />
           </div>
         </div>
       </CardContent>
