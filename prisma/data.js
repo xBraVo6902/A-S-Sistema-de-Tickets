@@ -4,7 +4,8 @@
  */
 export const persons = [
   {
-    name: "Admin",
+    firstName: "Admin",
+    lastName: "User",
     email: "admin@admin.com",
     rut: "11.111.111-1",
     password: "admin",
@@ -12,7 +13,8 @@ export const persons = [
     phone: "56997571019",
   },
   {
-    name: "John Doe",
+    firstName: "John",
+    lastName: "Doe",
     email: "client@client.com",
     rut: "22.222.222-2",
     companyRut: "33.333.333-3",
@@ -21,7 +23,8 @@ export const persons = [
     phone: "56960526880",
   },
   {
-    name: "Jane Doe",
+    firstName: "Jane",
+    lastName: "Doe",
     email: "user@user.com",
     rut: "44.444.444-4",
     password: "user",
@@ -29,7 +32,8 @@ export const persons = [
     phone: "56998782651",
   },
   {
-    name: "Tandie",
+    firstName: "Tandie",
+    lastName: "Smith",
     email: "temma0@salon.com",
     rut: "14.675.166-K",
     password: "fW7){Dnsj+BFC",
@@ -37,7 +41,8 @@ export const persons = [
     phone: "56965188959",
   },
   {
-    name: "Jareb",
+    firstName: "Jareb",
+    lastName: "Lachaize",
     email: "jlachaize1@aol.com",
     rut: "15.886.788-K",
     companyRut: "99.734.771-K",
@@ -46,7 +51,8 @@ export const persons = [
     phone: "56975645328",
   },
   {
-    name: "Drusilla",
+    firstName: "Drusilla",
+    lastName: "McCarty",
     email: "dmccartyj@pinterest.com",
     rut: "16.886.788-K",
     companyRut: "99.734.772-K",
@@ -55,7 +61,8 @@ export const persons = [
     phone: "56994526473",
   },
   {
-    name: "Acme Corp",
+    firstName: "Acme",
+    lastName: "Corp",
     email: "contact@acme.com",
     rut: "99.999.999-9",
     companyRut: "99.999.999-9",
@@ -64,7 +71,8 @@ export const persons = [
     phone: "56951435128",
   },
   {
-    name: "Jane Smith",
+    firstName: "Jane",
+    lastName: "Smith",
     email: "jane.smith@example.com",
     rut: "98.765.432-1",
     password: "password123",
@@ -72,7 +80,8 @@ export const persons = [
     phone: "56974300231",
   },
   {
-    name: "John Doe",
+    firstName: "John",
+    lastName: "Doe",
     email: "john.doe@example.com",
     rut: "12.345.678-9",
     password: "password123",
@@ -80,7 +89,8 @@ export const persons = [
     phone: "56950120591",
   },
   {
-    name: "Alice Johnson",
+    firstName: "Alice",
+    lastName: "Johnson",
     email: "alice.johnson@example.com",
     rut: "55.555.555-5",
     password: "password123",
@@ -88,7 +98,8 @@ export const persons = [
     phone: "56931054978",
   },
   {
-    name: "Bob Brown",
+    firstName: "Bob",
+    lastName: "Brown",
     email: "bob.brown@example.com",
     rut: "66.666.666-6",
     password: "password123",
@@ -96,7 +107,8 @@ export const persons = [
     phone: "56974986501",
   },
   {
-    name: "Charlie Davis",
+    firstName: "Charlie",
+    lastName: "Davis",
     email: "charlie.davis@example.com",
     rut: "77.777.777-7",
     companyRut: "88.888.888-8",
@@ -105,7 +117,8 @@ export const persons = [
     phone: "56952471107",
   },
   {
-    name: "Eve White",
+    firstName: "Eve",
+    lastName: "White",
     email: "eve.white@example.com",
     rut: "99.999.999-8",
     password: "password123",
@@ -113,7 +126,8 @@ export const persons = [
     phone: "56919687306",
   },
   {
-    name: "Frank Green",
+    firstName: "Frank",
+    lastName: "Green",
     email: "frank.green@example.com",
     rut: "10.101.010-1",
     password: "password123",
@@ -121,7 +135,8 @@ export const persons = [
     phone: "56930231679",
   },
   {
-    name: "Grace Black",
+    firstName: "Grace",
+    lastName: "Black",
     email: "grace.black@example.com",
     rut: "11.111.111-2",
     password: "password123",
@@ -129,7 +144,8 @@ export const persons = [
     phone: "56959173106",
   },
   {
-    name: "Hank Blue",
+    firstName: "Hank",
+    lastName: "Blue",
     email: "hank.blue@example.com",
     rut: "12.121.212-2",
     password: "password123",
@@ -137,7 +153,8 @@ export const persons = [
     phone: "56982694946",
   },
   {
-    name: "Ivy Red",
+    firstName: "Ivy",
+    lastName: "Red",
     email: "ivy.red@example.com",
     rut: "13.131.313-2",
     password: "password123",
@@ -145,7 +162,8 @@ export const persons = [
     phone: "56963084261",
   },
   {
-    name: "Jack Yellow",
+    firstName: "Jack",
+    lastName: "Yellow",
     email: "jack.yellow@example.com",
     rut: "14.141.414-2",
     password: "password123",
@@ -153,7 +171,8 @@ export const persons = [
     phone: "56951610387",
   },
   {
-    name: "Kara Purple",
+    firstName: "Kara",
+    lastName: "Purple",
     email: "kara.purple@example.com",
     rut: "15.151.515-2",
     password: "password123",
@@ -161,15 +180,17 @@ export const persons = [
     phone: "56931621749",
   },
   {
-    name: "Leo Orange",
+    firstName: "Leo",
+    lastName: "Orange",
     email: "leo.orange@example.com",
     rut: "16.161.616-2",
     password: "password123",
     role: "Client",
-    phone: "56972898652 ",
+    phone: "56972898652",
   },
   {
-    name: "Pablo Cortés",
+    firstName: "Pablo",
+    lastName: "Cortés",
     email: "pablo.cortes@example.com",
     rut: "20.600.436-3",
     password: "pablocortes",
@@ -177,7 +198,8 @@ export const persons = [
     phone: "56959252625",
   },
   {
-    name: "Camilo Bravo",
+    firstName: "Camilo",
+    lastName: "Bravo",
     email: "camilo.bravo@example.com",
     rut: "21.048.333-0",
     password: "camilobravo",
