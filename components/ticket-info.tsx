@@ -32,7 +32,7 @@ export type TicketInfoProps = {
 export default function TicketInfo(props: TicketInfoProps) {
   const whatsappData = {
     name: props.data.client.name,
-    phone: props.data.user.phone,
+    phone: "56964141800",
     title: props.data.title,
     id: props.data.id,
   };
