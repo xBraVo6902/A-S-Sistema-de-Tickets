@@ -217,8 +217,7 @@ export default function Page() {
       },
       cell: ({ row }) => <div>{row.getValue("createdAt")}</div>,
     },
-    {
-      accessorKey: "assignedTo",
+    {      accessorKey: "assignedTo",
       header: "Asignado a",
       cell: ({ row }) => {
         const assignedTo = row.original.assignedTo || "";
@@ -263,6 +262,7 @@ export default function Page() {
           </Select>
         );
       },
+
     },
     {
       id: "actions",
