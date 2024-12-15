@@ -11,10 +11,7 @@ async function getTickets(): Promise<Ticket[]> {
   const session: { user?: { id?: string ; role?: string} } | null = await getServerSession(
     authOptions
   );
-    // Verifica si el usuario es un administrador
-    if (session?.user?.role !== "Admin") {
-      throw new Error("Unauthorized: Only admins can view this page.");
-    }
+   
   
   const request = new Request(
     `${process.env.NEXTAUTH_URL}/api/tickets`,
