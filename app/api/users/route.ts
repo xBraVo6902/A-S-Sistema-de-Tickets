@@ -17,7 +17,8 @@ export async function GET() {
       where: { role: "User" },
       select: {
         id: true,
-        name: true,
+        firstName: true,
+        lastName: true,
         email: true,
       },
     });
@@ -47,9 +48,9 @@ export async function PUT(req: Request) {
 
   try {
     const body = await req.json();
-    const { id, name, email } = body;
+    const { id, firstName, lastName, email } = body;
 
-    if (!id || !name || !email) {
+    if (!id || !firstName || !lastName || !email) {
       return new Response(JSON.stringify({ message: "Datos incompletos" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
@@ -59,7 +60,8 @@ export async function PUT(req: Request) {
     const updatedUser = await prisma.person.update({
       where: { id: Number(id) }, // Asegúrate de que el ID sea del tipo correcto
       data: {
-        name,
+        firstName,
+        lastName,
         email,
       },
     });
@@ -99,7 +101,7 @@ export async function DELETE(req: Request) {
     }
 
     await prisma.ticket.deleteMany({
-      where: { clientId: Number(id) }, 
+      where: { clientId: Number(id) },
     });
 
     await prisma.person.delete({

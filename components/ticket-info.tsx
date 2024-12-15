@@ -1,3 +1,4 @@
+import TicketMessageButton from "./ticket-message-button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -14,19 +15,35 @@ export type TicketInfoProps = {
     type: string;
     priority: string;
     user: {
-      name: string;
+      firstName: string;
+      lastName: string;
       email: string;
       avatar: string | null;
-    };
+      phone: string;
+    } | null;
     client: {
-      name: string;
+      firstName: string;
+      lastName: string;
       email: string;
       avatar: string | null;
+      phone: string;
     };
   };
+  role: "User" | "Client";
 };
 
 export default function TicketInfo(props: TicketInfoProps) {
+  const whatsappData = {
+    name:
+      props.role === "User"
+        ? props.data.user?.firstName + " " + props.data.user?.lastName
+        : props.data.client.firstName + " " + props.data.client.lastName,
+    phone:
+      props.role === "User" ? props.data.client.phone : props.data.user?.phone,
+    title: props.data.title,
+    id: props.data.id,
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -66,17 +83,25 @@ export default function TicketInfo(props: TicketInfoProps) {
                 <Avatar>
                   <AvatarImage
                     src={props.data.client.avatar ?? ""}
-                    alt={props.data.client.name}
+                    alt={
+                      props.data.client.firstName +
+                      " " +
+                      props.data.client.lastName
+                    }
                   />
                   <AvatarFallback>
-                    {props.data.client.name
+                    {props.data.client.firstName
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{props.data.client.name}</p>
+                  <p className="font-medium">
+                    {props.data.client.firstName +
+                      " " +
+                      props.data.client.lastName}
+                  </p>
                   <p className="text-sm text-muted-foreground">
                     {props.data.client.email}
                   </p>
@@ -85,28 +110,54 @@ export default function TicketInfo(props: TicketInfoProps) {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2">Asignado a</h3>
-              <div className="flex items-center space-x-2">
-                <Avatar>
-                  <AvatarImage
-                    src={props.data.user.avatar ?? ""}
-                    alt={props.data.user.name}
-                  />
-                  <AvatarFallback>
-                    {props.data.user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium">{props.data.user.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {props.data.user.email}
-                  </p>
+              {props.data.user ? (
+                <div className="flex items-center space-x-2">
+                  <Avatar>
+                    <AvatarImage
+                      src={props.data.user.avatar ?? ""}
+                      alt={
+                        props.data.user.firstName +
+                        " " +
+                        props.data.user.lastName
+                      }
+                    />
+                    <AvatarFallback>
+                      {props.data.user.firstName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">
+                      {props.data.user.firstName +
+                        " " +
+                        props.data.user.lastName}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {props.data.user.email}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Sin asignar</p>
+              )}
             </div>
           </div>
+          {props.data.user && (
+            <>
+              <Separator />
+              <div>
+                <h3 className="text-lg font-semibold mb-2">
+                  Contacta a{" "}
+                  {props.role === "User"
+                    ? props.data.client.firstName
+                    : props.data.user.firstName}
+                </h3>
+                <TicketMessageButton data={whatsappData} role={props.role} />
+              </div>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
