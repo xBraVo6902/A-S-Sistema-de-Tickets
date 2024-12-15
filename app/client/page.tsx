@@ -26,7 +26,7 @@ export default function MainMenu() {
       title: "Crear ticket",
       description: "Crea un nuevo ticket de soporte",
       icon: TicketIcon,
-      href: "/client/create-ticket",
+      href: "/client/crear-ticket",
     },
     {
       title: "Mis tickets",

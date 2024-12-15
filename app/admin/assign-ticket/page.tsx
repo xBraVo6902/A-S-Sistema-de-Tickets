@@ -13,7 +13,13 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  MoreHorizontal,
+  Loader2,
+  Check,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -89,11 +95,80 @@ const updateTicketAssignment = async (ticketId: string, userId: string) => {
   }
 };
 
+const AssigneeCell = ({
+  row,
+  users,
+  setTickets,
+  status,
+  setStatus,
+}: {
+  row: { original: Ticket };
+  users: User[];
+  setTickets: React.Dispatch<React.SetStateAction<Ticket[]>>;
+  status: "idle" | "loading" | "success";
+  setStatus: (status: "idle" | "loading" | "success") => void;
+}) => {
+  const assignedTo = row.original.assignedTo || "";
+
+  React.useEffect(() => {
+    if (status === "success") {
+      const timer = setTimeout(() => setStatus("idle"), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [status, setStatus]);
+
+  const handleValueChange = async (value: string) => {
+    if (value === assignedTo) return;
+
+    setStatus("loading");
+    try {
+      await updateTicketAssignment(row.original.id, value);
+      setTickets((prevTickets) =>
+        prevTickets.map((ticket) =>
+          ticket.id === row.original.id
+            ? { ...ticket, assignedTo: value }
+            : ticket
+        )
+      );
+      setStatus("success");
+    } catch (error) {
+      console.error("Error updating ticket assignment:", error);
+      setStatus("idle");
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <Select value={assignedTo} onValueChange={handleValueChange}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Sin asignar" />
+        </SelectTrigger>
+        <SelectContent>
+          {users.map(
+            (user: { id: string; firstName: string; lastName: string }) => (
+              <SelectItem key={user.id} value={user.id}>
+                {user.firstName + " " + user.lastName}
+              </SelectItem>
+            )
+          )}
+        </SelectContent>
+      </Select>
+      {status === "loading" && (
+        <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+      )}
+      {status === "success" && <Check className="h-4 w-4 text-green-500" />}
+    </div>
+  );
+};
+
 export default function Page() {
   const [tickets, setTickets] = React.useState<Ticket[]>([]);
   const [users, setUsers] = React.useState<User[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [assignmentStatus, setAssignmentStatus] = React.useState<
+    Map<string, "idle" | "loading" | "success">
+  >(new Map());
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -221,52 +296,19 @@ export default function Page() {
     {
       accessorKey: "assignedTo",
       header: "Asignado a",
-      cell: ({ row }) => {
-        const assignedTo = row.original.assignedTo || "";
-
-        const handleValueChange = async (value: string) => {
-          const selectedUserName =
-            users.find((user) => user.id === value)?.firstName +
-              " " +
-              users.find((user) => user.id === value)?.lastName ||
-            "Sin asignar";
-
-          const confirmation = window.confirm(
-            `¿Estás seguro de que quieres asignar el ticket "${row.original.title}" a ${selectedUserName}?`
-          );
-
-          if (!confirmation) return;
-
-          try {
-            await updateTicketAssignment(row.original.id, value);
-            console.log(`Asignando ticket ${row.original.id} a ${value}`);
-            setTickets((prevTickets) =>
-              prevTickets.map((ticket) =>
-                ticket.id === row.original.id
-                  ? { ...ticket, assignedTo: value }
-                  : ticket
-              )
+      cell: ({ row }) => (
+        <AssigneeCell
+          row={row}
+          users={users}
+          setTickets={setTickets}
+          status={assignmentStatus.get(row.original.id) || "idle"}
+          setStatus={(status) => {
+            setAssignmentStatus(
+              new Map(assignmentStatus.set(row.original.id, status))
             );
-          } catch (error) {
-            console.error("Error updating ticket assignment:", error);
-          }
-        };
-
-        return (
-          <Select value={assignedTo} onValueChange={handleValueChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sin asignar" />
-            </SelectTrigger>
-            <SelectContent>
-              {users.map((user) => (
-                <SelectItem key={user.id} value={user.id}>
-                  {user.firstName + " " + user.lastName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        );
-      },
+          }}
+        />
+      ),
     },
     {
       id: "actions",
