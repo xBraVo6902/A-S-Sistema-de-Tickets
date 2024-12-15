@@ -6,7 +6,7 @@ export default function LoginPage() {
   return (
     <div className="w-full h-screen flex items-center justify-center">
       <Suspense>
-        <div className="text-center">
+        <div className="">
           <LoginForm />
           <p className="text-sm text-gray-600 mt-4">
             ¿Has olvidado tu contraseña?{" "}
