@@ -8,13 +8,13 @@ import { Suspense } from "react";
 
 async function getTickets(): Promise<Ticket[]> {
   const res = await import("@/app/api/tickets/route");
-  const session: { user?: { id?: string ; role?: string} } | null = await getServerSession(
+  const session: { user?: { id?: string; role?: string} } | null = await getServerSession(
     authOptions
   );
    
   
   const request = new Request(
-    `${process.env.NEXTAUTH_URL}/api/tickets`,
+    `${process.env.NEXTAUTH_URL}/api/dashboard-routes?route=summary`,
     {
       method: "GET",
     }
