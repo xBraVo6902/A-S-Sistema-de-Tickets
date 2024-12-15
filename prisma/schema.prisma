@@ -51,9 +51,9 @@ enum Status {
 }
 
 enum Type {
-  Hardware
-  Software
-  Other
+  Bug
+  Feature
+  Question
 }
 
 enum Priority {

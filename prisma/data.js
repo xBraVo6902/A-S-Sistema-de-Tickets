@@ -2,7 +2,7 @@
 /**
  * ! Datos de prueba. Eliminar antes de pasar a producción
  */
-export const persons = [
+export const people = [
   {
     firstName: "Admin",
     lastName: "User",
@@ -102,6 +102,7 @@ export const persons = [
     lastName: "Brown",
     email: "bob.brown@example.com",
     rut: "66.666.666-6",
+    companyRut: "99.999.999-9",
     password: "password123",
     role: "Client",
     phone: "56974986501",
@@ -130,6 +131,7 @@ export const persons = [
     lastName: "Green",
     email: "frank.green@example.com",
     rut: "10.101.010-1",
+    companyRut: "99.999.999-9",
     password: "password123",
     role: "Client",
     phone: "56930231679",
@@ -148,6 +150,7 @@ export const persons = [
     lastName: "Blue",
     email: "hank.blue@example.com",
     rut: "12.121.212-2",
+    companyRut: "99.999.999-9",
     password: "password123",
     role: "Client",
     phone: "56982694946",
@@ -166,6 +169,7 @@ export const persons = [
     lastName: "Yellow",
     email: "jack.yellow@example.com",
     rut: "14.141.414-2",
+    companyRut: "99.999.999-9",
     password: "password123",
     role: "Client",
     phone: "56951610387",
@@ -184,6 +188,7 @@ export const persons = [
     lastName: "Orange",
     email: "leo.orange@example.com",
     rut: "16.161.616-2",
+    companyRut: "99.999.999-9",
     password: "password123",
     role: "Client",
     phone: "56972898652",
@@ -202,6 +207,7 @@ export const persons = [
     lastName: "Bravo",
     email: "camilo.bravo@example.com",
     rut: "21.048.333-0",
+    companyRut: "99.999.999-9",
     password: "camilobravo",
     role: "Client",
     phone: "56964141800",
@@ -213,7 +219,7 @@ export const tickets = [
     title: "Veniam ea velit sunt ea nulla.",
     description:
       "Culpa occaecat cillum eu amet pariatur fugiat occaecat mollit et consectetur labore qui labore Lorem minim pariatur eiusmod non dolor aliquip.",
-    type: "Software",
+    type: "Bug",
     priority: "Medium",
     status: "Open",
     userId: 3, // Asignado a Jane Doe
@@ -224,7 +230,7 @@ export const tickets = [
     title: "Anim duis est nulla ullamco.",
     description:
       "Elit sint fugiat ea aute nostrud ad nisi nostrud commodo incididunt officia officia magna amet in id culpa sit id velit incididunt.",
-    type: "Other",
+    type: "Question",
     priority: "Low",
     status: "Closed",
     userId: 3, // Asignado a Jane Doe
@@ -235,7 +241,7 @@ export const tickets = [
     title: "Esse est reprehenderit incididunt.",
     description:
       "Ut nisi nulla magna adipisicing tempor id et officia ullamco ex minim ipsum culpa eiusmod ex pariatur dolore labore anim nostrud esse.",
-    type: "Hardware",
+    type: "Feature",
     priority: "Medium",
     status: "Open",
     userId: null, // No asignado
@@ -246,7 +252,7 @@ export const tickets = [
     title: "Amet minim dolor aute consequat.",
     description:
       "Ea qui elit commodo ea sit sit ipsum esse esse proident eiusmod veniam eu mollit sint sit incididunt irure adipisicing veniam fugiat.",
-    type: "Other",
+    type: "Question",
     priority: "Medium",
     status: "Closed",
     userId: null, // No asignado
@@ -257,7 +263,7 @@ export const tickets = [
     title: "Sit cupidatat quis mollit.",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Open",
     userId: 3, // Asignado a Jane Doe
@@ -268,7 +274,7 @@ export const tickets = [
     title: "Tempor amet do consectetur mollit dolor.",
     description:
       "Officia id magna ullamco minim qui cupidatat Lorem laboris voluptate est nisi occaecat officia pariatur ullamco occaecat ullamco do excepteur labore sunt quis adipisicing nulla qui reprehenderit duis eiusmod.",
-    type: "Software",
+    type: "Bug",
     priority: "Medium",
     status: "Open",
     userId: null, // No asignado
@@ -279,7 +285,7 @@ export const tickets = [
     title: "Deserunt duis duis ut aliqua exercitation.",
     description:
       "Ullamco incididunt quis ex irure dolore sint esse reprehenderit sint adipisicing consectetur non est non nostrud aute dolore culpa dolor.",
-    type: "Software",
+    type: "Bug",
     priority: "Medium",
     status: "Closed",
     userId: 3, // Asignado a Jane Doe
@@ -290,7 +296,7 @@ export const tickets = [
     title: "Id ea occaecat cillum.",
     description:
       "Commodo aute esse velit minim ullamco dolore ad id cupidatat amet fugiat quis eiusmod occaecat ut nulla mollit aute ea non deserunt magna sint anim ullamco nisi ad laborum pariatur.",
-    type: "Other",
+    type: "Question",
     priority: "High",
     status: "Open",
     userId: null, // No asignado
@@ -301,7 +307,7 @@ export const tickets = [
     title: "Occaecat laboris ut minim.",
     description:
       "Minim exercitation voluptate reprehenderit laborum qui id officia nostrud occaecat amet magna veniam Lorem veniam esse incididunt et commodo est id excepteur.",
-    type: "Other",
+    type: "Question",
     priority: "Medium",
     status: "Closed",
     userId: 3, // Asignado a Jane Doe
@@ -312,7 +318,7 @@ export const tickets = [
     title: "Magna commodo sit sint.",
     description:
       "Eiusmod cillum culpa nostrud enim aliqua labore sint eu sit magna velit amet est commodo est est sunt incididunt et anim proident officia dolor fugiat aliquip.",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Open",
     userId: 3, // Asignado a Jane Doe
@@ -323,7 +329,7 @@ export const tickets = [
     title: "Aliquip cupidatat et sit.",
     description:
       "Sint aliquip officia amet reprehenderit veniam minim sit laborum excepteur est duis dolore proident ipsum id ut quis culpa elit cupidatat eiusmod elit.",
-    type: "Other",
+    type: "Question",
     priority: "High",
     status: "Closed",
     userId: null, // No asignado
@@ -334,7 +340,7 @@ export const tickets = [
     title: "Laboris nisi ut aliquip ex ea commodo.",
     description:
       "Laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-    type: "Hardware",
+    type: "Feature",
     priority: "Low",
     status: "Open",
     userId: 4, // Asignado a Tandie
@@ -345,7 +351,7 @@ export const tickets = [
     title: "Excepteur sint occaecat cupidatat non proident.",
     description:
       "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    type: "Software",
+    type: "Bug",
     priority: "Medium",
     status: "Closed",
     userId: 4, // Asignado a Tandie
@@ -356,7 +362,7 @@ export const tickets = [
     title: "Sed ut perspiciatis unde omnis iste natus.",
     description:
       "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
-    type: "Other",
+    type: "Question",
     priority: "High",
     status: "Open",
     userId: 3, // Asignado a Jane Doe
@@ -367,7 +373,7 @@ export const tickets = [
     title: "Nemo enim ipsam voluptatem quia voluptas.",
     description:
       "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.",
-    type: "Hardware",
+    type: "Feature",
     priority: "Medium",
     status: "Closed",
     userId: null, // No asignado
@@ -378,7 +384,7 @@ export const tickets = [
     title: "Neque porro quisquam est qui dolorem.",
     description:
       "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Open",
     userId: 4, // Asignado a Tandie
@@ -389,7 +395,7 @@ export const tickets = [
     title: "Ut enim ad minima veniam.",
     description:
       "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?",
-    type: "Other",
+    type: "Question",
     priority: "Low",
     status: "Closed",
     userId: 3, // Asignado a Jane Doe
@@ -400,7 +406,7 @@ export const tickets = [
     title: "Quis autem vel eum iure reprehenderit.",
     description:
       "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
-    type: "Hardware",
+    type: "Feature",
     priority: "Medium",
     status: "Open",
     userId: null, // No asignado
@@ -411,7 +417,7 @@ export const tickets = [
     title: "At vero eos et accusamus et iusto odio.",
     description:
       "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Closed",
     userId: 4, // Asignado a Tandie
@@ -422,7 +428,7 @@ export const tickets = [
     title: "Similique sunt in culpa qui officia deserunt.",
     description:
       "Similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
-    type: "Other",
+    type: "Question",
     priority: "Low",
     status: "Open",
     userId: 3, // Asignado a Jane Doe
@@ -433,7 +439,7 @@ export const tickets = [
     title: "Nam libero tempore, cum soluta nobis est.",
     description:
       "Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.",
-    type: "Hardware",
+    type: "Feature",
     priority: "Medium",
     status: "Closed",
     userId: null, // No asignado
@@ -444,7 +450,7 @@ export const tickets = [
     title: "Temporibus autem quibusdam et aut officiis.",
     description:
       "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Open",
     userId: 4, // Asignado a Tandie
@@ -455,7 +461,7 @@ export const tickets = [
     title: "Itaque earum rerum hic tenetur a sapiente.",
     description:
       "Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
-    type: "Other",
+    type: "Question",
     priority: "Low",
     status: "Closed",
     userId: 3, // Asignado a Jane Doe
@@ -466,7 +472,7 @@ export const tickets = [
     title: "Ut enim ad minima veniam.",
     description:
       "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?",
-    type: "Hardware",
+    type: "Feature",
     priority: "Medium",
     status: "Open",
     userId: null, // No asignado
@@ -477,7 +483,7 @@ export const tickets = [
     title: "Quis autem vel eum iure reprehenderit.",
     description:
       "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Closed",
     userId: 4, // Asignado a Tandie
@@ -488,7 +494,7 @@ export const tickets = [
     title: "At vero eos et accusamus et iusto odio.",
     description:
       "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.",
-    type: "Other",
+    type: "Question",
     priority: "Low",
     status: "Open",
     userId: 3, // Asignado a Jane Doe
@@ -499,7 +505,7 @@ export const tickets = [
     title: "Similique sunt in culpa qui officia deserunt.",
     description:
       "Similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
-    type: "Hardware",
+    type: "Feature",
     priority: "Medium",
     status: "Closed",
     userId: null, // No asignado
@@ -510,7 +516,7 @@ export const tickets = [
     title: "Nam libero tempore, cum soluta nobis est.",
     description:
       "Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Open",
     userId: 4, // Asignado a Tandie
@@ -521,7 +527,7 @@ export const tickets = [
     title: "Temporibus autem quibusdam et aut officiis.",
     description:
       "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.",
-    type: "Other",
+    type: "Question",
     priority: "Low",
     status: "Closed",
     userId: 3, // Asignado a Jane Doe
@@ -532,7 +538,7 @@ export const tickets = [
     title: "Itaque earum rerum hic tenetur a sapiente.",
     description:
       "Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
-    type: "Hardware",
+    type: "Feature",
     priority: "Medium",
     status: "Open",
     userId: null, // No asignado
@@ -543,7 +549,7 @@ export const tickets = [
     title: "Ut enim ad minima veniam.",
     description:
       "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Closed",
     userId: 4, // Asignado a Tandie
@@ -554,7 +560,7 @@ export const tickets = [
     title: "Quis autem vel eum iure reprehenderit.",
     description:
       "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
-    type: "Other",
+    type: "Question",
     priority: "Low",
     status: "Open",
     userId: 3, // Asignado a Jane Doe
@@ -565,7 +571,7 @@ export const tickets = [
     title: "At vero eos et accusamus et iusto odio.",
     description:
       "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.",
-    type: "Hardware",
+    type: "Feature",
     priority: "Medium",
     status: "Closed",
     userId: null, // No asignado
@@ -576,7 +582,7 @@ export const tickets = [
     title: "Similique sunt in culpa qui officia deserunt.",
     description:
       "Similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Open",
     userId: 4, // Asignado a Tandie
@@ -587,7 +593,7 @@ export const tickets = [
     title: "Nam libero tempore, cum soluta nobis est.",
     description:
       "Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.",
-    type: "Other",
+    type: "Question",
     priority: "Low",
     status: "Closed",
     userId: 3, // Asignado a Jane Doe
@@ -598,7 +604,7 @@ export const tickets = [
     title: "Temporibus autem quibusdam et aut officiis.",
     description:
       "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.",
-    type: "Hardware",
+    type: "Feature",
     priority: "Medium",
     status: "Open",
     userId: null, // No asignado
@@ -609,7 +615,7 @@ export const tickets = [
     title: "Itaque earum rerum hic tenetur a sapiente.",
     description:
       "Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Closed",
     userId: 4, // Asignado a Tandie
@@ -620,7 +626,7 @@ export const tickets = [
     title: "Ut enim ad minima veniam.",
     description:
       "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?",
-    type: "Other",
+    type: "Question",
     priority: "Low",
     status: "Open",
     userId: 3, // Asignado a Jane Doe
@@ -631,7 +637,7 @@ export const tickets = [
     title: "Quis autem vel eum iure reprehenderit.",
     description:
       "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
-    type: "Hardware",
+    type: "Feature",
     priority: "Medium",
     status: "Closed",
     userId: null, // No asignado
@@ -642,7 +648,7 @@ export const tickets = [
     title: "At vero eos et accusamus et iusto odio.",
     description:
       "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Open",
     userId: 4, // Asignado a Tandie
@@ -653,7 +659,7 @@ export const tickets = [
     title: "Similique sunt in culpa qui officia deserunt.",
     description:
       "Similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
-    type: "Other",
+    type: "Question",
     priority: "Low",
     status: "Closed",
     userId: 3, // Asignado a Jane Doe
@@ -664,7 +670,7 @@ export const tickets = [
     title: "Nam libero tempore, cum soluta nobis est.",
     description:
       "Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.",
-    type: "Hardware",
+    type: "Feature",
     priority: "Medium",
     status: "Open",
     userId: null, // No asignado
@@ -675,7 +681,7 @@ export const tickets = [
     title: "Temporibus autem quibusdam et aut officiis.",
     description:
       "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Closed",
     userId: 4, // Asignado a Tandie
@@ -686,7 +692,7 @@ export const tickets = [
     title: "Itaque earum rerum hic tenetur a sapiente.",
     description:
       "Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
-    type: "Other",
+    type: "Question",
     priority: "Low",
     status: "Open",
     userId: 3, // Asignado a Jane Doe
@@ -697,7 +703,7 @@ export const tickets = [
     title: "Ut enim ad minima veniam.",
     description:
       "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?",
-    type: "Hardware",
+    type: "Feature",
     priority: "Medium",
     status: "Closed",
     userId: null, // No asignado
@@ -708,7 +714,7 @@ export const tickets = [
     title: "Quis autem vel eum iure reprehenderit.",
     description:
       "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
-    type: "Software",
+    type: "Bug",
     priority: "High",
     status: "Open",
     userId: 4, // Asignado a Tandie
