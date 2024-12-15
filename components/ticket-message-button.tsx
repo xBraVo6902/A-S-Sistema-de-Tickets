@@ -3,15 +3,19 @@ import { Button } from "./ui/button";
 export type WhatsAppProps = {
   data: {
     name: string;
-    phone: string;
+    phone: string | undefined;
     title: string;
     id: string;
   };
+  role: "User" | "Client";
 };
 
 export default function TicketMessageButton(props: WhatsAppProps) {
   const { name, phone, title, id } = props.data;
-  const message = `Hola, soy ${name} y me comunico contigo respecto al ticket: ${title} (ID: ${id})`;
+  const message =
+    props.role === "User"
+      ? `Hola, soy ${name} y me comunico con usted respecto al ticket que ha creado: ${title} (ID: ${id}). ¿En qué lo puedo ayudar?`
+      : `Hola, soy ${name} y me comunico con usted respecto al ticket: ${title} (ID: ${id}). Espero su respuesta.`;
 
   return (
     <Button className="bg-[#25D366] hover:bg-[#1ea952]">

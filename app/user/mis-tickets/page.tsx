@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { Ticket, columns } from "@/app/user/dashboard/columns";
+import { Ticket, columns } from "@/app/user/mis-tickets/columns";
 import { DataTable } from "@/components/data-table";
 import { authOptions } from "@/auth";
 import "dotenv/config";

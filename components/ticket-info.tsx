@@ -15,24 +15,31 @@ export type TicketInfoProps = {
     type: string;
     priority: string;
     user: {
-      name: string;
+      firstName: string;
+      lastName: string;
       email: string;
       avatar: string | null;
       phone: string;
     } | null;
     client: {
-      name: string;
+      firstName: string;
+      lastName: string;
       email: string;
       avatar: string | null;
       phone: string;
     };
   };
+  role: "User" | "Client";
 };
 
 export default function TicketInfo(props: TicketInfoProps) {
   const whatsappData = {
-    name: props.data.client.name,
-    phone: "56964141800",
+    name:
+      props.role === "User"
+        ? props.data.user?.firstName + " " + props.data.user?.lastName
+        : props.data.client.firstName + " " + props.data.client.lastName,
+    phone:
+      props.role === "User" ? props.data.client.phone : props.data.user?.phone,
     title: props.data.title,
     id: props.data.id,
   };
@@ -76,17 +83,25 @@ export default function TicketInfo(props: TicketInfoProps) {
                 <Avatar>
                   <AvatarImage
                     src={props.data.client.avatar ?? ""}
-                    alt={props.data.client.name}
+                    alt={
+                      props.data.client.firstName +
+                      " " +
+                      props.data.client.lastName
+                    }
                   />
                   <AvatarFallback>
-                    {props.data.client.name
+                    {props.data.client.firstName
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{props.data.client.name}</p>
+                  <p className="font-medium">
+                    {props.data.client.firstName +
+                      " " +
+                      props.data.client.lastName}
+                  </p>
                   <p className="text-sm text-muted-foreground">
                     {props.data.client.email}
                   </p>
@@ -100,17 +115,25 @@ export default function TicketInfo(props: TicketInfoProps) {
                   <Avatar>
                     <AvatarImage
                       src={props.data.user.avatar ?? ""}
-                      alt={props.data.user.name}
+                      alt={
+                        props.data.user.firstName +
+                        " " +
+                        props.data.user.lastName
+                      }
                     />
                     <AvatarFallback>
-                      {props.data.user.name
+                      {props.data.user.firstName
                         .split(" ")
                         .map((n) => n[0])
                         .join("")}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-medium">{props.data.user.name}</p>
+                    <p className="font-medium">
+                      {props.data.user.firstName +
+                        " " +
+                        props.data.user.lastName}
+                    </p>
                     <p className="text-sm text-muted-foreground">
                       {props.data.user.email}
                     </p>
@@ -126,9 +149,12 @@ export default function TicketInfo(props: TicketInfoProps) {
               <Separator />
               <div>
                 <h3 className="text-lg font-semibold mb-2">
-                  Contacta al técnico
+                  Contacta a{" "}
+                  {props.role === "User"
+                    ? props.data.client.firstName
+                    : props.data.user.firstName}
                 </h3>
-                <TicketMessageButton data={whatsappData} />
+                <TicketMessageButton data={whatsappData} role={props.role} />
               </div>
             </>
           )}

@@ -55,7 +55,8 @@ type Ticket = {
 
 type User = {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
 };
 
@@ -104,9 +105,9 @@ export default function Page() {
         ]);
         setTickets(ticketsData);
         setUsers(usersData);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        setError("Failed to load data");
+        console.error(error);
+        setError("Error al cargar los datos");
       } finally {
         setLoading(false);
       }
@@ -247,7 +248,7 @@ export default function Page() {
             <SelectContent>
               {users.map((user) => (
                 <SelectItem key={user.id} value={user.id}>
-                  {user.name}
+                  {user.firstName + " " + user.lastName}
                 </SelectItem>
               ))}
             </SelectContent>

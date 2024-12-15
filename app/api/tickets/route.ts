@@ -102,8 +102,6 @@ export async function GET(request: Request) {
         priority: true,
         createdAt: true,
         updatedAt: true,
-        client: { select: { name: true, email: true } },
-        user: { select: { name: true, email: true } },
       },
     });
 

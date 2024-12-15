@@ -57,9 +57,9 @@ const CreateTicketPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="container mx-auto py-10 md:px-10 flex justify-center">
       <form onSubmit={handleSubmit}>
-        <Card className="w-full max-w-xl">
+        <Card className="w-full max-w-2xl">
           <CardHeader>
             <CardTitle className="text-xl">Crear ticket de soporte</CardTitle>
             <CardDescription>
