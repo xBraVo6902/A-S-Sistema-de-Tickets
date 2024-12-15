@@ -265,7 +265,7 @@ export const tickets = [
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.",
     type: "Bug",
     priority: "High",
-    status: "Open",
+    status: "InProgress",
     userId: 3, // Asignado a Jane Doe
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2023-05-01"),
@@ -298,7 +298,7 @@ export const tickets = [
       "Commodo aute esse velit minim ullamco dolore ad id cupidatat amet fugiat quis eiusmod occaecat ut nulla mollit aute ea non deserunt magna sint anim ullamco nisi ad laborum pariatur.",
     type: "Question",
     priority: "High",
-    status: "Open",
+    status: "InProgress",
     userId: null, // No asignado
     clientId: 5, // Cliente Jareb
     createdAt: new Date("2023-08-20"),
@@ -320,7 +320,7 @@ export const tickets = [
       "Eiusmod cillum culpa nostrud enim aliqua labore sint eu sit magna velit amet est commodo est est sunt incididunt et anim proident officia dolor fugiat aliquip.",
     type: "Bug",
     priority: "High",
-    status: "Open",
+    status: "InProgress",
     userId: 3, // Asignado a Jane Doe
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2023-10-01"),
@@ -342,7 +342,7 @@ export const tickets = [
       "Laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
     type: "Feature",
     priority: "Low",
-    status: "Open",
+    status: "InProgress",
     userId: 4, // Asignado a Tandie
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2023-12-01"),
@@ -386,7 +386,7 @@ export const tickets = [
       "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
     type: "Bug",
     priority: "High",
-    status: "Open",
+    status: "InProgress",
     userId: 4, // Asignado a Tandie
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2024-02-05"),
@@ -408,7 +408,7 @@ export const tickets = [
       "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
     type: "Feature",
     priority: "Medium",
-    status: "Open",
+    status: "InProgress",
     userId: null, // No asignado
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2024-03-01"),
@@ -452,7 +452,7 @@ export const tickets = [
       "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.",
     type: "Bug",
     priority: "High",
-    status: "Open",
+    status: "InProgress",
     userId: 4, // Asignado a Tandie
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2024-05-01"),
@@ -474,7 +474,7 @@ export const tickets = [
       "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?",
     type: "Feature",
     priority: "Medium",
-    status: "Open",
+    status: "InProgress",
     userId: null, // No asignado
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2024-06-01"),
@@ -518,7 +518,7 @@ export const tickets = [
       "Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.",
     type: "Bug",
     priority: "High",
-    status: "Open",
+    status: "InProgress",
     userId: 4, // Asignado a Tandie
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2024-08-01"),
@@ -540,7 +540,7 @@ export const tickets = [
       "Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.",
     type: "Feature",
     priority: "Medium",
-    status: "Open",
+    status: "InProgress",
     userId: null, // No asignado
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2024-09-01"),
@@ -584,7 +584,7 @@ export const tickets = [
       "Similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.",
     type: "Bug",
     priority: "High",
-    status: "Open",
+    status: "InProgress",
     userId: 4, // Asignado a Tandie
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2024-11-01"),
@@ -606,7 +606,7 @@ export const tickets = [
       "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.",
     type: "Feature",
     priority: "Medium",
-    status: "Open",
+    status: "InProgress",
     userId: null, // No asignado
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2024-12-01"),
@@ -650,7 +650,7 @@ export const tickets = [
       "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.",
     type: "Bug",
     priority: "High",
-    status: "Open",
+    status: "InProgress",
     userId: 4, // Asignado a Tandie
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2025-02-01"),
@@ -672,7 +672,7 @@ export const tickets = [
       "Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.",
     type: "Feature",
     priority: "Medium",
-    status: "Open",
+    status: "InProgress",
     userId: null, // No asignado
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2025-03-01"),
@@ -716,7 +716,7 @@ export const tickets = [
       "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
     type: "Bug",
     priority: "High",
-    status: "Open",
+    status: "InProgress",
     userId: 4, // Asignado a Tandie
     clientId: 2, // Cliente John Doe
     createdAt: new Date("2025-05-01"),

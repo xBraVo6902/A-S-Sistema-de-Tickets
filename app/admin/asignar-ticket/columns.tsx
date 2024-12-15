@@ -27,9 +27,8 @@ export type Ticket = {
 export const columns: ColumnDef<Ticket>[] = [
   {
     accessorKey: "id",
-    header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="ID" />;
-    },
+    header: "ID",
+    filterFn: "exactMatch",
   },
   {
     accessorKey: "title",
