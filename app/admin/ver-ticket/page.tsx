@@ -8,16 +8,16 @@ import { Suspense } from "react";
 
 async function getTickets(): Promise<Ticket[]> {
   const res = await import("@/app/api/tickets/route");
-  const session: { user?: { id?: string ; role?: string} } | null = await getServerSession(
+  const session: { user?: { id?: string; role?: string} } | null = await getServerSession(
     authOptions
   );
-    // Verifica si el usuario es un administrador
-    if (session?.user?.role !== "Admin") {
-      throw new Error("Unauthorized: Only admins can view this page.");
-    }
-  
+
+  if (session?.user?.role !== "Admin") {
+    throw new Error("Unauthorized: Only admins can view this page.");
+  }
+
   const request = new Request(
-    `${process.env.NEXTAUTH_URL}/api/tickets`,
+    `${process.env.NEXTAUTH_URL}/api/dashboard-routes?route=summary`,
     {
       method: "GET",
     }
