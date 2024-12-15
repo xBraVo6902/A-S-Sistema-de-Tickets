@@ -18,13 +18,15 @@ export async function GET() {
       include: {
         client: {
           select: {
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
         user: {
           select: {
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
@@ -40,10 +42,10 @@ export async function GET() {
       type: translations.type[ticket.type],
       status: translations.status[ticket.status],
       priority: translations.priority[ticket.priority],
-      createdAt: new Date(ticket.createdAt).toLocaleString("es-ES"),
-      updatedAt: new Date(ticket.updatedAt).toLocaleString("es-ES"),
-      clientName: ticket.client.name,
-      assignedTo: ticket.user?.name || null,
+      createdAt: new Date(ticket.createdAt),
+      updatedAt: new Date(ticket.updatedAt),
+      clientName: ticket.client.firstName + ' ' + ticket.client.lastName,
+      assignedTo: ticket.user?.firstName + ' ' + ticket.user?.lastName || null,
     }));
 
     return new Response(JSON.stringify(formattedTickets), {

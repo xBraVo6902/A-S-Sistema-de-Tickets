@@ -61,7 +61,10 @@ export const columns: ColumnDef<Ticket>[] = [
   {
     accessorKey: "assignedTo",
     header: "Asignado a",
-    cell: ({ row }) => row.getValue("assignedTo") || "Sin asignar",
+    cell: ({ row }) => {
+      const assignedTo = row.getValue("assignedTo");
+      return assignedTo && assignedTo !== "undefined undefined" ? assignedTo : "Sin asignar";
+    },
   },
   {
     accessorKey: "createdAt",
