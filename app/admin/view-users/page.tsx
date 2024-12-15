@@ -12,14 +12,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 type User = {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  ticketCount: number; // Campo para el número de tickets asignados
+  ticketCount: number;
 };
 
 type Ticket = {
   id: string;
-  userId: string | null; // ID del usuario asignado
+  userId: string | null; 
 };
 
 const fetchUsers = async (): Promise<User[]> => {
@@ -106,12 +107,16 @@ export default function ViewUsersPage() {
 
   // Filtrar usuarios con React.useMemo
   const filteredUsers = React.useMemo(() => {
-    return users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(search.toLowerCase()) ||
-        user.email.toLowerCase().includes(search.toLowerCase()) ||
-        String(user.id).includes(search)
-    );
+    return users.filter((user) => {
+      const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+      const searchTerm = search.toLowerCase();
+      
+      return (
+        fullName.includes(searchTerm) ||
+        user.email.toLowerCase().includes(searchTerm) ||
+        String(user.id).includes(searchTerm)
+      );
+    });
   }, [users, search]);
 
   // Columnas de la tabla
@@ -122,9 +127,9 @@ export default function ViewUsersPage() {
       cell: ({ row }) => <div className="font-medium">{row.getValue("id")}</div>,
     },
     {
-      accessorKey: "name",
+      accessorKey: "firstName",
       header: "Nombre",
-      cell: ({ row }) => <div>{row.getValue("name")}</div>,
+      cell: ({ row }) => <div>{`${row.getValue("firstName")} ${row.original.lastName}`}</div>,
     },
     {
       accessorKey: "email",
@@ -134,7 +139,7 @@ export default function ViewUsersPage() {
     {
       accessorKey: "ticketCount",
       header: "Tickets Asignados",
-      cell: ({ row }) => <div>{row.getValue("ticketCount")}</div>, // Mostrar el número de tickets asignados
+      cell: ({ row }) => <div>{row.getValue("ticketCount")}</div>,
     },
     {
         id: "actions",
@@ -236,7 +241,8 @@ export default function ViewUsersPage() {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                       id: editingUser.id,
-                      name: editingUser.name,
+                      firstName: editingUser.firstName,
+                      lastName: editingUser.lastName,
                       email: editingUser.email,
                     }),
                   });
@@ -258,9 +264,22 @@ export default function ViewUsersPage() {
               </label>
               <input
                 type="text"
-                value={editingUser.name}
+                value={editingUser.firstName}
                 onChange={(e) =>
-                  setEditingUser({ ...editingUser, name: e.target.value })
+                  setEditingUser({ ...editingUser, firstName: e.target.value })
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Apellido
+              </label>
+              <input
+                type="text"
+                value={editingUser.lastName}
+                onChange={(e) =>
+                  setEditingUser({ ...editingUser, lastName: e.target.value })
                 }
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
               />
