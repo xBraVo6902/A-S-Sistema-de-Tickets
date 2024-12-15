@@ -102,8 +102,6 @@ export async function GET(request: Request) {
         priority: true,
         createdAt: true,
         updatedAt: true,
-        client: { select: { name: true, email: true } },
-        user: { select: { name: true, email: true } },
       },
     });
 
@@ -164,7 +162,7 @@ function buildWhereCondition(searchParams: URLSearchParams) {
   const assigned = searchParams.get("assigned");
   if (assigned === "true") {
     whereCondition.userId = { not: null };
-  } else if (assigned === "false" || !assigned) {
+  } else if (assigned === "false") {
     whereCondition.userId = null;
   }
 
