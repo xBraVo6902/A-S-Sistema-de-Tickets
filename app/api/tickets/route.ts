@@ -17,23 +17,41 @@ export async function POST(request: Request) {
     });
   }
 
-  if (session?.user.role !== "Client" && session?.user.role !== "Admin") {
-    return new Response(JSON.stringify({ message: "Forbidden" }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
   try {
     const body = await request.json();
+    const { searchParams } = new URL(request.url);
+    const clientRut = searchParams.get("clientRut");
+    const clientId = searchParams.get("clientId");
+
+    let finalClientId: number;
+
+    if (clientRut) {
+      // Si se proporciona RUT, buscar el cliente por RUT
+      const client = await prisma.person.findUnique({
+        where: { rut: clientRut }
+      });
+
+      if (!client) {
+        return new Response(
+          JSON.stringify({ message: "No se encontró el cliente con el RUT especificado" }),
+          { status: 404, headers: { "Content-Type": "application/json" } }
+        );
+      }
+      
+      finalClientId = client.id;
+    } else if (clientId) {
+      // Si se proporciona ID, usarlo directamente
+      finalClientId = parseInt(clientId);
+    } else {
+      // Si no se proporciona ninguno, usar el ID del usuario de la sesión
+      finalClientId = parseInt(session.user.id as string);
+    }
 
     const ticketSchema = z.object({
       title: z.string().min(1, "Title is required"),
       description: z.string().min(1, "Description is required"),
       type: z.enum(Object.keys(translations.type) as [string, ...string[]]),
-      priority: z.enum(
-        Object.keys(translations.priority) as [string, ...string[]]
-      ),
+      priority: z.enum(Object.keys(translations.priority) as [string, ...string[]]),
     });
 
     const parsedBody = ticketSchema.safeParse(body);
@@ -41,17 +59,11 @@ export async function POST(request: Request) {
     if (!parsedBody.success) {
       return new Response(JSON.stringify(parsedBody.error.errors), {
         status: 400,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
     }
 
     const { title, description, type, priority } = parsedBody.data;
-    const { searchParams } = new URL(request.url);
-    const clientId =
-      parseInt(searchParams.get("clientRut") as string) ||
-      parseInt(session.user.id as string);
 
     await prisma.ticket.create({
       data: {
@@ -59,7 +71,7 @@ export async function POST(request: Request) {
         description,
         type: capitalize(type) as Type,
         priority: capitalize(priority) as Priority,
-        client: { connect: { id: clientId } },
+        client: { connect: { id: finalClientId } },
       },
     });
 
