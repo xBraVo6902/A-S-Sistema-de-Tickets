@@ -12,7 +12,7 @@ export type Ticket = {
   status: Status;
   type: Type;
   priority: Priority;
-  user: { name: string } | null;
+  user: { firstName: string; lastName: string; image?: string | null } | null;
 };
 
 export const columns: ColumnDef<Ticket>[] = [
@@ -106,6 +106,7 @@ export const columns: ColumnDef<Ticket>[] = [
         <div className="flex items-center gap-2">
           <Avatar className="h-8 w-8">
             <AvatarImage
+              // TODO: Agregar avatares a la aplicación
               src={user.image ?? ""}
               alt={`${user.firstName} ${user.lastName}`}
             />
