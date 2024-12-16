@@ -42,7 +42,7 @@ export default function MainMenu() {
       title: "Asignar tickets",
       description: "Asigna tickets a los usuarios",
       icon: ClipboardDocumentCheckIcon,
-      href: "/admin/assign-ticket",
+      href: "/admin/asignar-ticket",
     },
     {
       title: "Usuarios",
