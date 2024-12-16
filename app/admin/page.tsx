@@ -36,7 +36,7 @@ export default function MainMenu() {
       title: "Ver tickets",
       description: "Obtén un resumen de los tickets creados",
       icon: RectangleStackIcon,
-      href: "",
+      href: "/admin/view-tickets",
     },
     {
       title: "Asignar tickets",
