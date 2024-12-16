@@ -17,6 +17,13 @@ export async function POST(request: Request) {
     });
   }
 
+  if (session?.user.role !== "Client" && session?.user.role !== "Admin") {
+    return new Response(JSON.stringify({ message: "Forbidden" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const body = await request.json();
     const { searchParams } = new URL(request.url);
