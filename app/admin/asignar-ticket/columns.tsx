@@ -15,6 +15,8 @@ import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { MoreHorizontal } from "lucide-react";
 
 import { Status, Type, Priority } from "@prisma/client";
+import { ticketMetadata } from "@/prisma/ticketMetadata";
+import * as Icons from "lucide-react";
 
 export type Ticket = {
   id: string;
@@ -42,40 +44,60 @@ export const columns: ColumnDef<Ticket>[] = [
   {
     accessorKey: "status",
     header: "Estado",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as Status & {
+        icon: string;
+        color: string;
+        text: string;
+      };
+      // @ts-expect-error - We know this is a valid icon name
+      const Icon = Icons[status.icon];
+
+      return (
+        <div className="flex items-center gap-2">
+          <Icon className="h-4 w-4" style={{ color: status.color }} />
+          <span>{status.text}</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "type",
     header: "Tipo",
+    cell: ({ row }) => {
+      const type = row.getValue("type") as Type & {
+        icon: string;
+        color: string;
+        text: string;
+      };
+      // @ts-expect-error - We know this is a valid icon name
+      const Icon = Icons[type.icon];
+
+      return (
+        <div className="flex items-center gap-2">
+          <Icon className="h-4 w-4" style={{ color: type.color }} />
+          <span>{type.text}</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "priority",
     header: "Prioridad",
-  },
-  {
-    id: "actions",
     cell: ({ row }) => {
-      const payment = row.original;
+      const priority = row.getValue("priority") as Priority & {
+        icon: string;
+        color: string;
+        text: string;
+      };
+      // @ts-expect-error - We know this is a valid icon name
+      const Icon = Icons[priority.icon];
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+          <Icon className="h-4 w-4" style={{ color: priority.color }} />
+          <span>{priority.text}</span>
+        </div>
       );
     },
   },

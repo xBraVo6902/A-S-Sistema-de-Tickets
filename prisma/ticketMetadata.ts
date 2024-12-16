@@ -3,51 +3,51 @@ export const ticketMetadata = {
     Open: {
       text: "Abierto",
       icon: "CircleDot",
-      color: "#3498db", // Azul
+      color: "#2471a3", // Azul más oscuro
     },
     Closed: {
       text: "Cerrado",
       icon: "CheckCircle2",
-      color: "#2ecc71", // Verde
+      color: "#27ae60", // Verde más oscuro
     },
     InProgress: {
       text: "En progreso",
       icon: "Timer",
-      color: "#f1c40f", // Amarillo
+      color: "#d4ac0d", // Amarillo más oscuro
     },
   },
   type: {
     Bug: {
       text: "Bug",
       icon: "Bug",
-      color: "#e74c3c", // Rojo
+      color: "#c0392b", // Rojo más oscuro
     },
     Feature: {
       text: "Característica",
       icon: "Lightbulb",
-      color: "#9b59b6", // Morado
+      color: "#8e44ad", // Morado más oscuro
     },
     Question: {
       text: "Pregunta",
       icon: "HelpCircle",
-      color: "#3498db", // Azul
+      color: "#2471a3", // Azul más oscuro
     },
   },
   priority: {
     Low: {
       text: "Baja",
       icon: "ArrowDown",
-      color: "#2ecc71", // Verde
+      color: "#27ae60", // Verde más oscuro
     },
     Medium: {
       text: "Media",
       icon: "ArrowRight",
-      color: "#f1c40f", // Amarillo
+      color: "#d4ac0d", // Amarillo más oscuro
     },
     High: {
       text: "Alta",
       icon: "ArrowUp",
-      color: "#e74c3c", // Rojo
+      color: "#c0392b", // Rojo más oscuro
     },
   },
 };

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 import prisma from "@/lib/db";
 import { Priority, Type, Status, Prisma } from "@prisma/client";
-import { translations } from "@/prisma/translations";
+import { ticketMetadata } from "@/prisma/ticketMetadata";
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -30,9 +30,9 @@ export async function POST(request: Request) {
     const ticketSchema = z.object({
       title: z.string().min(1, "Title is required"),
       description: z.string().min(1, "Description is required"),
-      type: z.enum(Object.keys(translations.type) as [string, ...string[]]),
+      type: z.enum(Object.keys(ticketMetadata.type) as [string, ...string[]]),
       priority: z.enum(
-        Object.keys(translations.priority) as [string, ...string[]]
+        Object.keys(ticketMetadata.priority) as [string, ...string[]]
       ),
     });
 
@@ -108,9 +108,18 @@ export async function GET(request: Request) {
     const translatedTickets = tickets.map((ticket) => {
       return {
         ...ticket,
-        priority: translations.priority[ticket.priority],
-        type: translations.type[ticket.type],
-        status: translations.status[ticket.status],
+        status: {
+          value: ticket.status,
+          ...ticketMetadata.status[ticket.status],
+        },
+        type: {
+          value: ticket.type,
+          ...ticketMetadata.type[ticket.type],
+        },
+        priority: {
+          value: ticket.priority,
+          ...ticketMetadata.priority[ticket.priority],
+        },
         createdAt: new Date(ticket.createdAt).toLocaleString("es-ES", {
           day: "2-digit",
           month: "2-digit",
