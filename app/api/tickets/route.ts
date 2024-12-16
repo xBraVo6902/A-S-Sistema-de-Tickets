@@ -102,6 +102,12 @@ export async function GET(request: Request) {
         priority: true,
         createdAt: true,
         updatedAt: true,
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
       },
     });
 

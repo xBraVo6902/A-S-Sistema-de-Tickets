@@ -1,21 +1,8 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
-import { MoreHorizontal } from "lucide-react";
-
 import { Status, Type, Priority } from "@prisma/client";
-import { ticketMetadata } from "@/prisma/ticketMetadata";
 import * as Icons from "lucide-react";
 
 export type Ticket = {
@@ -24,6 +11,7 @@ export type Ticket = {
   status: Status;
   type: Type;
   priority: Priority;
+  user: { name: string } | null;
 };
 
 export const columns: ColumnDef<Ticket>[] = [
@@ -99,6 +87,14 @@ export const columns: ColumnDef<Ticket>[] = [
           <span>{priority.text}</span>
         </div>
       );
+    },
+  },
+  {
+    accessorKey: "user",
+    header: "Encargado",
+    cell: ({ row }) => {
+      const user = row.getValue("user") as { name: string } | null;
+      return <span>{user?.name ?? "Sin asignar"}</span>;
     },
   },
 ];
