@@ -22,7 +22,7 @@ export default function MainMenu() {
       title: "Ver tickets",
       description: "Ve los tickets de soporte que tienes asignados",
       icon: RectangleStackIcon,
-      href: "user/dashboard",
+      href: "user/mis-tickets",
     },
     {
       title: "Preferencias de la cuenta",

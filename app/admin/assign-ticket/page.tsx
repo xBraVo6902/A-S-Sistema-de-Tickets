@@ -225,7 +225,7 @@ export default function Page() {
 
         const handleValueChange = async (value: string) => {
           const selectedUserName =
-          users.find((user) => user.id === value)?.name || "Sin asignar";
+          users.find((user) => user.id === value)?.firstName|| "Sin asignar";
     
         const confirmation = window.confirm(
           `¿Estás seguro de que quieres asignar el ticket "${row.original.title}" a ${selectedUserName}?`
