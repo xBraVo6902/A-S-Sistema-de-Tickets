@@ -20,6 +20,7 @@ export async function GET() {
         firstName: true,
         lastName: true,
         email: true,
+        phone: true,
       },
     });
 
@@ -48,9 +49,9 @@ export async function PUT(req: Request) {
 
   try {
     const body = await req.json();
-    const { id, firstName, lastName, email } = body;
+    const { id, firstName, lastName, email, phone } = body;
 
-    if (!id || !firstName || !lastName || !email) {
+    if (!id || !firstName || !lastName || !email || !phone) {
       return new Response(JSON.stringify({ message: "Datos incompletos" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
@@ -63,6 +64,7 @@ export async function PUT(req: Request) {
         firstName,
         lastName,
         email,
+        phone,
       },
     });
 

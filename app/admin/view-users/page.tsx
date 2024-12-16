@@ -15,6 +15,7 @@ type User = {
   firstName: string;
   lastName: string;
   email: string;
+  phone: string;
   ticketCount: number;
 };
 
@@ -38,9 +39,6 @@ const fetchAssignedTickets = async (): Promise<Ticket[]> => {
   }
   return response.json();
 };
-
-
-  
 
 export default function ViewUsersPage() {
   const [users, setUsers] = React.useState<User[]>([]);
@@ -72,8 +70,6 @@ export default function ViewUsersPage() {
       }
     }
   };
-  
-  
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -135,6 +131,11 @@ export default function ViewUsersPage() {
       accessorKey: "email",
       header: "Email",
       cell: ({ row }) => <div>{row.getValue("email")}</div>,
+    },
+    {
+      accessorKey: "phone",
+      header: "Teléfono",
+      cell: ({ row }) => <div>{`${"+"}${row.getValue("phone")}`}</div>,
     },
     {
       accessorKey: "ticketCount",
@@ -244,6 +245,7 @@ export default function ViewUsersPage() {
                       firstName: editingUser.firstName,
                       lastName: editingUser.lastName,
                       email: editingUser.email,
+                      phone: editingUser.phone, // Asegúrate de incluir el campo phone aquí
                     }),
                   });
               
@@ -293,6 +295,19 @@ export default function ViewUsersPage() {
                 value={editingUser.email}
                 onChange={(e) =>
                   setEditingUser({ ...editingUser, email: e.target.value })
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Teléfono
+              </label>
+              <input
+                type="text"
+                value={editingUser.phone}
+                onChange={(e) =>
+                  setEditingUser({ ...editingUser, phone: e.target.value })
                 }
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
               />
