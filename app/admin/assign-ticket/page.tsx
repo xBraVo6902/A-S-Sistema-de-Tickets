@@ -1,5 +1,4 @@
 "use client";
-
 import * as React from "react";
 import {
   ColumnDef,
@@ -218,6 +217,7 @@ export default function Page() {
       },
       cell: ({ row }) => <div>{row.getValue("createdAt")}</div>,
     },
+
     {      accessorKey: "assignedTo",
       header: "Asignado a",
       cell: ({ row }) => {
@@ -225,7 +225,7 @@ export default function Page() {
 
         const handleValueChange = async (value: string) => {
           const selectedUserName =
-          users.find((user) => user.id === value)?.name || "Sin asignar";
+          users.find((user) => user.id === value)?.firstName || "Sin asignar";
     
         const confirmation = window.confirm(
           `¿Estás seguro de que quieres asignar el ticket "${row.original.title}" a ${selectedUserName}?`
@@ -241,7 +241,7 @@ export default function Page() {
                 ticket.id === row.original.id
                   ? { ...ticket, assignedTo: value }
                   : ticket
-              )
+              ).filter(ticket =>!ticket.assignedTo) // asignados
             );
           } catch (error) {
             console.error("Error updating ticket assignment:", error);
@@ -322,7 +322,7 @@ export default function Page() {
     <div className="container mx-auto my-10 md:px-10">
       {loading ? (
         <LoadingTable />
-      ) : (
+      ) : (    
         <div>
           <h1 className="text-center md:text-left text-2xl font-semibold mb-5">
             Asignación de tickets
