@@ -1,3 +1,4 @@
+import { Priority, Status, Type } from "@prisma/client";
 import TicketMessageButton from "./ticket-message-button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
@@ -11,9 +12,9 @@ export type TicketInfoProps = {
     description: string;
     createdAt: string;
     updatedAt: string;
-    status: string;
-    type: string;
-    priority: string;
+    status: Status & { text: string; icon: string; color: string };
+    type: Type & { text: string; icon: string; color: string };
+    priority: Priority & { text: string; icon: string; color: string };
     user: {
       firstName: string;
       lastName: string;
@@ -53,9 +54,24 @@ export default function TicketInfo(props: TicketInfoProps) {
               {props.data.title}
             </CardTitle>
             <div className="flex space-x-2 mb-2">
-              <Badge variant="outline">{props.data.status}</Badge>
-              <Badge variant="outline">{props.data.type}</Badge>
-              <Badge variant="outline">Prioridad {props.data.priority}</Badge>
+              <Badge
+                style={{ backgroundColor: props.data.status.color }}
+                className="text-white"
+              >
+                {props.data.status.text}
+              </Badge>
+              <Badge
+                style={{ backgroundColor: props.data.type.color }}
+                className="text-white"
+              >
+                {props.data.type.text}
+              </Badge>
+              <Badge
+                style={{ backgroundColor: props.data.priority.color }}
+                className="text-white"
+              >
+                Prioridad {props.data.priority.text}
+              </Badge>
             </div>
           </div>
           <div className="text-right">

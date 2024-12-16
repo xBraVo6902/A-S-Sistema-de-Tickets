@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Status, Type, Priority } from "@prisma/client";
 import * as Icons from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export type Ticket = {
   id: string;
@@ -93,8 +94,29 @@ export const columns: ColumnDef<Ticket>[] = [
     accessorKey: "user",
     header: "Encargado",
     cell: ({ row }) => {
-      const user = row.getValue("user") as { name: string } | null;
-      return <span>{user?.name ?? "Sin asignar"}</span>;
+      const user = row.getValue("user") as {
+        firstName: string;
+        lastName: string;
+      } | null;
+
+      if (!user)
+        return <span className="text-muted-foreground">Sin asignar</span>;
+
+      return (
+        <div className="flex items-center gap-2">
+          <Avatar className="h-8 w-8">
+            <AvatarImage
+              src={user.image ?? ""}
+              alt={`${user.firstName} ${user.lastName}`}
+            />
+            <AvatarFallback>
+              {user.firstName.charAt(0)}
+              {user.lastName.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <span>{user.firstName}</span>
+        </div>
+      );
     },
   },
 ];

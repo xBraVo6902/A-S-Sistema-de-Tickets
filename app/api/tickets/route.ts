@@ -143,6 +143,8 @@ export async function GET(request: Request) {
       };
     });
 
+    console.log(translatedTickets);
+
     return new Response(JSON.stringify(translatedTickets), {
       status: 200,
       headers: { "Content-Type": "application/json" },
