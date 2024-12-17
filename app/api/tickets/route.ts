@@ -104,11 +104,18 @@ export async function GET(request: Request) {
       headers: { "Content-Type": "application/json" },
     });
   }
+  
 
   try {
     const { searchParams } = new URL(request.url);
     const whereCondition: Prisma.TicketWhereInput =
       buildWhereCondition(searchParams);
+
+       // Si se especifica unassigned=true, solo devolver tickets sin asignar
+    const unassigned = searchParams.get("unassigned");
+    if (unassigned === "true") {
+      whereCondition.userId = null;
+    }
 
     const tickets = await prisma.ticket.findMany({
       where: whereCondition,

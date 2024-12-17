@@ -186,7 +186,7 @@ async function getTechnicianPerformance() {
         },
       });
       return {
-        name: user?.name || 'Unknown',
+        name: user?.firstName +" "+ user?.lastName[0] || 'Unknown',
         completed: completedTickets,
         pending: pendingTickets,
       };
@@ -232,7 +232,7 @@ async function getCompanySummary() {
         },
       });
       return {
-        name: client?.name || 'Unknown',
+        name: client?.firstName +" "+ client?.lastName[0] || 'Unknown',
         completed: completedTickets,
         pending: pendingTickets,
       };
