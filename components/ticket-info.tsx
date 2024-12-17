@@ -75,12 +75,10 @@ export default function TicketInfo(props: TicketInfoProps) {
     id: props.data.id,
   };
 
-  const frameworks = props.users?.map((user) => ({
-    value: `${user.firstName.toLowerCase()} ${user.lastName.toLowerCase()}`,
+  const users = props.users?.map((user) => ({
+    value: `${user.id}`,
     label: `${user.firstName} ${user.lastName}`,
   }));
-
-  console.log(frameworks);
 
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
@@ -230,23 +228,20 @@ export default function TicketInfo(props: TicketInfoProps) {
                         className="w-[200px] justify-between"
                       >
                         {value
-                          ? frameworks?.find(
-                              (framework) => framework.value === value
-                            )?.label
+                          ? users?.find((user) => user.value === value)?.label
                           : "Asignar usuario..."}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[200px] p-0">
                       <Command>
-                        <CommandInput placeholder="Buscar usuario..." />
                         <CommandList>
                           <CommandEmpty>Sin resultados</CommandEmpty>
                           <CommandGroup>
-                            {frameworks?.map((framework) => (
+                            {users?.map((user) => (
                               <CommandItem
-                                key={framework.value}
-                                value={framework.value}
+                                key={user.value}
+                                value={user.value}
                                 onSelect={(currentValue) => {
                                   setValue(
                                     currentValue === value ? "" : currentValue
@@ -257,12 +252,12 @@ export default function TicketInfo(props: TicketInfoProps) {
                                 <Check
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    value === framework.value
+                                    value === user.value
                                       ? "opacity-100"
                                       : "opacity-0"
                                   )}
                                 />
-                                {framework.label}
+                                {user.label}
                               </CommandItem>
                             ))}
                           </CommandGroup>
