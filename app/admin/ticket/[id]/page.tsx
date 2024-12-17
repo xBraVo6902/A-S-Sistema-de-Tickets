@@ -1,8 +1,6 @@
+import { BackButton } from "@/components/back-button";
 import TicketInfo from "@/components/ticket-info";
 import { TicketInfoProps } from "@/components/ticket-info";
-import { Button } from "@/components/ui/button";
-import { ArrowLeftIcon } from "lucide-react";
-import Link from "next/link";
 
 async function getTicket(params: {
   params: { id: string };
@@ -56,12 +54,7 @@ export default async function TicketView({
 
   return (
     <div className="container mx-auto py-10 md:px-10 space-y-6">
-      <Link href="/admin/asignar-ticket">
-        <Button variant="outline" className="hover:bg-secondary">
-          <ArrowLeftIcon className="w-4 h-4 mr-2" />
-          Volver a la lista
-        </Button>
-      </Link>
+      <BackButton href="/admin/asignar-ticket" text="Volver a la lista" />
       <TicketInfo data={ticketData} role="Admin" users={users} />
     </div>
   );

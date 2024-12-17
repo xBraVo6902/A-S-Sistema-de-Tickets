@@ -153,37 +153,6 @@ export default function TicketInfo(props: TicketInfoProps) {
             <Separator />
             <div className="flex justify-between">
               <div>
-                <h3 className="text-lg font-semibold mb-2">Creado por</h3>
-                <div className="flex items-center space-x-2">
-                  <Avatar>
-                    <AvatarImage
-                      src={props.data.client.avatar ?? ""}
-                      alt={
-                        props.data.client.firstName +
-                        " " +
-                        props.data.client.lastName
-                      }
-                    />
-                    <AvatarFallback>
-                      {props.data.client.firstName
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium">
-                      {props.data.client.firstName +
-                        " " +
-                        props.data.client.lastName}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {props.data.client.email}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div>
                 <h3 className="text-lg font-semibold mb-2">Asignado a</h3>
                 {props.data.user ? (
                   <div className="flex items-center space-x-2">
@@ -217,6 +186,37 @@ export default function TicketInfo(props: TicketInfoProps) {
                 ) : (
                   <p className="text-sm text-muted-foreground">Sin asignar</p>
                 )}
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Creado por</h3>
+                <div className="flex items-center space-x-2">
+                  <Avatar>
+                    <AvatarImage
+                      src={props.data.client.avatar ?? ""}
+                      alt={
+                        props.data.client.firstName +
+                        " " +
+                        props.data.client.lastName
+                      }
+                    />
+                    <AvatarFallback>
+                      {props.data.client.firstName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">
+                      {props.data.client.firstName +
+                        " " +
+                        props.data.client.lastName}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {props.data.client.email}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
             {props.data.user && props.role !== "Admin" && (
