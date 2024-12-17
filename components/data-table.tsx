@@ -25,21 +25,17 @@ import {
 } from "@/components/ui/table";
 import { Button } from "./ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  role: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  role,
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -115,7 +111,7 @@ export function DataTable<TData, TValue>({
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => {
                     const id = row.getValue("id");
-                    router.push(`/admin/ticket/${id}`);
+                    router.push(`/${role}/ticket/${id}`);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (

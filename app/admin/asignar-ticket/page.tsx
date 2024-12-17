@@ -14,12 +14,12 @@ async function getTickets(): Promise<Ticket[]> {
   return await (await res.GET(request)).json();
 }
 
-export default async function DemoPage() {
+export default async function Page() {
   const data = await getTickets();
 
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} role="admin" />
     </div>
   );
 }
