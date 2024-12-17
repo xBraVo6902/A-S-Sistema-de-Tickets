@@ -61,7 +61,7 @@ type User = {
 };
 
 const fetchTickets = async (): Promise<Ticket[]> => {
-  const response = await fetch("/api/tickets");
+  const response = await fetch("/api/tickets?unassigned=true");
   if (!response.ok) {
     throw new Error("Failed to fetch tickets");
   }
