@@ -33,6 +33,7 @@ interface CreateTicketFormProps {
 
 export default function CreateTicketForm(props: CreateTicketFormProps) {
   const router = useRouter();
+  const [rut, setRut] = React.useState("");
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,18 +63,53 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
     router.push("/");
   };
 
+  const formatRut = (value: string) => {
+    let rutClean = value.replace(/[^0-9kK]/g, "");
+
+    rutClean = rutClean.replace(/k/g, "K");
+
+    if (rutClean.length === 0) return "";
+
+    const dv = rutClean.slice(-1);
+    let rutBody = rutClean.slice(0, -1);
+
+    rutBody = rutBody.replace(/\B(?=(\d{3})+(?!\d))/g, ".").replace(/^\./, "");
+
+    return rutBody ? `${rutBody}-${dv}` : dv;
+  };
+
+  const handleRutChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    const formatted = formatRut(value);
+    setRut(formatted);
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="text-xl">Crear ticket de soporte</CardTitle>
           <CardDescription>
-            Por favor, proporciona los detalles de tu problema para que podamos
-            ayudarte mejor.
+            {props.role === "Admin"
+              ? "Por favor, proporciona los detalles del problema del cliente."
+              : "Por favor, proporciona los detalles de tu problema para que podamos ayudarte mejor."}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid w-full items-center gap-4">
+            {props.role === "Admin" && (
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="title">Título</Label>
+                <Input
+                  id="rut"
+                  name="rut"
+                  placeholder="RUT del cliente"
+                  onChange={handleRutChange}
+                  value={rut}
+                  maxLength={12}
+                />
+              </div>
+            )}
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="title">Título</Label>
               <Input
