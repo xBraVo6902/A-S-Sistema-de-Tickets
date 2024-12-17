@@ -29,7 +29,7 @@ export default function MainMenu() {
       title: "Crear tickets",
       description: "Crea tickets de soporte para tus clientes",
       icon: TicketIcon,
-      href: "/admin/create-ticket",
+      href: "/admin/crear-ticket",
     },
     {
       title: "Ver tickets",

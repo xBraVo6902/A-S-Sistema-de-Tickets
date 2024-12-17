@@ -1,10 +1,6 @@
 # TODO
 
-Los puntos marcados con `!` son urgentes (próximo sprint), mientras que los marcados con `?` son opcionales (aunque deberían implementarse).
-
-- `!` En la vista de ticket por parte del usuario, aún no se puede cambiar el estado del ticket.
-- `!` No se por qué las rutas están en inglés pero deberían estar en español.
-- `?` ~Cuando carga alguna página que requiere de datos antes de mostrar la interfaz, simplemente aparece un mensaje diciendo Loading.... Debería cambiarse a un spinner o un esqueleto (ojalá).~ (Está implementado sólo en algunas partes)
+- El nombre del usuario en el mensaje de bienvenida no carga inmediatamente.
 
 # Configuración
 
