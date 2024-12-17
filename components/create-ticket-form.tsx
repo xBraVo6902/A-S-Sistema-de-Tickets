@@ -125,7 +125,7 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
           <div className="grid w-full items-center gap-4">
             {props.role === "Admin" && (
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="title">Título</Label>
+                <Label htmlFor="title">RUT del cliente</Label>
                 <Input
                   id="rut"
                   {...register("rut", {
@@ -135,7 +135,7 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
                         validateRut(value) || "RUT inválido",
                     },
                   })}
-                  placeholder="RUT del cliente"
+                  placeholder="Escribe el RUT del cliente"
                   onChange={(e) => {
                     const formattedRut = formatRut(e.target.value);
                     setValue("rut", formattedRut, { shouldValidate: true });
@@ -170,9 +170,12 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
                 name="type"
                 control={control}
                 rules={{ required: "Debes seleccionar un tipo de problema" }}
-                render={({ field }) => (
-                  <Select name="type">
-                    <SelectTrigger id="type">
+                render={({ field: { onChange, value } }) => (
+                  <Select value={value} onValueChange={onChange}>
+                    <SelectTrigger
+                      id="type"
+                      className={errors.type ? "border-red-500" : ""}
+                    >
                       <SelectValue placeholder="Selecciona el tipo de problema" />
                     </SelectTrigger>
                     <SelectContent position="popper">
@@ -210,9 +213,12 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
                 name="priority"
                 control={control}
                 rules={{ required: "Debes seleccionar una prioridad" }}
-                render={({ field }) => (
-                  <Select name="priority">
-                    <SelectTrigger id="priority">
+                render={({ field: { onChange, value } }) => (
+                  <Select value={value} onValueChange={onChange}>
+                    <SelectTrigger
+                      id="priority"
+                      className={errors.priority ? "border-red-500" : ""}
+                    >
                       <SelectValue placeholder="Selecciona la prioridad" />
                     </SelectTrigger>
                     <SelectContent position="popper">
