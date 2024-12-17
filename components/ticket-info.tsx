@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
+import * as Icons from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
@@ -25,7 +25,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
-import { assignUserToTicket } from "@/lib/actions";
+import { assignUserToTicket, updateTicketStatus } from "@/lib/actions";
+import { ticketMetadata } from "@/prisma/ticketMetadata";
 
 export type TicketInfoProps = {
   data: {
@@ -53,15 +54,13 @@ export type TicketInfoProps = {
     };
   };
   role: "User" | "Client" | "Admin";
-  users:
-    | {
-        id: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-        avatar: string | null;
-      }[]
-    | null;
+  users?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    avatar: string | null;
+  }[];
 };
 
 export default function TicketInfo(props: TicketInfoProps) {
@@ -81,22 +80,54 @@ export default function TicketInfo(props: TicketInfoProps) {
     label: `${user.firstName} ${user.lastName}`,
   }));
 
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
+  const statuses = Object.entries(ticketMetadata.status).map(
+    ([key, value]) => ({
+      value: key,
+      label: value.text,
+      icon: value.icon,
+      color: value.color,
+    })
+  );
+
+  const [assignOpen, setAssignOpen] = React.useState(false);
+  const [assignValue, setAssignValue] = React.useState("");
+
+  const [statusOpen, setStatusOpen] = React.useState(false);
+  const [statusValue, setStatusValue] = React.useState("");
 
   const handleAssignUser = async (currentValue: string) => {
-    setValue(currentValue === value ? "" : currentValue);
-    setOpen(false);
+    setAssignValue(currentValue === assignValue ? "" : currentValue);
+    setAssignOpen(false);
 
     if (currentValue) {
       try {
         const result = await assignUserToTicket(props.data.id, currentValue);
         if (!result.success) {
-          setValue(value);
+          setAssignValue(assignValue);
         }
       } catch (error) {
         console.error("Error assigning user:", error);
-        setValue(value);
+        setAssignValue(assignValue);
+      }
+    }
+  };
+
+  const handleStatusChange = async (currentValue: string) => {
+    setStatusValue(currentValue === statusValue ? "" : currentValue);
+    setStatusOpen(false);
+
+    if (currentValue) {
+      try {
+        const result = await updateTicketStatus(
+          props.data.id,
+          currentValue as Status
+        );
+        if (!result.success) {
+          setStatusValue(statusValue);
+        }
+      } catch (error) {
+        console.error("Error updating status:", error);
+        setStatusValue(statusValue);
       }
     }
   };
@@ -233,21 +264,21 @@ export default function TicketInfo(props: TicketInfoProps) {
                 </div>
               </>
             )}
-            {props.role === "Admin" && (
+            {(props.role === "Admin" || props.role === "User") && (
               <>
                 <Separator />
-                <div className="flex justify-end">
-                  <Popover open={open} onOpenChange={setOpen}>
+                <div className="flex justify-start space-x-2">
+                  <Popover open={statusOpen} onOpenChange={setStatusOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         role="combobox"
-                        aria-expanded={open}
+                        aria-expanded={statusOpen}
                         className="w-[200px] justify-between"
                       >
-                        {value
-                          ? users?.find((user) => user.value === value)?.label
-                          : "Asignar usuario..."}
+                        <div className="flex items-center">
+                          Actualizar estado...
+                        </div>
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
@@ -256,21 +287,28 @@ export default function TicketInfo(props: TicketInfoProps) {
                         <CommandList>
                           <CommandEmpty>Sin resultados</CommandEmpty>
                           <CommandGroup>
-                            {users?.map((user) => (
+                            {statuses.map((status) => (
                               <CommandItem
-                                key={user.value}
-                                value={user.value}
-                                onSelect={handleAssignUser}
+                                key={status.value}
+                                value={status.value}
+                                onSelect={handleStatusChange}
                               >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    value === user.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {user.label}
+                                <div className="flex items-center">
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      statusValue === status.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {/* @ts-expect-error - We know this is a valid icon name */}
+                                  {React.createElement(Icons[status.icon], {
+                                    className: "h-4 w-4 mr-2",
+                                    style: { color: status.color },
+                                  })}
+                                  {status.label}
+                                </div>
                               </CommandItem>
                             ))}
                           </CommandGroup>
@@ -278,6 +316,50 @@ export default function TicketInfo(props: TicketInfoProps) {
                       </Command>
                     </PopoverContent>
                   </Popover>
+                  {props.role === "Admin" && (
+                    <Popover open={assignOpen} onOpenChange={setAssignOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={assignOpen}
+                          className="w-[200px] justify-between"
+                        >
+                          {assignValue
+                            ? users?.find((user) => user.value === assignValue)
+                                ?.label
+                            : "Asignar usuario..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0">
+                        <Command>
+                          <CommandList>
+                            <CommandEmpty>Sin resultados</CommandEmpty>
+                            <CommandGroup>
+                              {users?.map((user) => (
+                                <CommandItem
+                                  key={user.value}
+                                  value={user.value}
+                                  onSelect={handleAssignUser}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      assignValue === user.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {user.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  )}
                 </div>
               </>
             )}
