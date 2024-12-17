@@ -1,8 +1,9 @@
 import { authOptions } from "@/auth";
 import prisma from "@/lib/db";
+import { Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -13,8 +14,12 @@ export async function GET() {
   }
 
   try {
+    const { searchParams } = new URL(request.url);
+    const whereCondition: Prisma.PersonWhereInput =
+      buildWhereCondition(searchParams);
+
     const users = await prisma.person.findMany({
-      where: { role: "User" },
+      where: whereCondition,
       select: {
         id: true,
         firstName: true,
@@ -77,6 +82,17 @@ export async function PUT(req: Request) {
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
+}
+
+function buildWhereCondition(searchParams: URLSearchParams) {
+  const whereCondition: Prisma.PersonWhereInput = { role: "User" };
+
+  const firstName = searchParams.get("firstName");
+  if (firstName) {
+    whereCondition.firstName = { contains: firstName };
+  }
+
+  return whereCondition;
 }
 
 export async function DELETE(req: Request) {

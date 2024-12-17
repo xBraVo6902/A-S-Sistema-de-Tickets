@@ -52,30 +52,16 @@ export type TicketInfoProps = {
     };
   };
   role: "User" | "Client" | "Admin";
+  users:
+    | {
+        id: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        avatar: string | null;
+      }[]
+    | null;
 };
-
-const frameworks = [
-  {
-    value: "next.js",
-    label: "Next.js",
-  },
-  {
-    value: "sveltekit",
-    label: "SvelteKit",
-  },
-  {
-    value: "nuxt.js",
-    label: "Nuxt.js",
-  },
-  {
-    value: "remix",
-    label: "Remix",
-  },
-  {
-    value: "astro",
-    label: "Astro",
-  },
-];
 
 export default function TicketInfo(props: TicketInfoProps) {
   const whatsappData = {
@@ -88,6 +74,13 @@ export default function TicketInfo(props: TicketInfoProps) {
     title: props.data.title,
     id: props.data.id,
   };
+
+  const frameworks = props.users?.map((user) => ({
+    value: `${user.id}`,
+    label: `${user.firstName} ${user.lastName}`,
+  }));
+
+  console.log(frameworks);
 
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
