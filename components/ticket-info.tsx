@@ -25,6 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
+import { assignUserToTicket } from "@/lib/actions";
 
 export type TicketInfoProps = {
   data: {
@@ -82,6 +83,23 @@ export default function TicketInfo(props: TicketInfoProps) {
 
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
+
+  const handleAssignUser = async (currentValue: string) => {
+    setValue(currentValue === value ? "" : currentValue);
+    setOpen(false);
+
+    if (currentValue) {
+      try {
+        const result = await assignUserToTicket(props.data.id, currentValue);
+        if (!result.success) {
+          setValue(value);
+        }
+      } catch (error) {
+        console.error("Error assigning user:", error);
+        setValue(value);
+      }
+    }
+  };
 
   return (
     <>
@@ -242,12 +260,7 @@ export default function TicketInfo(props: TicketInfoProps) {
                               <CommandItem
                                 key={user.value}
                                 value={user.value}
-                                onSelect={(currentValue) => {
-                                  setValue(
-                                    currentValue === value ? "" : currentValue
-                                  );
-                                  setOpen(false);
-                                }}
+                                onSelect={handleAssignUser}
                               >
                                 <Check
                                   className={cn(
