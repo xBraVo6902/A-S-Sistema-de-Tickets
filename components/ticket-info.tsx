@@ -26,29 +26,6 @@ import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
 
-const frameworks = [
-  {
-    value: "next.js",
-    label: "Next.js",
-  },
-  {
-    value: "sveltekit",
-    label: "SvelteKit",
-  },
-  {
-    value: "nuxt.js",
-    label: "Nuxt.js",
-  },
-  {
-    value: "remix",
-    label: "Remix",
-  },
-  {
-    value: "astro",
-    label: "Astro",
-  },
-];
-
 export type TicketInfoProps = {
   data: {
     id: string;
@@ -76,6 +53,29 @@ export type TicketInfoProps = {
   };
   role: "User" | "Client" | "Admin";
 };
+
+const frameworks = [
+  {
+    value: "next.js",
+    label: "Next.js",
+  },
+  {
+    value: "sveltekit",
+    label: "SvelteKit",
+  },
+  {
+    value: "nuxt.js",
+    label: "Nuxt.js",
+  },
+  {
+    value: "remix",
+    label: "Remix",
+  },
+  {
+    value: "astro",
+    label: "Astro",
+  },
+];
 
 export default function TicketInfo(props: TicketInfoProps) {
   const whatsappData = {
@@ -224,52 +224,65 @@ export default function TicketInfo(props: TicketInfoProps) {
                 </div>
               </>
             )}
+            {props.role === "Admin" && (
+              <>
+                <Separator />
+                <div className="flex justify-end">
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={open}
+                        className="w-[200px] justify-between"
+                      >
+                        {value
+                          ? frameworks.find(
+                              (framework) => framework.value === value
+                            )?.label
+                          : "Asignar usuario..."}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput placeholder="Buscar usuario..." />
+                        <CommandList>
+                          <CommandEmpty>Sin resultados</CommandEmpty>
+                          <CommandGroup>
+                            {frameworks.map((framework) => (
+                              <CommandItem
+                                key={framework.value}
+                                value={framework.value}
+                                onSelect={(currentValue) => {
+                                  setValue(
+                                    currentValue === value ? "" : currentValue
+                                  );
+                                  setOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    value === framework.value
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                                {framework.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-[200px] justify-between"
-          >
-            {value
-              ? frameworks.find((framework) => framework.value === value)?.label
-              : "Asignar usuario..."}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
-          <Command>
-            <CommandInput placeholder="Buscar usuario..." />
-            <CommandList>
-              <CommandEmpty>No framework found.</CommandEmpty>
-              <CommandGroup>
-                {frameworks.map((framework) => (
-                  <CommandItem
-                    key={framework.value}
-                    value={framework.value}
-                    onSelect={(currentValue) => {
-                      setValue(currentValue === value ? "" : currentValue);
-                      setOpen(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === framework.value ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {framework.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
     </>
   );
 }
