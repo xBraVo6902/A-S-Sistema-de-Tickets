@@ -76,7 +76,7 @@ export default function TicketInfo(props: TicketInfoProps) {
   };
 
   const frameworks = props.users?.map((user) => ({
-    value: `${user.id}`,
+    value: `${user.firstName.toLowerCase()} ${user.lastName.toLowerCase()}`,
     label: `${user.firstName} ${user.lastName}`,
   }));
 
@@ -230,7 +230,7 @@ export default function TicketInfo(props: TicketInfoProps) {
                         className="w-[200px] justify-between"
                       >
                         {value
-                          ? frameworks.find(
+                          ? frameworks?.find(
                               (framework) => framework.value === value
                             )?.label
                           : "Asignar usuario..."}
@@ -243,7 +243,7 @@ export default function TicketInfo(props: TicketInfoProps) {
                         <CommandList>
                           <CommandEmpty>Sin resultados</CommandEmpty>
                           <CommandGroup>
-                            {frameworks.map((framework) => (
+                            {frameworks?.map((framework) => (
                               <CommandItem
                                 key={framework.value}
                                 value={framework.value}
