@@ -30,7 +30,7 @@ export type TicketInfoProps = {
       phone: string;
     };
   };
-  role: "User" | "Client";
+  role: "User" | "Client" | "Admin";
 };
 
 export default function TicketInfo(props: TicketInfoProps) {
@@ -160,7 +160,7 @@ export default function TicketInfo(props: TicketInfoProps) {
               )}
             </div>
           </div>
-          {props.data.user && (
+          {props.data.user && props.role !== "Admin" && (
             <>
               <Separator />
               <div>

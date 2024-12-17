@@ -23,7 +23,6 @@ import { useSession } from "next-auth/react";
 export default function MainMenu() {
   const router = useRouter();
   const { data: session } = useSession();
-  console.log(session);
 
   const menuItems = [
     {

@@ -29,7 +29,7 @@ export default async function TicketView({
 
   return (
     <div className="container mx-auto py-10 md:px-10 space-y-6">
-      <TicketInfo data={ticketData} role="Client" />
+      <TicketInfo data={ticketData} role="Admin" />
     </div>
   );
 }
