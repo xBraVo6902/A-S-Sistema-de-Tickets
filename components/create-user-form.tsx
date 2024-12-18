@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,19 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import * as LucideIcons from "lucide-react";
-import { LucideIcon } from "lucide-react";
-
-import { ticketMetadata } from "@/prisma/ticketMetadata";
 import { searchClientByRut } from "@/lib/actions";
 
 interface CreateTicketFormProps {
@@ -39,10 +27,13 @@ type FormInputs = {
   lastName: string;
   email: string;
   phone: string;
+  companyRut?: string;
+  userType: "User" | "Client";
 };
 
 export default function CreateUserForm(props: CreateTicketFormProps) {
   const router = useRouter();
+  const [userType, setUserType] = React.useState<"User" | "Client">("User");
   const {
     register,
     handleSubmit,
@@ -93,6 +84,11 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
   const onSubmit = async (data: FormInputs) => {
     let response;
 
+    const submitData = {
+      ...data,
+      role: userType,
+    };
+
     if (props.role === "Admin") {
       const client = await searchClientByRut(data.rut);
       if (!client) {
@@ -108,7 +104,7 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(submitData),
       });
     } else {
       response = await fetch("/api/tickets", {
@@ -116,7 +112,7 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(submitData),
       });
     }
 
@@ -135,15 +131,64 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
         <CardHeader>
           <CardTitle className="text-xl">Registrar nuevo usuario</CardTitle>
           <CardDescription>
-            Completa el siguiente formulario para registrar un nuevo usuario o
-            cliente.
+            Selecciona el tipo de usuario y completa el formulario.
           </CardDescription>
+          <div className="flex gap-4 mt-4">
+            <Button
+              type="button"
+              variant={userType === "User" ? "default" : "outline"}
+              onClick={() => setUserType("User")}
+            >
+              Usuario
+            </Button>
+            <Button
+              type="button"
+              variant={userType === "Client" ? "default" : "outline"}
+              onClick={() => setUserType("Client")}
+            >
+              Cliente
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid w-full items-center gap-4">
+            {userType === "Client" && (
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="companyRut">RUT de la empresa</Label>
+                <Input
+                  id="companyRut"
+                  {...register("companyRut", {
+                    required:
+                      userType === "Client"
+                        ? "El RUT de la empresa es requerido"
+                        : false,
+                    validate: {
+                      validFormat: (value) =>
+                        !value || validateRut(value) || "RUT inválido",
+                    },
+                  })}
+                  placeholder="Ingrese el RUT de la empresa"
+                  onChange={(e) => {
+                    const formattedRut = formatRut(e.target.value);
+                    setValue("companyRut", formattedRut, {
+                      shouldValidate: true,
+                    });
+                  }}
+                  maxLength={12}
+                  className={errors.companyRut ? "border-red-500" : ""}
+                />
+                {errors.companyRut && (
+                  <span className="text-sm text-red-500">
+                    {errors.companyRut.message}
+                  </span>
+                )}
+              </div>
+            )}
             {props.role === "Admin" && (
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="title">RUT del cliente</Label>
+                <Label htmlFor="title">
+                  RUT del {userType === "User" ? "usuario" : "cliente"}
+                </Label>
                 <Input
                   id="rut"
                   {...register("rut", {
@@ -153,7 +198,9 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
                         validateRut(value) || "RUT inválido",
                     },
                   })}
-                  placeholder="Escribe el RUT del cliente"
+                  placeholder={`Ingrese el RUT del ${
+                    userType === "User" ? "usuario" : "cliente"
+                  }`}
                   onChange={(e) => {
                     const formattedRut = formatRut(e.target.value);
                     setValue("rut", formattedRut, { shouldValidate: true });
@@ -176,7 +223,9 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
                   {...register("firstName", {
                     required: "El nombre es requerido",
                   })}
-                  placeholder="Nombre del usuario"
+                  placeholder={`Nombre del ${
+                    userType === "User" ? "usuario" : "cliente"
+                  }`}
                   className={errors.firstName ? "border-red-500" : ""}
                 />
                 {errors.firstName && (
@@ -192,7 +241,9 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
                   {...register("lastName", {
                     required: "El apellido es requerido",
                   })}
-                  placeholder="Apellido del usuario"
+                  placeholder={`Apellido del ${
+                    userType === "User" ? "usuario" : "cliente"
+                  }`}
                   className={errors.lastName ? "border-red-500" : ""}
                 />
                 {errors.lastName && (
@@ -209,7 +260,9 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
                 {...register("email", {
                   required: "El email es requerido",
                 })}
-                placeholder="Email del usuario"
+                placeholder={`Email del ${
+                  userType === "User" ? "usuario" : "cliente"
+                }`}
                 className={errors.email ? "border-red-500" : ""}
               />
               {errors.email && (
@@ -225,7 +278,9 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
                 {...register("phone", {
                   required: "El número de teléfono es requerido",
                 })}
-                placeholder="Número de teléfono del usuario"
+                placeholder={`Número de teléfono del ${
+                  userType === "User" ? "usuario" : "cliente"
+                }`}
                 className={errors.phone ? "border-red-500" : ""}
               />
               {errors.phone && (
@@ -238,7 +293,7 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
         </CardContent>
         <CardFooter className="">
           <Button className="w-full" type="submit">
-            Crear usuario
+            Crear {userType === "User" ? "usuario" : "cliente"}
           </Button>
         </CardFooter>
       </Card>
