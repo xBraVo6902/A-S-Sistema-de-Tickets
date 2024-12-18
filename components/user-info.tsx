@@ -5,17 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Mail, Phone } from "lucide-react";
 
 export type UserInfoProps = {
   user: {
     id: string;
-    firstName: string;
-    lastName: string;
+    name: string;
     rut: string;
     email: string;
     phone: string;
-    avatar: string | null;
-    assignedTickets: {
+    avatar: string;
+    assigned: {
       id: string;
       title: string;
       status: {
@@ -33,18 +33,12 @@ export default function UserInfo({ user }: UserInfoProps) {
         <div className="flex justify-between items-start">
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage
-                src={user.avatar ?? ""}
-                alt={`${user.firstName} ${user.lastName}`}
-              />
-              <AvatarFallback>
-                {user.firstName[0]}
-                {user.lastName[0]}
-              </AvatarFallback>
+              <AvatarImage src={user.avatar ?? ""} alt={`${user.name}`} />
+              <AvatarFallback>{user.name[0]}</AvatarFallback>
             </Avatar>
             <div>
               <CardTitle className="text-2xl font-bold mb-2">
-                {user.firstName} {user.lastName}
+                {user.name}
               </CardTitle>
               <p className="text-sm text-muted-foreground">ID: {user.id}</p>
               <p className="text-sm text-muted-foreground">RUT: {user.rut}</p>
@@ -58,33 +52,49 @@ export default function UserInfo({ user }: UserInfoProps) {
             <h3 className="text-lg font-semibold mb-2">
               Información de contacto
             </h3>
-            <p>
-              <strong>Email:</strong> {user.email}
+            <p className="flex items-center">
+              <Mail className="h-5 w-5 mr-2" />
+              {user.email}
             </p>
-            <p>
-              <strong>Teléfono:</strong> {user.phone}
+            <p className="flex items-center">
+              <Phone className="h-5 w-5 mr-2" /> {user.phone}
             </p>
           </div>
           <Separator />
           <div>
             <h3 className="text-lg font-semibold mb-2">Tickets asignados</h3>
-            {user.assignedTickets.length > 0 ? (
-              <div className="space-y-2">
-                {user.assignedTickets.map((ticket) => (
-                  <div
-                    key={ticket.id}
-                    className="flex justify-between items-center"
-                  >
-                    <span>{ticket.title}</span>
-                    <Badge
-                      style={{ backgroundColor: ticket.status.color }}
-                      className="text-white"
-                    >
-                      {ticket.status.text}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
+            {user.assigned.length > 0 ? (
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2 pr-5 text-sm text-muted-foreground font-normal">
+                      ID
+                    </th>
+                    <th className="text-left py-2 text-sm text-muted-foreground font-normal">
+                      Título
+                    </th>
+                    <th className="text-right py-2 text-sm text-muted-foreground font-normal">
+                      Estado
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {user.assigned.map((ticket) => (
+                    <tr key={ticket.id} className="border-b">
+                      <td className="py-4 text-sm">{ticket.id}</td>
+                      <td className="py-4 text-sm">{ticket.title}</td>
+                      <td className="text-right py-4 text-sm">
+                        <Badge
+                          style={{ backgroundColor: ticket.status.color }}
+                          className="text-white"
+                        >
+                          {ticket.status.text}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             ) : (
               <p className="text-sm text-muted-foreground">
                 No hay tickets asignados

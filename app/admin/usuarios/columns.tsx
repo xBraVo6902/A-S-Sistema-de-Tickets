@@ -8,7 +8,7 @@ export type User = {
   name: string;
   rut: string;
   email: string;
-  assignedTickets: number;
+  ticketCount: number;
 };
 
 export const columns: ColumnDef<User>[] = [
@@ -46,7 +46,7 @@ export const columns: ColumnDef<User>[] = [
     header: "Email",
   },
   {
-    accessorKey: "assignedTickets",
+    accessorKey: "ticketCount",
     header: ({ column }) => {
       return (
         <DataTableColumnHeader column={column} title="Tickets asignados" />

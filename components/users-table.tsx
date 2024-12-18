@@ -29,13 +29,11 @@ import { Input } from "@/components/ui/input";
 interface UsersTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  role: string;
 }
 
 export function UsersTable<TData, TValue>({
   columns,
   data,
-  role,
 }: UsersTableProps<TData, TValue>) {
   const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -111,7 +109,7 @@ export function UsersTable<TData, TValue>({
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => {
                     const id = row.getValue("id");
-                    router.push(`/${role}/usuario/${id}`);
+                    router.push(`/admin/usuario/${id}`);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (

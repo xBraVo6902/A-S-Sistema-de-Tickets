@@ -46,24 +46,24 @@ export async function searchClientByRut(rut: string) {
   }
 }
 
+export async function getUserById(id: string) {
+  const user = await prisma.person.findUnique({
+    where: { id: parseInt(id) },
+    include: { assigned: true },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+}
+
 export async function getUsers() {
   const users = await prisma.person.findMany({
     where: { role: "User" },
+    include: { assigned: true },
   });
-  const usersWithTicketCount = await Promise.all(
-    users.map(async (user) => {
-      const ticketCount = await prisma.ticket.count({
-        where: { userId: user.id },
-      });
-      return { ...user, ticketCount };
-    })
-  );
 
-  return usersWithTicketCount.map((user) => ({
-    id: user.id,
-    name: user.firstName + " " + user.lastName,
-    rut: user.rut,
-    email: user.email,
-    assignedTickets: user.ticketCount,
-  }));
+  return users;
 }
