@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "./ui/button";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 interface UsersTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -79,6 +80,9 @@ export function UsersTable<TData, TValue>({
           }
           className="max-w-sm"
         />
+        <Button>
+          <Link href="/admin/crear-usuario">Crear nuevo usuario</Link>
+        </Button>
       </div>
       <div className="rounded-md border">
         <Table>
