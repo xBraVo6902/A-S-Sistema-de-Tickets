@@ -11,6 +11,9 @@ async function main() {
   await prisma.ticket.deleteMany({});
   await prisma.person.deleteMany({});
 
+  await prisma.$executeRaw`ALTER TABLE Person AUTO_INCREMENT = 1;`;
+  await prisma.$executeRaw`ALTER TABLE Ticket AUTO_INCREMENT = 1;`;
+
   const createdPeople = [];
   for (const person of people) {
     const hashedPassword = await bcrypt.hash(person.password, 10);
