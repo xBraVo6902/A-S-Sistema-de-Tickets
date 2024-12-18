@@ -53,6 +53,17 @@ export async function POST(request: Request) {
       parseInt(searchParams.get("clientRut") as string) ||
       parseInt(session.user.id as string);
 
+    const client = await prisma.person.findUnique({
+      where: { id: clientId },
+    });
+
+    if (client?.role !== "Client") {
+      return new Response(
+        JSON.stringify({ message: "El ID del cliente no es válido" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     await prisma.ticket.create({
       data: {
         title,
