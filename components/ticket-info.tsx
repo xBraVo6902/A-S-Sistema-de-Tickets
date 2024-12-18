@@ -168,10 +168,10 @@ export default function TicketInfo(props: TicketInfoProps) {
                 ID: {props.data.id}
               </p>
               <p className="text-sm text-muted-foreground">
-                Fecha de creación: {props.data.createdAt}
+                Creado: {props.data.createdAt}
               </p>
               <p className="text-sm text-muted-foreground">
-                Última modificación: {props.data.updatedAt}
+                Modificado: {props.data.updatedAt}
               </p>
             </div>
           </div>
