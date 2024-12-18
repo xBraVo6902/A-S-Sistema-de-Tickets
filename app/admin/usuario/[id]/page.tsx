@@ -54,7 +54,7 @@ export default async function TicketView({
 
   return (
     <div className="container mx-auto py-10 md:px-10 space-y-6">
-      <BackButton href="/admin/tickets" text="Volver a la lista" />
+      <BackButton href="/admin/usuarios" text="Volver a la lista" />
       <TicketInfo data={ticketData} role="Admin" users={users} />
     </div>
   );

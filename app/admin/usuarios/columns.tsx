@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 
 export type User = {
-  id: string;
+  id: number;
   name: string;
   rut: string;
   email: string;

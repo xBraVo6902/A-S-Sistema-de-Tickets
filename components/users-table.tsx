@@ -111,7 +111,7 @@ export function UsersTable<TData, TValue>({
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => {
                     const id = row.getValue("id");
-                    router.push(`/${role}/ticket/${id}`);
+                    router.push(`/${role}/usuario/${id}`);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
