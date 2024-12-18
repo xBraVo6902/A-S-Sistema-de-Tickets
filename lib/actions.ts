@@ -35,8 +35,13 @@ export async function updateTicketStatus(ticketId: string, status: Status) {
 }
 
 export async function searchClientByRut(rut: string) {
-  const client = await prisma.person.findUnique({
-    where: { rut: rut },
-  });
-  return client;
+  try {
+    const client = await prisma.person.findUnique({
+      where: { rut: rut, role: "Client" },
+    });
+    return client;
+  } catch (error) {
+    console.error("Failed to search client:", error);
+    return null;
+  }
 }

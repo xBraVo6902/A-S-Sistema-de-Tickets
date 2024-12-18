@@ -27,6 +27,7 @@ import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
 import { ticketMetadata } from "@/prisma/ticketMetadata";
+import { searchClientByRut } from "@/lib/actions";
 
 interface CreateTicketFormProps {
   role: "Client" | "Admin";
@@ -46,6 +47,7 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
     register,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
     control,
   } = useForm<FormInputs>({
@@ -94,6 +96,17 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
   };
 
   const onSubmit = async (data: FormInputs) => {
+    if (props.role === "Admin") {
+      const client = await searchClientByRut(data.rut);
+      if (!client) {
+        setError("rut", {
+          type: "manual",
+          message: "El cliente con el RUT ingresado no existe",
+        });
+        return;
+      }
+    }
+
     const response = await fetch("/api/tickets", {
       method: "POST",
       headers: {
@@ -141,6 +154,7 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
                     setValue("rut", formattedRut, { shouldValidate: true });
                   }}
                   maxLength={12}
+                  className={errors.rut ? "border-red-500" : ""}
                 />
                 {errors.rut && (
                   <span className="text-sm text-red-500">
@@ -157,6 +171,7 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
                   required: "El título es requerido",
                 })}
                 placeholder="Resumen breve del problema"
+                className={errors.title ? "border-red-500" : ""}
               />
               {errors.title && (
                 <span className="text-sm text-red-500">
@@ -258,6 +273,7 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
                   required: "La descripción es requerida",
                 })}
                 placeholder="Describe tu problema en detalle"
+                className={errors.description ? "border-red-500" : ""}
               />
               {errors.description && (
                 <span className="text-sm text-red-500">
