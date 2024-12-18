@@ -196,7 +196,7 @@ export const people = [
   {
     firstName: "Pablo",
     lastName: "Cortés",
-    email: "pablo.cortes@example.com",
+    email: "pablocortes1101@gmail.com",
     rut: "20.600.436-3",
     password: "pablocortes",
     role: "User",

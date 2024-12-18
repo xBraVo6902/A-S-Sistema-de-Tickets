@@ -15,6 +15,7 @@ model Person {
   firstName  String
   lastName   String
   email      String   @unique
+  avatar     String
   phone      String   @unique
   rut        String   @unique
   password   String   @db.Char(60)

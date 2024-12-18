@@ -4,6 +4,7 @@
 import { PrismaClient } from "@prisma/client";
 import { people, tickets } from "./data.js";
 import bcrypt from "bcrypt";
+import md5 from "md5";
 
 const prisma = new PrismaClient();
 
@@ -17,12 +18,17 @@ async function main() {
   const createdPeople = [];
   for (const person of people) {
     const hashedPassword = await bcrypt.hash(person.password, 10);
+
+    const hashedEmail = md5(person.email.trim().toLowerCase());
+    const gravatarUrl = `https://www.gravatar.com/avatar/${hashedEmail}?s=256&d=mp`;
+
     const createdPerson = await prisma.person.create({
       data: {
         firstName: person.firstName,
         lastName: person.lastName,
         email: person.email,
         rut: person.rut,
+        avatar: gravatarUrl,
         companyRut: person.companyRut,
         password: hashedPassword,
         role: person.role,
