@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     const { title, description, type, priority } = parsedBody.data;
     const { searchParams } = new URL(request.url);
     const clientId =
-      parseInt(searchParams.get("clientRut") as string) ||
+      parseInt(searchParams.get("clientId") as string) ||
       parseInt(session.user.id as string);
 
     const client = await prisma.person.findUnique({

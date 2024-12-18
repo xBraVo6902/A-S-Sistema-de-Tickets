@@ -96,6 +96,8 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
   };
 
   const onSubmit = async (data: FormInputs) => {
+    let response;
+
     if (props.role === "Admin") {
       const client = await searchClientByRut(data.rut);
       if (!client) {
@@ -105,17 +107,26 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
         });
         return;
       }
+
+      response = await fetch(`/api/tickets?clientId=${client.id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+    } else {
+      response = await fetch("/api/tickets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
     }
 
-    const response = await fetch("/api/tickets", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    const result = await response.json();
-    if (response.ok) {
+    const result = await response?.json();
+    if (response?.ok) {
       alert(result.message);
       router.push("/");
     } else {
