@@ -1,3 +1,5 @@
+import { text } from "stream/consumers";
+
 export const ticketMetadata = {
   status: {
     Open: {
@@ -48,6 +50,11 @@ export const ticketMetadata = {
       text: "Alta",
       icon: "ArrowUp",
       color: "#c0392b", // Rojo más oscuro
+    },
+    Urgent: {
+      text: "Urgente",
+      icon: "ClockAlert",
+      color: "#5c0099",
     },
   },
 };

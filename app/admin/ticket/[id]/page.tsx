@@ -25,7 +25,7 @@ type User = {
   firstName: string;
   lastName: string;
   email: string;
-  avatar: string | null;
+  avatar: string;
 };
 
 async function getUsers(): Promise<User[]> {

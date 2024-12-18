@@ -43,14 +43,14 @@ export type TicketInfoProps = {
       firstName: string;
       lastName: string;
       email: string;
-      avatar: string | null;
+      avatar: string;
       phone: string;
     } | null;
     client: {
       firstName: string;
       lastName: string;
       email: string;
-      avatar: string | null;
+      avatar: string;
       phone: string;
     };
   };
@@ -60,11 +60,13 @@ export type TicketInfoProps = {
     firstName: string;
     lastName: string;
     email: string;
-    avatar: string | null;
+    avatar: string;
   }[];
 };
 
 export default function TicketInfo(props: TicketInfoProps) {
+  console.log(props.data);
+
   const whatsappData = {
     name:
       props.role === "User"
@@ -190,7 +192,7 @@ export default function TicketInfo(props: TicketInfoProps) {
                   <div className="flex items-center space-x-2">
                     <Avatar>
                       <AvatarImage
-                        src={props.data.user.avatar ?? ""}
+                        src={props.data.user.avatar}
                         alt={
                           props.data.user.firstName +
                           " " +
@@ -198,10 +200,7 @@ export default function TicketInfo(props: TicketInfoProps) {
                         }
                       />
                       <AvatarFallback>
-                        {props.data.user.firstName
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+                        {props.data.user.firstName[0]}
                       </AvatarFallback>
                     </Avatar>
                     <div>
@@ -224,7 +223,7 @@ export default function TicketInfo(props: TicketInfoProps) {
                 <div className="flex items-center space-x-2">
                   <Avatar>
                     <AvatarImage
-                      src={props.data.client.avatar ?? ""}
+                      src={props.data.client.avatar}
                       alt={
                         props.data.client.firstName +
                         " " +
@@ -232,10 +231,7 @@ export default function TicketInfo(props: TicketInfoProps) {
                       }
                     />
                     <AvatarFallback>
-                      {props.data.client.firstName
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
+                      {props.data.client.firstName[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div>

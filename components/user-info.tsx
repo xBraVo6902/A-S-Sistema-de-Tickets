@@ -49,16 +49,19 @@ export default function UserInfo({ user }: UserInfoProps) {
       <CardContent>
         <div className="space-y-4">
           <div>
-            <h3 className="text-lg font-semibold mb-2">
+            <h3 className="text-lg font-semibold mb-4">
               Información de contacto
             </h3>
-            <p className="flex items-center">
-              <Mail className="h-5 w-5 mr-2" />
-              {user.email}
-            </p>
-            <p className="flex items-center">
-              <Phone className="h-5 w-5 mr-2" /> {user.phone}
-            </p>
+            <div className="space-y-3">
+              <p className="flex items-center text-base">
+                <Mail className="h-4 w-4 mr-3 text-muted-foreground" />
+                <span>{user.email}</span>
+              </p>
+              <p className="flex items-center text-base">
+                <Phone className="h-4 w-4 mr-3 text-muted-foreground" />
+                <span>{user.phone}</span>
+              </p>
+            </div>
           </div>
           <Separator />
           <div>

@@ -37,6 +37,7 @@ export async function GET(
             lastName: true,
             email: true,
             phone: true,
+            avatar: true,
           },
         },
         client: {
@@ -46,6 +47,7 @@ export async function GET(
             lastName: true,
             email: true,
             phone: true,
+            avatar: true,
           },
         },
       },
