@@ -21,15 +21,15 @@ export const columns: ColumnDef<User>[] = [
       const value = String(row.getValue(columnId));
       return (
         value.includes(filterValue) ||
-        row
-          .getValue("name")
+        String(row.getValue("name"))
           .toLowerCase()
           .includes(filterValue.toLowerCase()) ||
-        row
-          .getValue("email")
+        String(row.getValue("email"))
           .toLowerCase()
           .includes(filterValue.toLowerCase()) ||
-        row.getValue("rut").toLowerCase().includes(filterValue.toLowerCase())
+        String(row.getValue("rut"))
+          .toLowerCase()
+          .includes(filterValue.toLowerCase())
       );
     },
   },
@@ -47,6 +47,10 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "assignedTickets",
-    header: "Tickets asignados",
+    header: ({ column }) => {
+      return (
+        <DataTableColumnHeader column={column} title="Tickets asignados" />
+      );
+    },
   },
 ];
