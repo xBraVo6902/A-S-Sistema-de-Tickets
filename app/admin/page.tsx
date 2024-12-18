@@ -14,7 +14,6 @@ import {
   TicketIcon,
   RectangleStackIcon,
   UserIcon,
-  ClipboardDocumentCheckIcon,
   Cog6ToothIcon,
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
@@ -33,15 +32,9 @@ export default function MainMenu() {
     },
     {
       title: "Ver tickets",
-      description: "Obtén un resumen de los tickets creados",
+      description: "Ve los tickets creados por los clientes",
       icon: RectangleStackIcon,
-      href: "",
-    },
-    {
-      title: "Asignar tickets",
-      description: "Asigna tickets a los usuarios",
-      icon: ClipboardDocumentCheckIcon,
-      href: "/admin/asignar-ticket",
+      href: "/admin/tickets",
     },
     {
       title: "Usuarios",
