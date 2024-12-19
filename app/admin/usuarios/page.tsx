@@ -10,7 +10,6 @@ export default async function Page() {
     email: user.email,
     ticketCount: user.assigned.length,
   }));
-  console.log(data);
 
   return (
     <div className="container mx-auto py-10">
