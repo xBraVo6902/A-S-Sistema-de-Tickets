@@ -240,10 +240,12 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
                 id="email"
                 {...register("email", {
                   required: "El email es requerido",
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Dirección de email inválida",
+                  },
                 })}
-                placeholder={`Email del ${
-                  userType === "User" ? "usuario" : "cliente"
-                }`}
+                placeholder="user@example.com"
                 className={errors.email ? "border-red-500" : ""}
               />
               {errors.email && (
@@ -254,16 +256,30 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="phone">Número de télefono</Label>
-              <Input
-                id="phone"
-                {...register("phone", {
-                  required: "El número de teléfono es requerido",
-                })}
-                placeholder={`Número de teléfono del ${
-                  userType === "User" ? "usuario" : "cliente"
-                }`}
-                className={errors.phone ? "border-red-500" : ""}
-              />
+              <div className="flex">
+                <div className="flex items-center text-sm px-3 border rounded-l-md bg-muted w-20">
+                  +56 9
+                </div>
+                <Input
+                  id="phone"
+                  {...register("phone", {
+                    required: "El número de teléfono es requerido",
+                    pattern: {
+                      value: /^[0-9\s]{8}$/,
+                      message: "Debe contener 8 números",
+                    },
+                    onChange: (e) => {
+                      const cleaned = e.target.value.replace(/[^\d\s]/g, "");
+                      const limited = cleaned.slice(0, 8);
+                      e.target.value = limited;
+                    },
+                  })}
+                  placeholder="1234 5678"
+                  className={`rounded-l-none border-l-0 ${
+                    errors.phone ? "border-red-500" : ""
+                  }`}
+                />
+              </div>
               {errors.phone && (
                 <span className="text-sm text-red-500">
                   {errors.phone.message}
