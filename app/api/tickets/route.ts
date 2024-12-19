@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     const { title, description, type, priority } = parsedBody.data;
 
     const client = await prisma.person.findUnique({
-      where: { id: clientId },
+      where: { id: finalClientId },
     });
     console.log(client);
 
