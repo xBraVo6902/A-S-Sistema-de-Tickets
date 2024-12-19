@@ -24,7 +24,6 @@ model Person {
   companyRut     String?
   temporaryToken String?
   tokenExpiry    DateTime?
-  isFirstLogin   Boolean   @default(true)
 }
 
 enum Role {

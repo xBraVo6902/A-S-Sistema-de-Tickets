@@ -14,8 +14,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
-import { searchClientByRut, searchUserOrClientByRut } from "@/lib/actions";
+import { createUserOrClient, searchUserOrClientByRut } from "@/lib/actions";
+
+import crypto from "crypto";
 
 interface CreateTicketFormProps {
   role: "Client" | "Admin";
@@ -84,12 +85,25 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
     if (person) {
       setError("rut", {
         type: "manual",
-        message: `El ${
-          data.userType === "Client" ? "cliente" : "usuario"
-        } con el RUT ingresado ya existe`,
+        message: "La persona con este RUT ya existe",
       });
       return;
     }
+
+    const temporaryToken = crypto.randomBytes(32).toString("hex");
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    const submitData = {
+      ...data,
+      role: userType,
+      temporaryToken,
+      tokenExpiry,
+    };
+
+    await createUserOrClient(submitData);
+
+    const resetLink = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/reset-password?token=${temporaryToken}`;
+    console.log(resetLink);
   };
 
   return (

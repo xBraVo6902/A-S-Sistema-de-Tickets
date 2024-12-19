@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db";
 import { Status } from "@prisma/client";
 import md5 from "md5";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import "dotenv/config";
 
 export async function assignUserToTicket(ticketId: string, userId: string) {
   try {
@@ -57,6 +60,22 @@ export async function searchUserOrClientByRut(rut: string) {
     console.error("Failed to search person:", error);
     return null;
   }
+}
+
+export async function emailExists(email: string) {
+  const user = await prisma.person.findFirst({
+    where: { email: email },
+  });
+
+  return !!user;
+}
+
+export async function phoneExists(phone: string) {
+  const user = await prisma.person.findFirst({
+    where: { phone: phone },
+  });
+
+  return !!user;
 }
 
 export async function getUserById(id: string) {
