@@ -257,7 +257,7 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="phone">Número de télefono</Label>
               <div className="flex">
-                <div className="flex items-center text-sm px-3 border rounded-l-md bg-muted w-20">
+                <div className="flex items-center text-sm px-2 border rounded-l-md bg-muted w-16">
                   +56 9
                 </div>
                 <Input
