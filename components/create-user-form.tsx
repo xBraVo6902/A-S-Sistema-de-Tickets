@@ -95,6 +95,7 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
     const temporaryToken = crypto.randomBytes(32).toString("hex");
     const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
+    data.phone = "569" + data.phone.replace(/\s/g, "");
     const submitData = {
       ...data,
       role: userType,
@@ -107,7 +108,7 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
     const resetLink = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/reset-password?token=${temporaryToken}`;
 
     const message = `Bienvenido/a al sistema de tickets. Para crear tu contraseña, haz click en el siguiente enlace:\n${resetLink}`;
-    const phoneNumber = `569${data.phone.replace(/\s/g, "")}`;
+    const phoneNumber = `${data.phone.replace(/\s/g, "")}`;
     const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
       message
     )}`;

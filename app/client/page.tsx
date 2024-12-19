@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { TicketIcon } from "@heroicons/react/24/outline";
+import { RectangleStackIcon, TicketIcon } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
 
 export default function MainMenu() {
@@ -23,6 +23,12 @@ export default function MainMenu() {
       description: "Crea un nuevo ticket de soporte",
       icon: TicketIcon,
       href: "/client/crear-ticket",
+    },
+    {
+      title: "Ver tickets",
+      description: "Ve los tickets de soporte que has creado",
+      icon: RectangleStackIcon,
+      href: "/client/mis-tickets",
     },
   ];
 

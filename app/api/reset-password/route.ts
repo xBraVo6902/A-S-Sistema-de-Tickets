@@ -6,6 +6,7 @@ export async function PUT(req: Request) {
   const { token, newPassword } = await req.json();
 
   if (!token || !newPassword) {
+    console.error("Token and new password are required");
     return NextResponse.json(
       { message: "Token y nueva contraseña son requeridos" },
       { status: 400 }
@@ -21,6 +22,7 @@ export async function PUT(req: Request) {
     });
 
     if (!user) {
+      console.error("Invalid or expired token");
       return NextResponse.json(
         { message: "Token inválido o expirado" },
         { status: 400 }

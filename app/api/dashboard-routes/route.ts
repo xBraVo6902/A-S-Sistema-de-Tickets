@@ -131,7 +131,20 @@ async function getMonthlySummary() {
       },
     });
 
-    return new Response(JSON.stringify(monthlyData), {
+    // Transform the data to group by month
+    const monthlySummary = monthlyData.reduce(
+      (acc: { [key: string]: { month: string; tickets: number } }, item) => {
+        const month = item.createdAt.toISOString().slice(0, 7); // Get YYYY-MM format
+        if (!acc[month]) {
+          acc[month] = { month, tickets: 0 };
+        }
+        acc[month].tickets += item._count._all;
+        return acc;
+      },
+      {}
+    );
+
+    return new Response(JSON.stringify(Object.values(monthlySummary)), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -183,35 +196,42 @@ async function getByCategory() {
 
 async function getTechnicianPerformance() {
   try {
-    const ticketsByTechnician = await prisma.ticket.groupBy({
+    const monthlySummaryRaw = await prisma.ticket.groupBy({
       by: ["userId"],
       _count: {
         _all: true,
       },
     });
 
+    const monthlySummary = monthlySummaryRaw.filter(
+      (item) => item.userId !== null
+    );
+
     const result = await Promise.all(
-      ticketsByTechnician.map(async (item) => {
-        if (item.userId === null) {
-          return null;
-        }
+      monthlySummary.map(async (item) => {
         const user = await prisma.person.findUnique({
-          where: { id: item.userId },
+          where: { id: item.userId as number },
         });
+
+        if (!user) return null;
+
         const completedTickets = await prisma.ticket.count({
           where: {
             userId: item.userId,
             status: Status.Closed,
           },
         });
+
         const pendingTickets = await prisma.ticket.count({
           where: {
             userId: item.userId,
             status: Status.Open,
           },
         });
+
         return {
-          name: user?.firstName + " " + user?.lastName || "Unknown",
+          name: `${user.firstName} ${user.lastName}`,
+          total: item._count._all,
           completed: completedTickets,
           pending: pendingTickets,
         };
@@ -261,7 +281,7 @@ async function getCompanySummary() {
           },
         });
         return {
-          name: client?.firstName + " " + client?.lastName || "Unknown",
+          name: client ? `${client.firstName} ${client.lastName}` : "Unknown",
           completed: completedTickets,
           pending: pendingTickets,
         };

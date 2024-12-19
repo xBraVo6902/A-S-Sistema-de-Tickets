@@ -126,7 +126,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="cursor-pointer hover:bg-muted/50"
+                  className="cursor-pointer hover:bg-muted/50 min-h-12"
                   onClick={() => {
                     const id = row.getValue("id");
                     router.push(`/${role}/ticket/${id}`);

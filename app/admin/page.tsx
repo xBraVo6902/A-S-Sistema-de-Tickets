@@ -14,7 +14,7 @@ import {
   TicketIcon,
   RectangleStackIcon,
   UserIcon,
-  ChartBarIcon,
+  // ChartBarIcon,
 } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
 
@@ -41,12 +41,12 @@ export default function MainMenu() {
       icon: UserIcon,
       href: "/admin/menu-usuarios",
     },
-    {
-      title: "Dashboard",
-      description: "Ver datos relevantes",
-      icon: ChartBarIcon,
-      href: "/admin/dashboard",
-    },
+    // {
+    //   title: "Dashboard",
+    //   description: "Ver datos relevantes",
+    //   icon: ChartBarIcon,
+    //   href: "/admin/dashboard",
+    // },
   ];
 
   return (

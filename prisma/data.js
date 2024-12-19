@@ -201,7 +201,7 @@ export const people = [
     companyRut: "16.232.286-9",
     password: "camilobravo",
     role: "Client",
-    phone: "56964141800",
+    phone: "56964141801",
   },
 ];
 

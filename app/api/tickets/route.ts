@@ -56,6 +56,7 @@ export async function POST(request: Request) {
     const client = await prisma.person.findUnique({
       where: { id: clientId },
     });
+    console.log(client);
 
     if (client?.role !== "Client") {
       return new Response(

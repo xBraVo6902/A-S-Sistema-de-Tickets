@@ -140,7 +140,8 @@ export async function createUserOrClient(data: CreateUserOrClientInput) {
         tokenExpiry: data.tokenExpiry,
       },
     });
-
+    revalidatePath("/admin/usuarios");
+    revalidatePath("/admin/clientes");
     return user;
   } catch (error) {
     console.error("Failed to create user:", error);
