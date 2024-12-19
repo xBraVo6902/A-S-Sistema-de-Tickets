@@ -194,15 +194,6 @@ export const people = [
     phone: "56972898652",
   },
   {
-    firstName: "Pablo",
-    lastName: "Cortés",
-    email: "pablocortes1101@gmail.com",
-    rut: "20.600.436-3",
-    password: "pablocortes",
-    role: "User",
-    phone: "56959252625",
-  },
-  {
     firstName: "Camilo",
     lastName: "Bravo",
     email: "camilo.bravo@example.com",
