@@ -10,13 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  TicketIcon,
-  RectangleStackIcon,
-  UserIcon,
-  ChartBarIcon,
-} from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
+import { UserPen, UserPlus, UserSearch } from "lucide-react";
 
 export default function MainMenu() {
   const router = useRouter();
@@ -24,28 +19,22 @@ export default function MainMenu() {
 
   const menuItems = [
     {
-      title: "Crear tickets",
-      description: "Crea tickets de soporte para tus clientes",
-      icon: TicketIcon,
-      href: "/admin/crear-ticket",
+      title: "Ver usuarios (técnicos)",
+      description: "Ve los usuarios técnicos del sistema",
+      icon: UserPen,
+      href: "/admin/usuarios",
     },
     {
-      title: "Ver tickets",
-      description: "Ve los tickets creados por los clientes",
-      icon: RectangleStackIcon,
-      href: "/admin/tickets",
+      title: "Ver clientes",
+      description: "Ve los cleintes del sistema",
+      icon: UserSearch,
+      href: "/admin/clientes",
     },
     {
-      title: "Usuarios",
-      description: "Gestiona los usuarios del sistema",
-      icon: UserIcon,
-      href: "/admin/menu-usuarios",
-    },
-    {
-      title: "Dashboard",
-      description: "Ver datos relevantes",
-      icon: ChartBarIcon,
-      href: "/admin/dashboard",
+      title: "Crear usuario/cliente",
+      description: "Crea un nuevo usuario o cliente",
+      icon: UserPlus,
+      href: "/admin/crear-usuario",
     },
   ];
 
