@@ -32,7 +32,7 @@ interface UsersTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function UsersTable<TData, TValue>({
+export function ClientsTable<TData, TValue>({
   columns,
   data,
 }: UsersTableProps<TData, TValue>) {
@@ -71,7 +71,7 @@ export function UsersTable<TData, TValue>({
     <div>
       <div className="flex items-center gap-4 py-4">
         <Input
-          placeholder="Buscar usuario..."
+          placeholder="Buscar cliente..."
           value={(table.getColumn("id")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table

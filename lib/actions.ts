@@ -79,7 +79,7 @@ export async function phoneExists(phone: string) {
 export async function getUserById(id: string) {
   const user = await prisma.person.findUnique({
     where: { id: parseInt(id) },
-    include: { assigned: true },
+    include: { assigned: true, created: true },
   });
 
   if (!user) {
@@ -96,6 +96,15 @@ export async function getUsers() {
   });
 
   return users;
+}
+
+export async function getClients() {
+  const clients = await prisma.person.findMany({
+    where: { role: "Client" },
+    include: { created: true },
+  });
+
+  return clients;
 }
 
 type CreateUserOrClientInput = {

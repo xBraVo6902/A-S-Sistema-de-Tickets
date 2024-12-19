@@ -3,15 +3,16 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 
-export type User = {
+export type Client = {
   id: number;
   name: string;
   rut: string;
+  companyRut: string | null;
   email: string;
   ticketCount: number;
 };
 
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<Client>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => {
@@ -40,6 +41,10 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "rut",
     header: "RUT",
+  },
+  {
+    accessorKey: "companyRut",
+    header: "RUT de la empresa",
   },
   {
     accessorKey: "email",

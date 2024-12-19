@@ -26,7 +26,7 @@ export default function MainMenu() {
     },
     {
       title: "Ver clientes",
-      description: "Ve los cleintes del sistema",
+      description: "Ve los clientes del sistema",
       icon: UserSearch,
       href: "/admin/clientes",
     },

@@ -15,7 +15,8 @@ export type UserInfoProps = {
     email: string;
     phone: string;
     avatar: string;
-    assigned: {
+    role: string;
+    tickets: {
       id: string;
       title: string;
       status: {
@@ -66,7 +67,7 @@ export default function UserInfo({ user }: UserInfoProps) {
           <Separator />
           <div>
             <h3 className="text-lg font-semibold mb-2">Tickets asignados</h3>
-            {user.assigned.length > 0 ? (
+            {user.tickets.length > 0 ? (
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
@@ -82,7 +83,7 @@ export default function UserInfo({ user }: UserInfoProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {user.assigned.map((ticket) => (
+                  {user.tickets.map((ticket) => (
                     <tr key={ticket.id} className="border-b">
                       <td className="py-4 text-sm">{ticket.id}</td>
                       <td className="py-4 text-sm">{ticket.title}</td>

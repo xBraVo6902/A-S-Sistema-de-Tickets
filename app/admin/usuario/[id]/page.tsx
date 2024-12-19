@@ -26,14 +26,17 @@ export default async function UserPage({
     email: user.email,
     phone: formatPhone(user.phone),
     avatar: user.avatar,
-    assigned: user.assigned.map((ticket) => ({
-      id: ticket.id.toString(),
-      title: ticket.title,
-      status: {
-        text: ticketMetadata.status[ticket.status].text,
-        color: ticketMetadata.status[ticket.status].color,
-      },
-    })),
+    role: user.role,
+    tickets: (user.role === "Client" ? user.created : user.assigned).map(
+      (ticket) => ({
+        id: ticket.id.toString(),
+        title: ticket.title,
+        status: {
+          text: ticketMetadata.status[ticket.status].text,
+          color: ticketMetadata.status[ticket.status].color,
+        },
+      })
+    ),
   };
 
   return (
