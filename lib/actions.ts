@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db";
-import { Status, Ticket } from "@prisma/client";
+import { Status } from "@prisma/client";
+import md5 from "md5";
 
 export async function assignUserToTicket(ticketId: string, userId: string) {
   try {
@@ -46,6 +47,18 @@ export async function searchClientByRut(rut: string) {
   }
 }
 
+export async function searchUserOrClientByRut(rut: string) {
+  try {
+    const person = await prisma.person.findUnique({
+      where: { rut: rut },
+    });
+    return person;
+  } catch (error) {
+    console.error("Failed to search person:", error);
+    return null;
+  }
+}
+
 export async function getUserById(id: string) {
   const user = await prisma.person.findUnique({
     where: { id: parseInt(id) },
@@ -66,4 +79,45 @@ export async function getUsers() {
   });
 
   return users;
+}
+
+type CreateUserOrClientInput = {
+  companyRut?: string;
+  rut: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  role: "User" | "Client";
+  temporaryToken: string;
+  tokenExpiry: Date;
+};
+
+export async function generateAvatarUrl(email: string) {
+  const hashedEmail = md5(email.trim().toLowerCase());
+  return `https://www.gravatar.com/avatar/${hashedEmail}?s=256&d=mp`;
+}
+
+export async function createUserOrClient(data: CreateUserOrClientInput) {
+  try {
+    const user = await prisma.person.create({
+      data: {
+        companyRut: data.companyRut,
+        rut: data.rut,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        role: data.role,
+        avatar: await generateAvatarUrl(data.email),
+        temporaryToken: data.temporaryToken,
+        tokenExpiry: data.tokenExpiry,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Failed to create user:", error);
+    return null;
+  }
 }

@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { searchClientByRut } from "@/lib/actions";
+import { searchClientByRut, searchUserOrClientByRut } from "@/lib/actions";
 
 interface CreateTicketFormProps {
   role: "Client" | "Admin";
@@ -32,7 +32,6 @@ type FormInputs = {
 };
 
 export default function CreateUserForm(props: CreateTicketFormProps) {
-  const router = useRouter();
   const [userType, setUserType] = React.useState<"User" | "Client">("User");
   const {
     register,
@@ -40,7 +39,6 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
     setValue,
     setError,
     formState: { errors },
-    control,
   } = useForm<FormInputs>();
 
   const formatRut = (value: string) => {
@@ -82,46 +80,15 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
   };
 
   const onSubmit = async (data: FormInputs) => {
-    let response;
-
-    const submitData = {
-      ...data,
-      role: userType,
-    };
-
-    if (props.role === "Admin") {
-      const client = await searchClientByRut(data.rut);
-      if (!client) {
-        setError("rut", {
-          type: "manual",
-          message: "El cliente con el RUT ingresado no existe",
-        });
-        return;
-      }
-
-      response = await fetch(`/api/tickets?clientId=${client.id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(submitData),
+    const person = await searchUserOrClientByRut(data.rut);
+    if (person) {
+      setError("rut", {
+        type: "manual",
+        message: `El ${
+          data.userType === "Client" ? "cliente" : "usuario"
+        } con el RUT ingresado ya existe`,
       });
-    } else {
-      response = await fetch("/api/tickets", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(submitData),
-      });
-    }
-
-    const result = await response?.json();
-    if (response?.ok) {
-      alert(result.message);
-      router.push("/");
-    } else {
-      alert(result.message);
+      return;
     }
   };
 
