@@ -2,7 +2,7 @@ import { authOptions } from "@/auth";
 import { getServerSession } from "next-auth";
 import prisma from "@/lib/db";
 import { Status } from "@prisma/client";
-import { Type } from "@prisma/client"
+import { ticketMetadata } from "@/prisma/ticketMetadata";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -44,7 +44,7 @@ async function getRecentTickets() {
   try {
     const tickets = await prisma.ticket.findMany({
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       take: 5, // Obtener los 5 tickets más recientes
     });
@@ -56,7 +56,9 @@ async function getRecentTickets() {
   } catch (error) {
     console.error(error);
     return new Response(
-      JSON.stringify({ message: "Hubo un error al obtener los tickets recientes" }),
+      JSON.stringify({
+        message: "Hubo un error al obtener los tickets recientes",
+      }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -65,21 +67,30 @@ async function getRecentTickets() {
 async function getSummary() {
   try {
     const totalTickets = await prisma.ticket.count();
-    const pendingTickets = await prisma.ticket.count({ where: { status: Status.Open } });
-    const completedTickets = await prisma.ticket.count({ where: { status: Status.Closed } });
-
-    return new Response(JSON.stringify({
-      totalTickets,
-      pendingTickets,
-      completedTickets,
-    }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
+    const pendingTickets = await prisma.ticket.count({
+      where: { status: Status.Open },
     });
+    const completedTickets = await prisma.ticket.count({
+      where: { status: Status.Closed },
+    });
+
+    return new Response(
+      JSON.stringify({
+        totalTickets,
+        pendingTickets,
+        completedTickets,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     console.error(error);
     return new Response(
-      JSON.stringify({ message: "Hubo un error al obtener el resumen de tickets" }),
+      JSON.stringify({
+        message: "Hubo un error al obtener el resumen de tickets",
+      }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -88,7 +99,9 @@ async function getSummary() {
 async function getResolutionRate() {
   try {
     const totalTickets = await prisma.ticket.count();
-    const completedTickets = await prisma.ticket.count({ where: { status: Status.Closed } });
+    const completedTickets = await prisma.ticket.count({
+      where: { status: Status.Closed },
+    });
     const resolutionRate = (completedTickets / totalTickets) * 100;
 
     return new Response(JSON.stringify({ resolutionRate }), {
@@ -98,7 +111,9 @@ async function getResolutionRate() {
   } catch (error) {
     console.error(error);
     return new Response(
-      JSON.stringify({ message: "Hubo un error al obtener la tasa de resolución" }),
+      JSON.stringify({
+        message: "Hubo un error al obtener la tasa de resolución",
+      }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -107,12 +122,12 @@ async function getResolutionRate() {
 async function getMonthlySummary() {
   try {
     const monthlyData = await prisma.ticket.groupBy({
-      by: ['createdAt'],
+      by: ["createdAt"],
       _count: {
         _all: true,
       },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: "asc",
       },
     });
 
@@ -123,7 +138,9 @@ async function getMonthlySummary() {
   } catch (error) {
     console.error(error);
     return new Response(
-      JSON.stringify({ message: "Hubo un error al obtener el resumen mensual de tickets" }),
+      JSON.stringify({
+        message: "Hubo un error al obtener el resumen mensual de tickets",
+      }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -132,16 +149,21 @@ async function getMonthlySummary() {
 async function getByCategory() {
   try {
     const ticketsByCategory = await prisma.ticket.groupBy({
-      by: ['type'],
+      by: ["type"],
       _count: {
         _all: true,
       },
     });
 
-    // Asegúrate de que 'type' contenga los nombres correctos de las categorías
     const result = ticketsByCategory.map((item) => ({
-      type: item.type === Type.Hardware ? 'Hardware' : item.type === Type.Software ? 'Software' : 'Other',
+      type: ticketMetadata.type[item.type as keyof typeof ticketMetadata.type]
+        .text,
       _count: item._count,
+      color:
+        ticketMetadata.type[item.type as keyof typeof ticketMetadata.type]
+          .color,
+      icon: ticketMetadata.type[item.type as keyof typeof ticketMetadata.type]
+        .icon,
     }));
 
     return new Response(JSON.stringify(result), {
@@ -151,7 +173,9 @@ async function getByCategory() {
   } catch (error) {
     console.error(error);
     return new Response(
-      JSON.stringify({ message: "Hubo un error al obtener el desglose por categoría" }),
+      JSON.stringify({
+        message: "Hubo un error al obtener el desglose por categoría",
+      }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -160,37 +184,39 @@ async function getByCategory() {
 async function getTechnicianPerformance() {
   try {
     const ticketsByTechnician = await prisma.ticket.groupBy({
-      by: ['userId'],
+      by: ["userId"],
       _count: {
         _all: true,
       },
     });
 
-    const result = await Promise.all(ticketsByTechnician.map(async (item) => {
-      if (item.userId === null) {
-        return null;
-      }
-      const user = await prisma.person.findUnique({
-        where: { id: item.userId },
-      });
-      const completedTickets = await prisma.ticket.count({
-        where: {
-          userId: item.userId,
-          status: Status.Closed,
-        },
-      });
-      const pendingTickets = await prisma.ticket.count({
-        where: {
-          userId: item.userId,
-          status: Status.Open,
-        },
-      });
-      return {
-        name: user?.name || 'Unknown',
-        completed: completedTickets,
-        pending: pendingTickets,
-      };
-    }));
+    const result = await Promise.all(
+      ticketsByTechnician.map(async (item) => {
+        if (item.userId === null) {
+          return null;
+        }
+        const user = await prisma.person.findUnique({
+          where: { id: item.userId },
+        });
+        const completedTickets = await prisma.ticket.count({
+          where: {
+            userId: item.userId,
+            status: Status.Closed,
+          },
+        });
+        const pendingTickets = await prisma.ticket.count({
+          where: {
+            userId: item.userId,
+            status: Status.Open,
+          },
+        });
+        return {
+          name: user?.firstName + " " + user?.lastName || "Unknown",
+          completed: completedTickets,
+          pending: pendingTickets,
+        };
+      })
+    );
 
     return new Response(JSON.stringify(result.filter(Boolean)), {
       status: 200,
@@ -199,7 +225,9 @@ async function getTechnicianPerformance() {
   } catch (error) {
     console.error(error);
     return new Response(
-      JSON.stringify({ message: "Hubo un error al obtener el rendimiento de los técnicos" }),
+      JSON.stringify({
+        message: "Hubo un error al obtener el rendimiento de los técnicos",
+      }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -208,35 +236,37 @@ async function getTechnicianPerformance() {
 async function getCompanySummary() {
   try {
     const ticketsByCompany = await prisma.ticket.groupBy({
-      by: ['clientId'],
+      by: ["clientId"],
       _count: {
         _all: true,
         status: true,
       },
     });
 
-    const result = await Promise.all(ticketsByCompany.map(async (item) => {
-      const client = await prisma.person.findUnique({
-        where: { id: item.clientId },
-      });
-      const completedTickets = await prisma.ticket.count({
-        where: {
-          clientId: item.clientId,
-          status: Status.Closed,
-        },
-      });
-      const pendingTickets = await prisma.ticket.count({
-        where: {
-          clientId: item.clientId,
-          status: Status.Open,
-        },
-      });
-      return {
-        name: client?.name || 'Unknown',
-        completed: completedTickets,
-        pending: pendingTickets,
-      };
-    }));
+    const result = await Promise.all(
+      ticketsByCompany.map(async (item) => {
+        const client = await prisma.person.findUnique({
+          where: { id: item.clientId },
+        });
+        const completedTickets = await prisma.ticket.count({
+          where: {
+            clientId: item.clientId,
+            status: Status.Closed,
+          },
+        });
+        const pendingTickets = await prisma.ticket.count({
+          where: {
+            clientId: item.clientId,
+            status: Status.Open,
+          },
+        });
+        return {
+          name: client?.firstName + " " + client?.lastName || "Unknown",
+          completed: completedTickets,
+          pending: pendingTickets,
+        };
+      })
+    );
 
     return new Response(JSON.stringify(result), {
       status: 200,
@@ -245,7 +275,9 @@ async function getCompanySummary() {
   } catch (error) {
     console.error(error);
     return new Response(
-      JSON.stringify({ message: "Hubo un error al obtener el resumen por empresa" }),
+      JSON.stringify({
+        message: "Hubo un error al obtener el resumen por empresa",
+      }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }

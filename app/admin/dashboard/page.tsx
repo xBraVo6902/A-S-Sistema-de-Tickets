@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Overview } from "@/components/dashboard admin/overview";
@@ -16,7 +16,11 @@ type DashboardData = {
   pendingTickets: number;
   completedTickets: number;
   ticketsByCategory: Array<{ category: string; count: number }>;
-  ticketsByTechnician: Array<{ name: string; completed: number; pending: number }>;
+  ticketsByTechnician: Array<{
+    name: string;
+    completed: number;
+    pending: number;
+  }>;
   ticketsByCompany: Array<{ name: string; completed: number; pending: number }>;
   monthlyData: Array<{ month: string; tickets: number }>;
 };
@@ -27,47 +31,96 @@ interface MonthlyData {
 }
 
 async function fetchDashboardData(): Promise<DashboardData> {
-  const [summary, resolutionRate, monthlySummary, byCategory, technicianPerformance, companySummary] = await Promise.all([
-    fetch('/api/dashboard-routes?route=summary').then(res => res.json()),
-    fetch('/api/dashboard-routes?route=resolution-rate').then(res => res.json()),
-    fetch('/api/dashboard-routes?route=monthly-summary').then(res => res.json()),
-    fetch('/api/dashboard-routes?route=by-category').then(res => res.json()),
-    fetch('/api/dashboard-routes?route=technician-performance').then(res => res.json()),
-    fetch('/api/dashboard-routes?route=company-summary').then(res => res.json()),
+  const [
+    summary,
+    monthlySummary,
+    byCategory,
+    technicianPerformance,
+    companySummary,
+  ] = await Promise.all([
+    fetch("/api/dashboard-routes?route=summary").then((res) => res.json()),
+    fetch("/api/dashboard-routes?route=resolution-rate").then((res) =>
+      res.json()
+    ),
+    fetch("/api/dashboard-routes?route=monthly-summary").then((res) =>
+      res.json()
+    ),
+    fetch("/api/dashboard-routes?route=by-category").then((res) => res.json()),
+    fetch("/api/dashboard-routes?route=technician-performance").then((res) =>
+      res.json()
+    ),
+    fetch("/api/dashboard-routes?route=company-summary").then((res) =>
+      res.json()
+    ),
   ]);
+
+  interface MonthlySummaryItem {
+    createdAt: string;
+    _count: {
+      _all: number;
+    };
+  }
+
+  interface CategoryItem {
+    type: string;
+    _count: {
+      _all: number;
+    };
+  }
+
+  interface TechnicianPerformanceItem {
+    name: string;
+    completed: number;
+    pending: number;
+  }
+
+  interface CompanySummaryItem {
+    name: string;
+    completed: number;
+    pending: number;
+  }
 
   const monthlyDataMap: { [key: string]: number } = {};
 
-  monthlySummary.forEach((item: any) => {
-    const month = new Date(item.createdAt).toLocaleString('es-ES', { month: 'short', year: 'numeric' });
+  monthlySummary.forEach((item: MonthlySummaryItem) => {
+    const month = new Date(item.createdAt).toLocaleString("es-ES", {
+      month: "short",
+      year: "numeric",
+    });
     if (!monthlyDataMap[month]) {
       monthlyDataMap[month] = 0;
     }
     monthlyDataMap[month] += item._count._all;
   });
 
-  const monthlyData: MonthlyData[] = Object.keys(monthlyDataMap).map(month => ({
-    month,
-    tickets: monthlyDataMap[month],
-  }));
+  const monthlyData: MonthlyData[] = Object.keys(monthlyDataMap).map(
+    (month) => ({
+      month,
+      tickets: monthlyDataMap[month],
+    })
+  );
 
   // Ordenar los meses cronológicamente
-  monthlyData.sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
+  monthlyData.sort(
+    (a, b) => new Date(a.month).getTime() - new Date(b.month).getTime()
+  );
 
   return {
     totalTickets: summary.totalTickets,
     pendingTickets: summary.pendingTickets,
     completedTickets: summary.completedTickets,
-    ticketsByCategory: byCategory.map((item: any) => ({
+    ticketsByCategory: byCategory.map((item: CategoryItem) => ({
       category: item.type,
       count: item._count._all,
     })),
-    ticketsByTechnician: technicianPerformance.map((item: any) => ({
-      name: item.name,
-      completed: item.completed,
-      pending: item.pending,
-    })),
-    ticketsByCompany: companySummary.map((item: any) => ({
+    ticketsByTechnician: technicianPerformance.map(
+      (item: TechnicianPerformanceItem) => ({
+        name: item.name,
+        completed: item.completed,
+        pending: item.pending,
+      })
+    ),
+    ticketsByCompany: companySummary.map((item: CompanySummaryItem) => ({
       name: item.name,
       completed: item.completed,
       pending: item.pending,
@@ -77,7 +130,9 @@ async function fetchDashboardData(): Promise<DashboardData> {
 }
 
 export default function AdminDashboard() {
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -108,7 +163,9 @@ export default function AdminDashboard() {
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard de Administrador</h2>
+        <h2 className="text-3xl font-bold tracking-tight">
+          Dashboard de Administrador
+        </h2>
       </div>
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
@@ -123,7 +180,9 @@ export default function AdminDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.totalTickets}</div>
+                <div className="text-2xl font-bold">
+                  {dashboardData.totalTickets}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -133,7 +192,9 @@ export default function AdminDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.pendingTickets}</div>
+                <div className="text-2xl font-bold">
+                  {dashboardData.pendingTickets}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -143,7 +204,9 @@ export default function AdminDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.completedTickets}</div>
+                <div className="text-2xl font-bold">
+                  {dashboardData.completedTickets}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -154,7 +217,12 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {((dashboardData.completedTickets / dashboardData.totalTickets) * 100).toFixed(2)}%
+                  {(
+                    (dashboardData.completedTickets /
+                      dashboardData.totalTickets) *
+                    100
+                  ).toFixed(2)}
+                  %
                 </div>
               </CardContent>
             </Card>
@@ -210,7 +278,9 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <Suspense fallback={<LoadingSpinner />}>
-                  <TechnicianPerformance data={dashboardData.ticketsByTechnician} />
+                  <TechnicianPerformance
+                    data={dashboardData.ticketsByTechnician}
+                  />
                 </Suspense>
               </CardContent>
             </Card>
@@ -228,5 +298,5 @@ export default function AdminDashboard() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

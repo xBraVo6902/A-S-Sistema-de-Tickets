@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { createUserOrClient, searchUserOrClientByRut } from "@/lib/actions";
 
 import crypto from "crypto";
+import { useRouter } from "next/navigation";
 
 interface CreateTicketFormProps {
   role: "Client" | "Admin";
@@ -33,6 +34,7 @@ type FormInputs = {
 };
 
 export default function CreateUserForm(props: CreateTicketFormProps) {
+  const router = useRouter();
   const [userType, setUserType] = React.useState<"User" | "Client">("User");
   const {
     register,
@@ -110,8 +112,8 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
       message
     )}`;
 
-    // Abrir WhatsApp en una nueva pestaña
     window.open(whatsappLink, "_blank");
+    router.push("/admin/menu-usuarios");
   };
 
   return (

@@ -27,7 +27,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
 import { assignUserToTicket, updateTicketStatus } from "@/lib/actions";
 import { ticketMetadata } from "@/prisma/ticketMetadata";
-import { BackButton } from "./back-button";
 
 export type TicketInfoProps = {
   data: {
