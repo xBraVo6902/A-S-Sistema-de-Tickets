@@ -43,12 +43,6 @@ export default function MainMenu() {
       href: "/admin/usuarios",
     },
     {
-      title: "Preferencias de la cuenta",
-      description: "Configura las preferencias de tu cuenta",
-      icon: Cog6ToothIcon,
-      href: "",
-    },
-    {
       title: "Dashboard",
       description: "Ver datos relevantes",
       icon: ChartBarIcon,

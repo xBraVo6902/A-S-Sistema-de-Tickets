@@ -4,8 +4,6 @@ import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db";
 import { Status } from "@prisma/client";
 import md5 from "md5";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 import "dotenv/config";
 
 export async function assignUserToTicket(ticketId: string, userId: string) {
@@ -139,4 +137,9 @@ export async function createUserOrClient(data: CreateUserOrClientInput) {
     console.error("Failed to create user:", error);
     return null;
   }
+}
+
+export async function getPeople() {
+  const people = await prisma.person.findMany();
+  return people;
 }
