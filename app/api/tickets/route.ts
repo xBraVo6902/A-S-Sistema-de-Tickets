@@ -117,6 +117,7 @@ export async function GET(request: Request) {
           select: {
             firstName: true,
             lastName: true,
+            avatar: true,
           },
         },
       },
@@ -153,8 +154,6 @@ export async function GET(request: Request) {
         }),
       };
     });
-
-    console.log(translatedTickets);
 
     return new Response(JSON.stringify(translatedTickets), {
       status: 200,

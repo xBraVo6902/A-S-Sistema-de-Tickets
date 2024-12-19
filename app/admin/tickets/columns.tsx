@@ -12,7 +12,7 @@ export type Ticket = {
   status: Status;
   type: Type;
   priority: Priority;
-  user: { firstName: string; lastName: string; image?: string | null } | null;
+  user: { firstName: string; lastName: string; avatar: string } | null;
 };
 
 export const columns: ColumnDef<Ticket>[] = [
@@ -95,6 +95,7 @@ export const columns: ColumnDef<Ticket>[] = [
     header: "Encargado",
     cell: ({ row }) => {
       const user = row.getValue("user") as {
+        avatar: string;
         firstName: string;
         lastName: string;
       } | null;
@@ -106,8 +107,7 @@ export const columns: ColumnDef<Ticket>[] = [
         <div className="flex items-center gap-2">
           <Avatar className="h-8 w-8">
             <AvatarImage
-              // TODO: Agregar avatares a la aplicación
-              src={user.image ?? ""}
+              src={user.avatar}
               alt={`${user.firstName} ${user.lastName}`}
             />
             <AvatarFallback>

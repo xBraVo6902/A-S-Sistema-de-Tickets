@@ -39,6 +39,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = React.useState("");
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
@@ -55,31 +56,48 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    filterFns: {
-      exactMatch: (row, columnId, filterValue) => {
-        const value = String(row.getValue(columnId));
-        return value === filterValue;
-      },
-    },
     state: {
       sorting,
       columnFilters,
       columnVisibility,
+      globalFilter,
+    },
+    globalFilterFn: (row, columnId, filterValue) => {
+      const searchTerm = String(filterValue).toLowerCase();
+      const exactMatchFields = ["estado", "tipo", "prioridad"];
+
+      return row.getAllCells().some((cell) => {
+        const columnId = cell.column.id;
+        const rawValue = cell.getValue();
+
+        let cellValue = "";
+        if (typeof rawValue === "object" && rawValue !== null) {
+          cellValue = String(
+            (rawValue as { text: string }).text ||
+              (rawValue as { firstName: string }).firstName ||
+              ""
+          ).toLowerCase();
+        } else {
+          cellValue = String(rawValue).toLowerCase();
+        }
+
+        if (exactMatchFields.includes(columnId)) {
+          return cellValue === searchTerm;
+        }
+
+        return cellValue.includes(searchTerm);
+      });
     },
   });
 
   return (
     <div>
-      <div className="flex items-center gap-4 py-4">
+      <div className="flex items-center gap-4 py-4 flex-wrap">
         <Input
-          placeholder="Buscar por ID"
-          value={(table.getColumn("id")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table
-              .getColumn("id")
-              ?.setFilterValue(event.target.value || undefined)
-          }
-          className="max-w-sm"
+          placeholder="Buscar ticket..."
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
+          className="max-w-[400px]"
         />
       </div>
       <div className="rounded-md border">
