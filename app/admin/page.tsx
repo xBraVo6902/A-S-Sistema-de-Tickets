@@ -14,54 +14,39 @@ import {
   TicketIcon,
   RectangleStackIcon,
   UserIcon,
-  ClipboardDocumentCheckIcon,
-  Cog6ToothIcon,
-  ChartBarIcon,
+  // ChartBarIcon,
 } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
 
 export default function MainMenu() {
   const router = useRouter();
   const { data: session } = useSession();
-  console.log(session);
 
   const menuItems = [
     {
       title: "Crear tickets",
       description: "Crea tickets de soporte para tus clientes",
       icon: TicketIcon,
-      href: "/admin/create-ticket",
+      href: "/admin/crear-ticket",
     },
     {
       title: "Ver tickets",
-      description: "Obtén un resumen de los tickets creados",
+      description: "Ve los tickets creados por los clientes",
       icon: RectangleStackIcon,
-      href: "/admin/view-tickets",
-    },
-    {
-      title: "Asignar tickets",
-      description: "Asigna tickets a los usuarios",
-      icon: ClipboardDocumentCheckIcon,
-      href: "/admin/assign-ticket",
+      href: "/admin/tickets",
     },
     {
       title: "Usuarios",
       description: "Gestiona los usuarios del sistema",
       icon: UserIcon,
-      href: "/admin/view-users",
+      href: "/admin/menu-usuarios",
     },
-    {
-      title: "Preferencias de la cuenta",
-      description: "Configura las preferencias de tu cuenta",
-      icon: Cog6ToothIcon,
-      href: "",
-    },
-    {
-      title: "Dashboard",
-      description: "Ver datos relevantes",
-      icon: ChartBarIcon,
-      href: "/admin/dashboard",
-    },
+    // {
+    //   title: "Dashboard",
+    //   description: "Ver datos relevantes",
+    //   icon: ChartBarIcon,
+    //   href: "/admin/dashboard",
+    // },
   ];
 
   return (

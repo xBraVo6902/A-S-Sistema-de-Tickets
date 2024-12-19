@@ -3,8 +3,6 @@ import { Ticket, columns } from "@/app/client/mis-tickets/columns";
 import { DataTable } from "@/components/data-table";
 import { authOptions } from "@/auth";
 import "dotenv/config";
-import { LoadingTable } from "@/components/loading-table";
-import { Suspense } from "react";
 
 async function getTickets(): Promise<Ticket[]> {
   const res = await import("@/app/api/tickets/route");
@@ -25,18 +23,11 @@ async function getTickets(): Promise<Ticket[]> {
   return await (await res.GET(request)).json();
 }
 
-async function TicketsTable() {
-  const data = await getTickets();
-  return <DataTable columns={columns} data={data} />;
-}
-
 export default async function Page() {
+  const data = await getTickets();
   return (
-    <div className="container mx-auto py-10 md:px-10">
-      <h1 className="text-2xl font-semibold mb-5">Mis tickets</h1>
-      <Suspense fallback={<LoadingTable />}>
-        <TicketsTable />
-      </Suspense>
+    <div className="container mx-auto py-10">
+      <DataTable columns={columns} data={data} role="client" />
     </div>
   );
 }

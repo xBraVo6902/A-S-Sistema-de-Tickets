@@ -1,10 +1,12 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
+  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -27,16 +29,22 @@ import { Input } from "@/components/ui/input";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  role: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  role,
 }: DataTableProps<TData, TValue>) {
+  const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = React.useState("");
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
 
   const table = useReactTable({
     data,
@@ -47,22 +55,49 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       columnFilters,
+      columnVisibility,
+      globalFilter,
+    },
+    globalFilterFn: (row, columnId, filterValue) => {
+      const searchTerm = String(filterValue).toLowerCase();
+      const exactMatchFields = ["estado", "tipo", "prioridad"];
+
+      return row.getAllCells().some((cell) => {
+        const columnId = cell.column.id;
+        const rawValue = cell.getValue();
+
+        let cellValue = "";
+        if (typeof rawValue === "object" && rawValue !== null) {
+          cellValue = String(
+            (rawValue as { text: string }).text ||
+              (rawValue as { firstName: string }).firstName ||
+              ""
+          ).toLowerCase();
+        } else {
+          cellValue = String(rawValue).toLowerCase();
+        }
+
+        if (exactMatchFields.includes(columnId)) {
+          return cellValue === searchTerm;
+        }
+
+        return cellValue.includes(searchTerm);
+      });
     },
   });
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center gap-4 py-4 flex-wrap">
         <Input
-          placeholder="Buscar por título"
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
+          placeholder="Buscar ticket..."
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
+          className="max-w-[400px]"
         />
       </div>
       <div className="rounded-md border">
@@ -91,6 +126,11 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="cursor-pointer hover:bg-muted/50 min-h-12"
+                  onClick={() => {
+                    const id = row.getValue("id");
+                    router.push(`/${role}/ticket/${id}`);
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -108,7 +148,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Sin resultados.
+                  Sin resultados
                 </TableCell>
               </TableRow>
             )}

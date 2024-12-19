@@ -1,25 +1,41 @@
 // TODO
-/**
- * ! Script para llenar la base de datos con datos de prueba
- * ! Eliminar antes de pasar a producción
- */
+// ! Script de desarrollo, borrar antes de hacer deploy.
 
 import { PrismaClient } from "@prisma/client";
-import { persons, tickets } from "./data.js";
+import { people, tickets } from "./data.js";
 import bcrypt from "bcrypt";
+import md5 from "md5";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  for (const person of persons) {
-    const hashedPassword = await bcrypt.hash(person.password, 10);
-    person.password = hashedPassword;
+  await prisma.ticket.deleteMany({});
+  await prisma.person.deleteMany({});
 
-    await prisma.person.upsert({
-      where: { email: person.email },
-      update: {},
-      create: person,
+  await prisma.$executeRaw`ALTER TABLE Person AUTO_INCREMENT = 1;`;
+  await prisma.$executeRaw`ALTER TABLE Ticket AUTO_INCREMENT = 1;`;
+
+  const createdPeople = [];
+  for (const person of people) {
+    const hashedPassword = await bcrypt.hash(person.password, 10);
+
+    const hashedEmail = md5(person.email.trim().toLowerCase());
+    const gravatarUrl = `https://www.gravatar.com/avatar/${hashedEmail}?s=256&d=mp`;
+
+    const createdPerson = await prisma.person.create({
+      data: {
+        firstName: person.firstName,
+        lastName: person.lastName,
+        email: person.email,
+        rut: person.rut,
+        avatar: gravatarUrl,
+        companyRut: person.companyRut,
+        password: hashedPassword,
+        role: person.role,
+        phone: person.phone,
+      },
     });
+    createdPeople.push(createdPerson);
   }
 
   for (const ticket of tickets) {
@@ -30,20 +46,19 @@ async function main() {
         type: ticket.type,
         priority: ticket.priority,
         status: ticket.status,
+        userId: ticket.userId,
+        clientId: ticket.clientId,
         createdAt: ticket.createdAt,
-        client: { connect: { id: ticket.clientId } },
-        user: ticket.userId ? { connect: { id: ticket.userId } } : undefined,
       },
     });
   }
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error("Unexpected error:", e);
-    await prisma.$disconnect();
+  .catch((e) => {
+    console.error(e);
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });

@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,56 +13,58 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import router from 'next/router'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 
-const formSchema = z.object({
-  password: z.string().min(8, {
-    message: "La contraseña debe tener al menos 8 caracteres.",
-  }),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Las contraseñas no coinciden",
-  path: ["confirmPassword"],
-})
+const formSchema = z
+  .object({
+    password: z.string().min(8, {
+      message: "La contraseña debe tener al menos 8 caracteres.",
+    }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
 
 export default function ResetPasswordPage() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       password: "",
       confirmPassword: "",
     },
-  })
+  });
 
-    const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        try {
-        const response = await fetch("/api/reset-password", {
-            method: "PUT",
-            headers: {
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-            token: new URLSearchParams(window.location.search).get("token"),
-            newPassword: data.password,
-            }),
-        })
-    
-        if (response.ok) {
-            alert("Contraseña restablecida correctamente")
-            router.push("/login")
-        } else {
-            alert("Error restableciendo la contraseña")
-        }
-        } catch (error) {
-        console.error(error)
-        alert("Error restableciendo la contraseña")
-        }
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      const response = await fetch("/api/reset-password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: new URLSearchParams(window.location.search).get("token"),
+          newPassword: data.password,
+        }),
+      });
+      if (response.ok) {
+        alert("Contraseña restablecida correctamente");
+        router.push("/login");
+      } else {
+        alert("Error restableciendo la contraseña");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error restableciendo la contraseña");
     }
+  };
 
   return (
-        <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen">
       <div className="container mx-auto max-w-md py-10">
         <h1 className="text-2xl font-bold mb-5">Restablecer contraseña</h1>
         <Form {...form}>
@@ -104,5 +106,5 @@ export default function ResetPasswordPage() {
         </Form>
       </div>
     </div>
-  )
+  );
 }

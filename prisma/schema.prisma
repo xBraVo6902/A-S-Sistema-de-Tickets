@@ -8,19 +8,22 @@ datasource db {
 }
 
 model Person {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  role       Role
-  firstName  String
-  lastName   String
-  email      String   @unique
-  phone      String   @unique
-  rut        String   @unique
-  password   String   @db.Char(60)
-  assigned   Ticket[] @relation(name: "UserToTicket")
-  created    Ticket[] @relation(name: "ClientToTicket")
-  companyRut String?
+  id             Int       @id @default(autoincrement())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  role           Role
+  firstName      String
+  lastName       String
+  email          String    @unique
+  avatar         String
+  phone          String    @unique
+  rut            String    @unique
+  password       String?   @db.Char(60)
+  assigned       Ticket[]  @relation(name: "UserToTicket")
+  created        Ticket[]  @relation(name: "ClientToTicket")
+  companyRut     String?
+  temporaryToken String?
+  tokenExpiry    DateTime?
 }
 
 enum Role {
@@ -51,13 +54,14 @@ enum Status {
 }
 
 enum Type {
-  Hardware
-  Software
-  Other
+  Bug
+  Feature
+  Question
 }
 
 enum Priority {
   Low
   Medium
   High
+  Urgent
 }

@@ -29,7 +29,7 @@ export const authOptions = {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      authorize: async (credentials, req) => {
+      authorize: async (credentials) => {
         if (!credentials) return null;
 
         const person = await prisma.person.findUnique({
@@ -38,10 +38,10 @@ export const authOptions = {
 
         if (!person) throw new Error("USER_NOT_FOUND");
 
-        const passwordsMatch = await bcrypt.compare(
-          credentials.password,
-          person.password
-        );
+        const passwordsMatch =
+          person.password === null
+            ? credentials.password === person.password
+            : await bcrypt.compare(credentials.password, person.password);
 
         if (!passwordsMatch) throw new Error("WRONG_PASSWORD");
 
@@ -55,7 +55,7 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    session: ({ session, token, user }) => ({
+    session: ({ session, token }) => ({
       ...session,
       user: {
         ...session.user,

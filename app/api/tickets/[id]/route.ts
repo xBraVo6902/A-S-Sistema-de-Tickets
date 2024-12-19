@@ -1,7 +1,7 @@
 import { authOptions } from "@/auth";
 import prisma from "@/lib/db";
 import { getServerSession } from "next-auth";
-import { translations } from "@/prisma/translations";
+import { ticketMetadata } from "@/prisma/ticketMetadata";
 
 export async function GET(
   request: Request,
@@ -37,6 +37,7 @@ export async function GET(
             lastName: true,
             email: true,
             phone: true,
+            avatar: true,
           },
         },
         client: {
@@ -46,6 +47,7 @@ export async function GET(
             lastName: true,
             email: true,
             phone: true,
+            avatar: true,
           },
         },
       },
@@ -60,9 +62,9 @@ export async function GET(
 
     const translatedTicket = {
       ...ticket,
-      priority: translations.priority[ticket.priority],
-      status: translations.status[ticket.status],
-      type: translations.type[ticket.type],
+      priority: ticketMetadata.priority[ticket.priority],
+      status: ticketMetadata.status[ticket.status],
+      type: ticketMetadata.type[ticket.type],
       createdAt: new Date(ticket.createdAt).toLocaleString("es-ES", {
         day: "2-digit",
         month: "2-digit",

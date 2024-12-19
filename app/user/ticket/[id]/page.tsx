@@ -1,3 +1,4 @@
+import { BackButton } from "@/components/back-button";
 import TicketInfo from "@/components/ticket-info";
 import { TicketInfoProps } from "@/components/ticket-info";
 
@@ -29,6 +30,7 @@ export default async function TicketView({
 
   return (
     <div className="container mx-auto py-10 md:px-10 space-y-6">
+      <BackButton href="/user/mis-tickets" text="Volver a la lista" />
       <TicketInfo data={ticketData} role="User" />
     </div>
   );

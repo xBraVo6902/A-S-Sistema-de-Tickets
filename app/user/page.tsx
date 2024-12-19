@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { RectangleStackIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
+import { RectangleStackIcon } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
 
 export default function MainMenu() {
@@ -23,12 +23,6 @@ export default function MainMenu() {
       description: "Ve los tickets de soporte que tienes asignados",
       icon: RectangleStackIcon,
       href: "user/mis-tickets",
-    },
-    {
-      title: "Preferencias de la cuenta",
-      description: "Configura las preferencias de tu cuenta",
-      icon: Cog6ToothIcon,
-      href: "",
     },
   ];
 
