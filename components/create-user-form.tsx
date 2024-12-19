@@ -103,7 +103,15 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
     await createUserOrClient(submitData);
 
     const resetLink = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/reset-password?token=${temporaryToken}`;
-    console.log(resetLink);
+
+    const message = `Bienvenido/a al sistema de tickets. Para crear tu contraseña, haz click en el siguiente enlace:\n${resetLink}`;
+    const phoneNumber = `569${data.phone.replace(/\s/g, "")}`;
+    const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+      message
+    )}`;
+
+    // Abrir WhatsApp en una nueva pestaña
+    window.open(whatsappLink, "_blank");
   };
 
   return (
@@ -274,8 +282,8 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
                       e.target.value = limited;
                     },
                   })}
-                  placeholder="1234 5678"
-                  className={`rounded-l-none border-l-0 ${
+                  placeholder="12345678"
+                  className={`rounded-l-none ${
                     errors.phone ? "border-red-500" : ""
                   }`}
                 />
