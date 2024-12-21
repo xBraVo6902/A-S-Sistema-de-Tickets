@@ -8,21 +8,98 @@ import md5 from "md5";
 
 const prisma = new PrismaClient();
 
+const statuses = [
+  {
+    name: "Abierto",
+    order: 1,
+    lucideIcon: "CircleDot",
+    hexColor: "#2471a3",
+  },
+  {
+    name: "En progreso",
+    order: 2,
+    lucideIcon: "Timer",
+    hexColor: "#d4ac0d",
+  },
+  {
+    name: "Cerrado",
+    order: 3,
+    lucideIcon: "CheckCircle2",
+    hexColor: "#27ae60",
+  },
+];
+
+const types = [
+  {
+    name: "Bug",
+    lucideIcon: "Bug",
+    hexColor: "#c0392b",
+  },
+  {
+    name: "Característica",
+    lucideIcon: "Lightbulb",
+    hexColor: "#8e44ad",
+  },
+  {
+    name: "Pregunta",
+    lucideIcon: "HelpCircle",
+    hexColor: "#2471a3",
+  },
+];
+
+const priorities = [
+  {
+    name: "Baja",
+    order: 1,
+    lucideIcon: "ArrowDown",
+    hexColor: "#27ae60",
+  },
+  {
+    name: "Media",
+    order: 2,
+    lucideIcon: "ArrowRight",
+    hexColor: "#d4ac0d",
+  },
+  {
+    name: "Alta",
+    order: 3,
+    lucideIcon: "ArrowUp",
+    hexColor: "#c0392b",
+  },
+];
+
 async function main() {
   await prisma.ticket.deleteMany({});
   await prisma.person.deleteMany({});
+  await prisma.status.deleteMany({});
+  await prisma.type.deleteMany({});
+  await prisma.priority.deleteMany({});
 
   await prisma.$executeRaw`ALTER TABLE Person AUTO_INCREMENT = 1;`;
   await prisma.$executeRaw`ALTER TABLE Ticket AUTO_INCREMENT = 1;`;
+  await prisma.$executeRaw`ALTER TABLE Status AUTO_INCREMENT = 1;`;
+  await prisma.$executeRaw`ALTER TABLE Type AUTO_INCREMENT = 1;`;
+  await prisma.$executeRaw`ALTER TABLE Priority AUTO_INCREMENT = 1;`;
 
-  const createdPeople = [];
+  const statusRecords = await Promise.all(
+    statuses.map((status) => prisma.status.create({ data: status }))
+  );
+
+  const typeRecords = await Promise.all(
+    types.map((type) => prisma.type.create({ data: type }))
+  );
+
+  const priorityRecords = await Promise.all(
+    priorities.map((priority) => prisma.priority.create({ data: priority }))
+  );
+
   for (const person of people) {
     const hashedPassword = await bcrypt.hash(person.password, 10);
 
     const hashedEmail = md5(person.email.trim().toLowerCase());
     const gravatarUrl = `https://www.gravatar.com/avatar/${hashedEmail}?s=256&d=mp`;
 
-    const createdPerson = await prisma.person.create({
+    await prisma.person.create({
       data: {
         firstName: person.firstName,
         lastName: person.lastName,
@@ -35,17 +112,20 @@ async function main() {
         phone: person.phone,
       },
     });
-    createdPeople.push(createdPerson);
   }
 
   for (const ticket of tickets) {
+    const status = statusRecords.find((s) => s.name === ticket.status);
+    const type = typeRecords.find((t) => t.name === ticket.type);
+    const priority = priorityRecords.find((p) => p.name === ticket.priority);
+
     await prisma.ticket.create({
       data: {
         title: ticket.title,
         description: ticket.description,
-        type: ticket.type,
-        priority: ticket.priority,
-        status: ticket.status,
+        statusId: status.id,
+        typeId: type.id,
+        priorityId: priority.id,
         userId: ticket.userId,
         clientId: ticket.clientId,
         createdAt: ticket.createdAt,

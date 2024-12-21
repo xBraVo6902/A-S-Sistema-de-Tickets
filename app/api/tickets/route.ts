@@ -3,12 +3,15 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 import prisma from "@/lib/db";
 import { Priority, Type, Status, Prisma } from "@prisma/client";
-import { ticketMetadata } from "@/prisma/ticketMetadata";
+import { getTicketMetadata } from "@/lib/actions";
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
+  const [session, ticketMetadata] = await Promise.all([
+    getServerSession(authOptions),
+    getTicketMetadata(),
+  ]);
 
   if (!session) {
     return new Response(JSON.stringify({ message: "Unauthorized" }), {
@@ -59,9 +62,9 @@ export async function POST(request: Request) {
     const ticketSchema = z.object({
       title: z.string().min(1, "Title is required"),
       description: z.string().min(1, "Description is required"),
-      type: z.enum(Object.keys(ticketMetadata.type) as [string, ...string[]]),
+      type: z.enum(Object.keys(ticketMetadata.types) as [string, ...string[]]),
       priority: z.enum(
-        Object.keys(ticketMetadata.priority) as [string, ...string[]]
+        Object.keys(ticketMetadata.priorities) as [string, ...string[]]
       ),
     });
 
@@ -91,8 +94,10 @@ export async function POST(request: Request) {
       data: {
         title,
         description,
-        type: capitalize(type) as Type,
-        priority: capitalize(priority) as Priority,
+        typeId: ticketMetadata.types.find((t) => t.name === type)?.id,
+        priorityId: ticketMetadata.priorities.find((p) => p.name === priority)
+          ?.id,
+        statusId: ticketMetadata.statuses.find((s) => s.name === "Abierto")?.id,
         client: { connect: { id: finalClientId } },
       },
     });

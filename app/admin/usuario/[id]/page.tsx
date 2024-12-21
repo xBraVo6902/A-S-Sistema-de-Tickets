@@ -1,7 +1,6 @@
 import { BackButton } from "@/components/back-button";
 import UserInfo from "@/components/user-info";
-import { getUserById } from "@/lib/actions";
-import { ticketMetadata } from "@/prisma/ticketMetadata";
+import { getUserById, getTicketMetadata } from "@/lib/actions";
 
 export default async function UserPage({
   params,
@@ -9,7 +8,10 @@ export default async function UserPage({
   params: Promise<{ id: string }>;
 }) {
   const id = (await params).id;
-  const user = await getUserById(id);
+  const [user, ticketMetadata] = await Promise.all([
+    getUserById(id),
+    getTicketMetadata(),
+  ]);
 
   const formatPhone = (phone: string) => {
     const countryCode = phone.slice(0, 2);
@@ -32,8 +34,8 @@ export default async function UserPage({
         id: ticket.id.toString(),
         title: ticket.title,
         status: {
-          text: ticketMetadata.status[ticket.status].text,
-          color: ticketMetadata.status[ticket.status].color,
+          text: ticketMetadata.statuses[ticket.statusId].name,
+          color: ticketMetadata.statuses[ticket.statusId].hexColor,
         },
       })
     ),

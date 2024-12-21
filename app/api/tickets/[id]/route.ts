@@ -1,13 +1,16 @@
 import { authOptions } from "@/auth";
+import { getTicketMetadata } from "@/lib/actions";
 import prisma from "@/lib/db";
 import { getServerSession } from "next-auth";
-import { ticketMetadata } from "@/prisma/ticketMetadata";
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
+  const [session, ticketMetadata] = await Promise.all([
+    getServerSession(authOptions),
+    getTicketMetadata(),
+  ]);
 
   if (!session) {
     return new Response(JSON.stringify({ message: "Unauthorized" }), {
@@ -27,9 +30,9 @@ export async function GET(
         updatedAt: true,
         title: true,
         description: true,
-        status: true,
-        type: true,
-        priority: true,
+        statusId: true,
+        typeId: true,
+        priorityId: true,
         user: {
           select: {
             id: true,
@@ -62,9 +65,9 @@ export async function GET(
 
     const translatedTicket = {
       ...ticket,
-      priority: ticketMetadata.priority[ticket.priority],
-      status: ticketMetadata.status[ticket.status],
-      type: ticketMetadata.type[ticket.type],
+      priority: ticketMetadata.priorities[ticket.priorityId],
+      status: ticketMetadata.statuses[ticket.statusId],
+      type: ticketMetadata.types[ticket.typeId],
       createdAt: new Date(ticket.createdAt).toLocaleString("es-ES", {
         day: "2-digit",
         month: "2-digit",

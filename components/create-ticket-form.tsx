@@ -26,10 +26,11 @@ import { useRouter } from "next/navigation";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
-import { ticketMetadata } from "@/prisma/ticketMetadata";
 import { searchClientByRut } from "@/lib/actions";
+import { TicketMetadata } from "@/lib/types";
 
 interface CreateTicketFormProps {
+  ticketMetadata: TicketMetadata;
   role: "Client" | "Admin";
 }
 
@@ -205,19 +206,19 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
                       <SelectValue placeholder="Selecciona el tipo de problema" />
                     </SelectTrigger>
                     <SelectContent position="popper">
-                      {Object.entries(ticketMetadata.type).map(
+                      {Object.entries(props.ticketMetadata.types).map(
                         ([key, value]) => {
                           const Icon = LucideIcons[
-                            value.icon as keyof typeof LucideIcons
+                            value.lucideIcon as keyof typeof LucideIcons
                           ] as LucideIcon;
                           return (
                             <SelectItem key={key} value={key}>
                               <div className="flex items-center gap-2">
                                 <Icon
                                   className="h-4 w-4"
-                                  style={{ color: value.color }}
+                                  style={{ color: value.hexColor }}
                                 />
-                                {value.text}
+                                {value.name}
                               </div>
                             </SelectItem>
                           );
@@ -248,19 +249,19 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
                       <SelectValue placeholder="Selecciona la prioridad" />
                     </SelectTrigger>
                     <SelectContent position="popper">
-                      {Object.entries(ticketMetadata.priority).map(
+                      {Object.entries(props.ticketMetadata.priorities).map(
                         ([key, value]) => {
                           const Icon = LucideIcons[
-                            value.icon as keyof typeof LucideIcons
+                            value.lucideIcon as keyof typeof LucideIcons
                           ] as LucideIcon;
                           return (
                             <SelectItem key={key} value={key}>
                               <div className="flex items-center gap-2">
                                 <Icon
                                   className="h-4 w-4"
-                                  style={{ color: value.color }}
+                                  style={{ color: value.hexColor }}
                                 />
-                                {value.text}
+                                {value.name}
                               </div>
                             </SelectItem>
                           );
