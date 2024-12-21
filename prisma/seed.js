@@ -11,16 +11,19 @@ const prisma = new PrismaClient();
 const statuses = [
   {
     name: "Abierto",
+    order: 1,
     lucideIcon: "CircleDot",
     hexColor: "#2471a3",
   },
   {
     name: "En progreso",
+    order: 2,
     lucideIcon: "Timer",
     hexColor: "#d4ac0d",
   },
   {
     name: "Cerrado",
+    order: 3,
     lucideIcon: "CheckCircle2",
     hexColor: "#27ae60",
   },
@@ -47,16 +50,19 @@ const types = [
 const priorities = [
   {
     name: "Baja",
+    order: 1,
     lucideIcon: "ArrowDown",
     hexColor: "#27ae60",
   },
   {
     name: "Media",
+    order: 2,
     lucideIcon: "ArrowRight",
     hexColor: "#d4ac0d",
   },
   {
     name: "Alta",
+    order: 3,
     lucideIcon: "ArrowUp",
     hexColor: "#c0392b",
   },

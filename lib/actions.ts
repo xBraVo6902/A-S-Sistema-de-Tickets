@@ -156,9 +156,9 @@ export async function getPeople() {
 
 export async function getTicketMetadata() {
   const [statuses, types, priorities] = await Promise.all([
-    prisma.status.findMany(),
+    prisma.status.findMany({ orderBy: { order: "asc" } }),
     prisma.type.findMany(),
-    prisma.priority.findMany(),
+    prisma.priority.findMany({ orderBy: { order: "asc" } }),
   ]);
 
   return { statuses, types, priorities };

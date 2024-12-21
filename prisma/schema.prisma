@@ -53,6 +53,7 @@ model Ticket {
 model Status {
   id         Int      @id @default(autoincrement())
   name       String   @unique
+  order      Int
   lucideIcon String
   hexColor   String   @db.Char(7)
   Ticket     Ticket[]
@@ -69,6 +70,7 @@ model Type {
 model Priority {
   id         Int      @id @default(autoincrement())
   name       String   @unique
+  order      Int
   lucideIcon String
   hexColor   String   @db.Char(7)
   Ticket     Ticket[]
