@@ -1,8 +1,7 @@
 import { authOptions } from "@/auth";
 import { getServerSession } from "next-auth";
 import prisma from "@/lib/db";
-import { Status } from "@prisma/client";
-import { ticketMetadata } from "@/prisma/ticketMetadata";
+import { getTicketMetadata } from "@/lib/actions";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -66,13 +65,22 @@ async function getRecentTickets() {
 
 async function getSummary() {
   try {
-    const totalTickets = await prisma.ticket.count();
-    const pendingTickets = await prisma.ticket.count({
-      where: { status: Status.Open },
-    });
-    const completedTickets = await prisma.ticket.count({
-      where: { status: Status.Closed },
-    });
+    const ticketMetadata = await getTicketMetadata();
+    const [totalTickets, pendingTickets, completedTickets] = await Promise.all([
+      prisma.ticket.count(),
+      prisma.ticket.count({
+        where: {
+          statusId: ticketMetadata.statuses.find((s) => s.name === "Abierto")
+            ?.id,
+        },
+      }),
+      prisma.ticket.count({
+        where: {
+          statusId: ticketMetadata.statuses.find((s) => s.name === "Cerrado")
+            ?.id,
+        },
+      }),
+    ]);
 
     return new Response(
       JSON.stringify({
@@ -98,10 +106,16 @@ async function getSummary() {
 
 async function getResolutionRate() {
   try {
-    const totalTickets = await prisma.ticket.count();
-    const completedTickets = await prisma.ticket.count({
-      where: { status: Status.Closed },
-    });
+    const ticketMetadata = await getTicketMetadata();
+    const [totalTickets, completedTickets] = await Promise.all([
+      prisma.ticket.count(),
+      prisma.ticket.count({
+        where: {
+          statusId: ticketMetadata.statuses.find((s) => s.name === "Cerrado")
+            ?.id,
+        },
+      }),
+    ]);
     const resolutionRate = (completedTickets / totalTickets) * 100;
 
     return new Response(JSON.stringify({ resolutionRate }), {

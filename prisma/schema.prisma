@@ -38,30 +38,40 @@ model Ticket {
   updatedAt   DateTime @updatedAt
   title       String   @db.Text
   description String   @db.Text
-  status      Status   @default(Open)
-  type        Type
-  priority    Priority
+  status      Status   @relation(fields: [statusId], references: [id])
+  statusId    Int
+  type        Type     @relation(fields: [typeId], references: [id])
+  typeId      Int
+  priority    Priority @relation(fields: [priorityId], references: [id])
+  priorityId  Int
   user        Person?  @relation(name: "UserToTicket", fields: [userId], references: [id])
   userId      Int?
   client      Person   @relation(name: "ClientToTicket", fields: [clientId], references: [id])
   clientId    Int
 }
 
-enum Status {
-  Open
-  InProgress
-  Closed
+model Status {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  order      Int
+  lucideIcon String
+  hexColor   String   @db.Char(7)
+  Ticket     Ticket[]
 }
 
-enum Type {
-  Bug
-  Feature
-  Question
+model Type {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  lucideIcon String
+  hexColor   String   @db.Char(7)
+  Ticket     Ticket[]
 }
 
-enum Priority {
-  Low
-  Medium
-  High
-  Urgent
+model Priority {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  order      Int
+  lucideIcon String
+  hexColor   String   @db.Char(7)
+  Ticket     Ticket[]
 }
