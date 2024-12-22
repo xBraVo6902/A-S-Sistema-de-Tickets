@@ -97,6 +97,24 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
   };
 
   const onSubmit = async (data: FormInputs) => {
+    const { type, priority, ...rest } = data;
+    const typeName = (
+      props.ticketMetadata.types[
+        type as keyof typeof props.ticketMetadata.types
+      ] as { name: string }
+    ).name;
+    const priorityName = (
+      props.ticketMetadata.priorities[
+        priority as keyof typeof props.ticketMetadata.priorities
+      ] as { name: string }
+    ).name;
+
+    const formattedData = {
+      ...rest,
+      type: typeName,
+      priority: priorityName,
+    };
+
     let response;
 
     if (props.role === "Admin") {
@@ -114,7 +132,7 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formattedData),
       });
     } else {
       response = await fetch("/api/tickets", {
@@ -122,7 +140,7 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formattedData),
       });
     }
 

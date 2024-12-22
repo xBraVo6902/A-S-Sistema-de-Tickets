@@ -30,41 +30,20 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { searchParams } = new URL(request.url);
-    const clientRut = searchParams.get("clientRut");
     const clientId = searchParams.get("clientId");
 
-    let finalClientId: number;
-
-    if (clientRut) {
-      // Si se proporciona RUT, buscar el cliente por RUT
-      const client = await prisma.person.findUnique({
-        where: { rut: clientRut },
-      });
-
-      if (!client) {
-        return new Response(
-          JSON.stringify({
-            message: "No se encontró el cliente con el RUT especificado",
-          }),
-          { status: 404, headers: { "Content-Type": "application/json" } }
-        );
-      }
-
-      finalClientId = client.id;
-    } else if (clientId) {
-      // Si se proporciona ID, usarlo directamente
-      finalClientId = parseInt(clientId);
-    } else {
-      // Si no se proporciona ninguno, usar el ID del usuario de la sesión
-      finalClientId = parseInt(session.user.id as string);
-    }
+    const finalClientId = clientId
+      ? parseInt(clientId)
+      : parseInt(session?.user?.id || "0");
 
     const ticketSchema = z.object({
       title: z.string().min(1, "Title is required"),
       description: z.string().min(1, "Description is required"),
-      type: z.enum(Object.keys(ticketMetadata.types) as [string, ...string[]]),
+      type: z.enum(
+        ticketMetadata.types.map((t) => t.name) as [string, ...string[]]
+      ),
       priority: z.enum(
-        Object.keys(ticketMetadata.priorities) as [string, ...string[]]
+        ticketMetadata.priorities.map((p) => p.name) as [string, ...string[]]
       ),
     });
 
@@ -90,14 +69,21 @@ export async function POST(request: Request) {
       );
     }
 
+    const typeId = ticketMetadata.types.find((t) => t.name === type)?.id;
+    const priorityId = ticketMetadata.priorities.find(
+      (p) => p.name === priority
+    )?.id;
+    const statusId = ticketMetadata.statuses.find(
+      (s) => s.name === "Abierto"
+    )?.id;
+
     await prisma.ticket.create({
       data: {
         title,
         description,
-        typeId: ticketMetadata.types.find((t) => t.name === type)?.id,
-        priorityId: ticketMetadata.priorities.find((p) => p.name === priority)
-          ?.id,
-        statusId: ticketMetadata.statuses.find((s) => s.name === "Abierto")?.id,
+        type: { connect: { id: typeId } },
+        priority: { connect: { id: priorityId } },
+        status: { connect: { id: statusId } },
         client: { connect: { id: finalClientId } },
       },
     });
