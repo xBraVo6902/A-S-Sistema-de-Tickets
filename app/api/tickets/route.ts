@@ -2,10 +2,7 @@ import { authOptions } from "@/auth";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import prisma from "@/lib/db";
-import { Priority, Type, Status, Prisma } from "@prisma/client";
 import { getTicketMetadata } from "@/lib/actions";
-
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export async function POST(request: Request) {
   const [session, ticketMetadata] = await Promise.all([
@@ -113,20 +110,26 @@ export async function GET(request: Request) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const whereCondition: Prisma.TicketWhereInput =
-      buildWhereCondition(searchParams);
+    const clientId = searchParams.get("clientId");
+    const userId = searchParams.get("userId");
 
     const tickets = await prisma.ticket.findMany({
-      where: whereCondition,
+      where:
+        clientId || userId
+          ? { client: { id: parseInt(clientId || userId || "0") } }
+          : {},
       select: {
         id: true,
         title: true,
-        description: true,
-        type: true,
-        status: true,
-        priority: true,
-        createdAt: true,
-        updatedAt: true,
+        type: {
+          select: { id: true, name: true, hexColor: true, lucideIcon: true },
+        },
+        status: {
+          select: { id: true, name: true, hexColor: true, lucideIcon: true },
+        },
+        priority: {
+          select: { id: true, name: true, hexColor: true, lucideIcon: true },
+        },
         user: {
           select: {
             firstName: true,
@@ -137,39 +140,7 @@ export async function GET(request: Request) {
       },
     });
 
-    const translatedTickets = tickets.map((ticket) => {
-      return {
-        ...ticket,
-        status: {
-          value: ticket.status,
-          ...ticketMetadata.status[ticket.status],
-        },
-        type: {
-          value: ticket.type,
-          ...ticketMetadata.type[ticket.type],
-        },
-        priority: {
-          value: ticket.priority,
-          ...ticketMetadata.priority[ticket.priority],
-        },
-        createdAt: new Date(ticket.createdAt).toLocaleString("es-ES", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        updatedAt: new Date(ticket.updatedAt).toLocaleString("es-ES", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      };
-    });
-
-    return new Response(JSON.stringify(translatedTickets), {
+    return new Response(JSON.stringify(tickets), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -180,68 +151,4 @@ export async function GET(request: Request) {
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
-}
-
-function buildWhereCondition(searchParams: URLSearchParams) {
-  const whereCondition: Prisma.TicketWhereInput = {};
-
-  const status = searchParams.get("status")?.toLowerCase();
-  if (status) {
-    whereCondition.status = capitalize(status) as Status;
-  }
-
-  const priority = searchParams.get("priority")?.toLowerCase();
-  if (priority) {
-    whereCondition.priority = capitalize(priority) as Priority;
-  }
-
-  const type = searchParams.get("type")?.toLowerCase();
-  if (type) {
-    whereCondition.type = capitalize(type) as Type;
-  }
-
-  const assigned = searchParams.get("assigned");
-  if (assigned === "true") {
-    whereCondition.userId = { not: null };
-  } else if (assigned === "false") {
-    whereCondition.userId = null;
-  }
-
-  const clientId = searchParams.get("clientId");
-  if (clientId) {
-    whereCondition.clientId = parseInt(clientId);
-  }
-
-  const userId = searchParams.get("userId");
-  if (userId) {
-    whereCondition.userId = parseInt(userId);
-  }
-
-  const createdFrom = searchParams.get("createdFrom");
-  const createdTo = searchParams.get("createdTo");
-  if (createdFrom || createdTo) {
-    whereCondition.createdAt = {
-      ...(createdFrom ? { gte: new Date(createdFrom) } : {}),
-      ...(createdTo ? { lte: new Date(createdTo) } : {}),
-    };
-  }
-
-  const updatedFrom = searchParams.get("updatedFrom");
-  const updatedTo = searchParams.get("updatedTo");
-  if (updatedFrom || updatedTo) {
-    whereCondition.updatedAt = {
-      ...(updatedFrom ? { gte: new Date(updatedFrom) } : {}),
-      ...(updatedTo ? { lte: new Date(updatedTo) } : {}),
-    };
-  }
-
-  const keyword = searchParams.get("keyword");
-  if (keyword) {
-    whereCondition.OR = [
-      { title: { contains: keyword } },
-      { description: { contains: keyword } },
-    ];
-  }
-
-  return whereCondition;
 }

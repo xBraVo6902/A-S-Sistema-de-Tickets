@@ -13,3 +13,24 @@ export interface TicketMetadata {
     hexColor: string;
   }[];
 }
+
+export interface TicketStatus {
+  id: number;
+  name: string;
+  lucideIcon: string;
+  hexColor: string;
+}
+
+export interface TicketType {
+  id: number;
+  name: string;
+  lucideIcon: string;
+  hexColor: string;
+}
+
+export interface TicketPriority {
+  id: number;
+  name: string;
+  lucideIcon: string;
+  hexColor: string;
+}
