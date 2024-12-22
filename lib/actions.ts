@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db";
-import { Status } from "@prisma/client";
 import md5 from "md5";
 import "dotenv/config";
 
@@ -21,11 +20,11 @@ export async function assignUserToTicket(ticketId: string, userId: string) {
   }
 }
 
-export async function updateTicketStatus(ticketId: string, status: Status) {
+export async function updateTicketStatus(ticketId: string, statusId: string) {
   try {
     await prisma.ticket.update({
       where: { id: parseInt(ticketId) },
-      data: { status: status },
+      data: { statusId: parseInt(statusId) },
     });
 
     revalidatePath(`/admin/ticket/${ticketId}`);

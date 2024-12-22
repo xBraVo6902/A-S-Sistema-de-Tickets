@@ -19,14 +19,17 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { Priority, Status, Type } from "@prisma/client";
 import TicketMessageButton from "./ticket-message-button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
-import { assignUserToTicket, updateTicketStatus } from "@/lib/actions";
-import { ticketMetadata } from "@/prisma/ticketMetadata";
+import {
+  assignUserToTicket,
+  updateTicketStatus,
+  getTicketMetadata,
+} from "@/lib/actions";
+import { TicketPriority, TicketStatus, TicketType } from "@/lib/types";
 
 export type TicketInfoProps = {
   data: {
@@ -35,9 +38,9 @@ export type TicketInfoProps = {
     description: string;
     createdAt: string;
     updatedAt: string;
-    status: Status & { text: string; icon: string; color: string };
-    type: Type & { text: string; icon: string; color: string };
-    priority: Priority & { text: string; icon: string; color: string };
+    status: TicketStatus;
+    type: TicketType;
+    priority: TicketPriority;
     user: {
       firstName: string;
       lastName: string;
@@ -82,14 +85,15 @@ export default function TicketInfo(props: TicketInfoProps) {
     label: `${user.firstName} ${user.lastName}`,
   }));
 
-  const statuses = Object.entries(ticketMetadata.status).map(
-    ([key, value]) => ({
-      value: key,
-      label: value.text,
-      icon: value.icon,
-      color: value.color,
-    })
-  );
+  const [statuses, setStatuses] = React.useState<TicketStatus[]>([]);
+
+  React.useEffect(() => {
+    async function fetchStatuses() {
+      const metadata = await getTicketMetadata();
+      setStatuses(metadata.statuses);
+    }
+    fetchStatuses();
+  }, []);
 
   const [assignOpen, setAssignOpen] = React.useState(false);
   const [assignValue, setAssignValue] = React.useState("");
@@ -122,7 +126,9 @@ export default function TicketInfo(props: TicketInfoProps) {
       try {
         const result = await updateTicketStatus(
           props.data.id,
-          currentValue as Status
+          statuses
+            .find((status) => status.name === currentValue)
+            ?.id.toString() || ""
         );
         if (!result.success) {
           setStatusValue(statusValue);
@@ -145,22 +151,22 @@ export default function TicketInfo(props: TicketInfoProps) {
               </CardTitle>
               <div className="flex space-x-2 mb-2">
                 <Badge
-                  style={{ backgroundColor: props.data.status.color }}
+                  style={{ backgroundColor: props.data.status.hexColor }}
                   className="text-white"
                 >
-                  {props.data.status.text}
+                  {props.data.status.name}
                 </Badge>
                 <Badge
-                  style={{ backgroundColor: props.data.type.color }}
+                  style={{ backgroundColor: props.data.type.hexColor }}
                   className="text-white"
                 >
-                  {props.data.type.text}
+                  {props.data.type.name}
                 </Badge>
                 <Badge
-                  style={{ backgroundColor: props.data.priority.color }}
+                  style={{ backgroundColor: props.data.priority.hexColor }}
                   className="text-white"
                 >
-                  Prioridad {props.data.priority.text}
+                  Prioridad {props.data.priority.name}
                 </Badge>
               </div>
             </div>
@@ -285,25 +291,28 @@ export default function TicketInfo(props: TicketInfoProps) {
                           <CommandGroup>
                             {statuses.map((status) => (
                               <CommandItem
-                                key={status.value}
-                                value={status.value}
+                                key={status.id}
+                                value={status.name}
                                 onSelect={handleStatusChange}
                               >
                                 <div className="flex items-center">
                                   <Check
                                     className={cn(
                                       "mr-2 h-4 w-4",
-                                      statusValue === status.value
+                                      statusValue === status.name
                                         ? "opacity-100"
                                         : "opacity-0"
                                     )}
                                   />
-                                  {/* @ts-expect-error - We know this is a valid icon name */}
-                                  {React.createElement(Icons[status.icon], {
-                                    className: "h-4 w-4 mr-2",
-                                    style: { color: status.color },
-                                  })}
-                                  {status.label}
+                                  {React.createElement(
+                                    // @ts-expect-error - We know this is a valid icon name
+                                    Icons[status.lucideIcon],
+                                    {
+                                      className: "h-4 w-4 mr-2",
+                                      style: { color: status.hexColor },
+                                    }
+                                  )}
+                                  {status.name}
                                 </div>
                               </CommandItem>
                             ))}
