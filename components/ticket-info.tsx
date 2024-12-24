@@ -69,16 +69,8 @@ export type TicketInfoProps = {
 export default function TicketInfo(props: TicketInfoProps) {
   console.log(props.data);
 
-  const whatsappData = {
-    name:
-      props.role === "User"
-        ? props.data.user?.firstName + " " + props.data.user?.lastName
-        : props.data.client.firstName + " " + props.data.client.lastName,
-    phone:
-      props.role === "User" ? props.data.client.phone : props.data.user?.phone,
-    title: props.data.title,
-    id: props.data.id,
-  };
+  const phone =
+    props.role === "User" ? props.data.client.phone : props.data.user?.phone;
 
   const users = props.users?.map((user) => ({
     value: `${user.id}`,
@@ -262,7 +254,7 @@ export default function TicketInfo(props: TicketInfoProps) {
                       ? props.data.client.firstName
                       : props.data.user.firstName}
                   </h3>
-                  <TicketMessageButton data={whatsappData} role={props.role} />
+                  <TicketMessageButton phone={phone} />
                 </div>
               </>
             )}

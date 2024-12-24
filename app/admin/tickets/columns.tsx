@@ -92,7 +92,7 @@ export const columns: ColumnDef<Ticket>[] = [
   },
   {
     accessorKey: "user",
-    header: "Encargado",
+    header: "Asignado a",
     cell: ({ row }) => {
       const user = row.getValue("user") as {
         avatar: string;

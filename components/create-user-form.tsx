@@ -24,8 +24,8 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import {
-  createUserOrClient,
-  searchUserOrClientByRut,
+  createPerson,
+  searchPersonByRut,
   emailExists,
   phoneExists,
 } from "@/lib/actions";
@@ -114,7 +114,7 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
 
   const onSubmit = async (data: FormInputs) => {
     const [person, email, phone] = await Promise.all([
-      searchUserOrClientByRut(data.rut),
+      searchPersonByRut(data.rut),
       emailExists(data.email),
       phoneExists(data.phone),
     ]);
@@ -155,7 +155,7 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
     };
 
     try {
-      await createUserOrClient(submitData);
+      await createPerson(submitData);
       setShouldRefresh(true);
       showAlert(
         `${userType === "Client" ? "Cliente" : "Usuario"} creado exitosamente`

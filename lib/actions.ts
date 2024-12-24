@@ -47,7 +47,7 @@ export async function searchClientByRut(rut: string) {
   }
 }
 
-export async function searchUserOrClientByRut(rut: string) {
+export async function searchPersonByRut(rut: string) {
   try {
     const person = await prisma.person.findUnique({
       where: { rut: rut },
@@ -106,7 +106,7 @@ export async function getClients() {
   return clients;
 }
 
-type CreateUserOrClientInput = {
+type CreatePersonInput = {
   companyRut?: string;
   rut: string;
   firstName: string;
@@ -123,7 +123,7 @@ export async function generateAvatarUrl(email: string) {
   return `https://www.gravatar.com/avatar/${hashedEmail}?s=256&d=mp`;
 }
 
-export async function createUserOrClient(data: CreateUserOrClientInput) {
+export async function createPerson(data: CreatePersonInput) {
   try {
     const user = await prisma.person.create({
       data: {
@@ -161,4 +161,44 @@ export async function getTicketMetadata() {
   ]);
 
   return { statuses, types, priorities };
+}
+
+export async function getTicketsByPersonId(personId: string) {
+  try {
+    const tickets = await prisma.ticket.findMany({
+      where: { userId: parseInt(personId) },
+      select: {
+        id: true,
+        title: true,
+        type: {
+          select: { id: true, name: true, hexColor: true, lucideIcon: true },
+        },
+        status: {
+          select: { id: true, name: true, hexColor: true, lucideIcon: true },
+        },
+        priority: {
+          select: { id: true, name: true, hexColor: true, lucideIcon: true },
+        },
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
+        client: {
+          select: {
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+
+    return tickets;
+  } catch (error) {
+    console.error("Failed to get tickets by person id:", error);
+    return [];
+  }
 }
