@@ -69,7 +69,7 @@ export async function emailExists(email: string) {
 
 export async function phoneExists(phone: string) {
   const user = await prisma.person.findFirst({
-    where: { phone: phone },
+    where: { phone: "569" + phone },
   });
 
   return !!user;

@@ -14,7 +14,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createUserOrClient, searchUserOrClientByRut } from "@/lib/actions";
+import {
+  createUserOrClient,
+  searchUserOrClientByRut,
+  emailExists,
+  phoneExists,
+} from "@/lib/actions";
 
 import crypto from "crypto";
 import { useRouter } from "next/navigation";
@@ -83,14 +88,35 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
   };
 
   const onSubmit = async (data: FormInputs) => {
-    const person = await searchUserOrClientByRut(data.rut);
+    const [person, email, phone] = await Promise.all([
+      searchUserOrClientByRut(data.rut),
+      emailExists(data.email),
+      phoneExists(data.phone),
+    ]);
+    let error = false;
+
     if (person) {
       setError("rut", {
         type: "manual",
         message: "La persona con este RUT ya existe",
       });
-      return;
+      error = true;
     }
+    if (email) {
+      setError("email", {
+        type: "manual",
+        message: "Este email ya está registrado",
+      });
+      error = true;
+    }
+    if (phone) {
+      setError("phone", {
+        type: "manual",
+        message: "Este número de teléfono ya está registrado",
+      });
+      error = true;
+    }
+    if (error) return;
 
     const temporaryToken = crypto.randomBytes(32).toString("hex");
     const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
