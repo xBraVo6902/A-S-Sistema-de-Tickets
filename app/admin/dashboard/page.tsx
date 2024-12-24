@@ -10,6 +10,7 @@ import { CategoryBreakdown } from "@/components/dashboard admin/category-breakdo
 import { TechnicianPerformance } from "@/components/dashboard admin/technician-performance";
 import { CompanyOverview } from "@/components/dashboard admin/company-overview";
 import { LoadingSpinner } from "@/components/dashboard admin/loading-spinner";
+import { getTicketMetadata } from "@/lib/actions";
 
 type DashboardData = {
   totalTickets: number;
@@ -30,13 +31,39 @@ interface MonthlyData {
   tickets: number;
 }
 
+interface MonthlySummaryItem {
+  month: string;
+  tickets: number;
+}
+
+interface CategoryItem {
+  type: string;
+  _count: {
+    _all: number;
+  };
+}
+
+interface TechnicianPerformanceItem {
+  name: string;
+  completed: number;
+  pending: number;
+}
+
+interface CompanySummaryItem {
+  name: string;
+  completed: number;
+  pending: number;
+}
+
 async function fetchDashboardData(): Promise<DashboardData> {
   const [
     summary,
+    resolutionRate,
     monthlySummary,
     byCategory,
     technicianPerformance,
     companySummary,
+    ticketMetadata,
   ] = await Promise.all([
     fetch("/api/dashboard-routes?route=summary").then((res) => res.json()),
     fetch("/api/dashboard-routes?route=resolution-rate").then((res) =>
@@ -52,45 +79,22 @@ async function fetchDashboardData(): Promise<DashboardData> {
     fetch("/api/dashboard-routes?route=company-summary").then((res) =>
       res.json()
     ),
+    getTicketMetadata(),
   ]);
 
-  interface MonthlySummaryItem {
-    createdAt: string;
-    _count: {
-      _all: number;
-    };
-  }
-
-  interface CategoryItem {
-    type: string;
-    _count: {
-      _all: number;
-    };
-  }
-
-  interface TechnicianPerformanceItem {
-    name: string;
-    completed: number;
-    pending: number;
-  }
-
-  interface CompanySummaryItem {
-    name: string;
-    completed: number;
-    pending: number;
+  // Verificar que monthlySummary es un array
+  if (!Array.isArray(monthlySummary)) {
+    throw new Error("monthlySummary is not an array");
   }
 
   const monthlyDataMap: { [key: string]: number } = {};
 
   monthlySummary.forEach((item: MonthlySummaryItem) => {
-    const month = new Date(item.createdAt).toLocaleString("es-ES", {
-      month: "short",
-      year: "numeric",
-    });
+    const month = item.month;
     if (!monthlyDataMap[month]) {
       monthlyDataMap[month] = 0;
     }
-    monthlyDataMap[month] += item._count._all;
+    monthlyDataMap[month] += item.tickets;
   });
 
   const monthlyData: MonthlyData[] = Object.keys(monthlyDataMap).map(
