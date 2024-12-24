@@ -36,10 +36,12 @@ export default async function UserPage({
         id: ticket.id.toString(),
         title: ticket.title,
         status: {
-          text: ticketMetadata.statuses.find((s) => s.id === ticket.statusId)
-            ?.name,
-          color: ticketMetadata.statuses.find((s) => s.id === ticket.statusId)
-            ?.hexColor,
+          text:
+            ticketMetadata.statuses.find((s) => s.id === ticket.statusId)
+              ?.name ?? "?",
+          color:
+            ticketMetadata.statuses.find((s) => s.id === ticket.statusId)
+              ?.hexColor ?? "#000000",
         },
       })
     ),

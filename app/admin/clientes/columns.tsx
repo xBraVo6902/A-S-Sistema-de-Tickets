@@ -9,7 +9,8 @@ export type Client = {
   rut: string;
   companyRut: string | null;
   email: string;
-  ticketCount: number;
+  open: number;
+  closed: number;
 };
 
 export const columns: ColumnDef<Client>[] = [
@@ -51,9 +52,15 @@ export const columns: ColumnDef<Client>[] = [
     header: "Email",
   },
   {
-    accessorKey: "ticketCount",
+    accessorKey: "open",
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Tickets creados" />;
+    },
+  },
+  {
+    accessorKey: "closed",
+    header: ({ column }) => {
+      return <DataTableColumnHeader column={column} title="Tickets cerrados" />;
     },
   },
 ];
