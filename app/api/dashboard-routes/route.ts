@@ -135,10 +135,9 @@ async function getResolutionRate() {
 
 async function getMonthlySummary() {
   try {
-    const monthlyData = await prisma.ticket.groupBy({
-      by: ["createdAt"],
-      _count: {
-        _all: true,
+    const tickets = await prisma.ticket.findMany({
+      select: {
+        createdAt: true,
       },
       orderBy: {
         createdAt: "asc",
@@ -146,19 +145,22 @@ async function getMonthlySummary() {
     });
 
     // Transform the data to group by month
-    const monthlySummary = monthlyData.reduce(
+    const monthlySummary = tickets.reduce(
       (acc: { [key: string]: { month: string; tickets: number } }, item) => {
         const month = item.createdAt.toISOString().slice(0, 7); // Get YYYY-MM format
         if (!acc[month]) {
           acc[month] = { month, tickets: 0 };
         }
-        acc[month].tickets += item._count._all;
+        acc[month].tickets += 1;
         return acc;
       },
       {}
     );
 
-    return new Response(JSON.stringify(Object.values(monthlySummary)), {
+    // Convert the object to an array
+    const monthlySummaryArray = Object.values(monthlySummary);
+
+    return new Response(JSON.stringify(monthlySummaryArray), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -175,22 +177,17 @@ async function getMonthlySummary() {
 
 async function getByCategory() {
   try {
+    const ticketMetadata = await getTicketMetadata();
     const ticketsByCategory = await prisma.ticket.groupBy({
-      by: ["type"],
+      by: ["typeId"],
       _count: {
         _all: true,
       },
     });
 
     const result = ticketsByCategory.map((item) => ({
-      type: ticketMetadata.type[item.type as keyof typeof ticketMetadata.type]
-        .text,
+      type: ticketMetadata.types.find((t) => t.id === item.typeId)?.name || "Unknown",
       _count: item._count,
-      color:
-        ticketMetadata.type[item.type as keyof typeof ticketMetadata.type]
-          .color,
-      icon: ticketMetadata.type[item.type as keyof typeof ticketMetadata.type]
-        .icon,
     }));
 
     return new Response(JSON.stringify(result), {
@@ -210,6 +207,7 @@ async function getByCategory() {
 
 async function getTechnicianPerformance() {
   try {
+    const ticketMetadata = await getTicketMetadata();
     const monthlySummaryRaw = await prisma.ticket.groupBy({
       by: ["userId"],
       _count: {
@@ -232,14 +230,14 @@ async function getTechnicianPerformance() {
         const completedTickets = await prisma.ticket.count({
           where: {
             userId: item.userId,
-            status: Status.Closed,
+            statusId: ticketMetadata.statuses.find((s) => s.name === "Cerrado")?.id,
           },
         });
 
         const pendingTickets = await prisma.ticket.count({
           where: {
             userId: item.userId,
-            status: Status.Open,
+            statusId: ticketMetadata.statuses.find((s) => s.name === "Abierto")?.id,
           },
         });
 
@@ -269,11 +267,12 @@ async function getTechnicianPerformance() {
 
 async function getCompanySummary() {
   try {
+    const ticketMetadata = await getTicketMetadata();
     const ticketsByCompany = await prisma.ticket.groupBy({
       by: ["clientId"],
       _count: {
         _all: true,
-        status: true,
+        statusId: true,
       },
     });
 
@@ -285,13 +284,13 @@ async function getCompanySummary() {
         const completedTickets = await prisma.ticket.count({
           where: {
             clientId: item.clientId,
-            status: Status.Closed,
+            statusId: ticketMetadata.statuses.find((s: any) => s.name === "Cerrado")?.id,
           },
         });
         const pendingTickets = await prisma.ticket.count({
           where: {
             clientId: item.clientId,
-            status: Status.Open,
+            statusId: ticketMetadata.statuses.find((s: any) => s.name === "Abierto")?.id,
           },
         });
         return {
@@ -314,5 +313,5 @@ async function getCompanySummary() {
       }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
-  }
+  } 
 }
