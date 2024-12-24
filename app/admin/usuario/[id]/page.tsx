@@ -12,6 +12,8 @@ export default async function UserPage({
     getUserById(id),
     getTicketMetadata(),
   ]);
+  console.log(user);
+  console.log(ticketMetadata);
 
   const formatPhone = (phone: string) => {
     const countryCode = phone.slice(0, 2);
@@ -34,8 +36,10 @@ export default async function UserPage({
         id: ticket.id.toString(),
         title: ticket.title,
         status: {
-          text: ticketMetadata.statuses[ticket.statusId].name,
-          color: ticketMetadata.statuses[ticket.statusId].hexColor,
+          text: ticketMetadata.statuses.find((s) => s.id === ticket.statusId)
+            ?.name,
+          color: ticketMetadata.statuses.find((s) => s.id === ticket.statusId)
+            ?.hexColor,
         },
       })
     ),

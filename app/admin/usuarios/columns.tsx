@@ -8,7 +8,8 @@ export type User = {
   name: string;
   rut: string;
   email: string;
-  ticketCount: number;
+  open: number;
+  closed: number;
 };
 
 export const columns: ColumnDef<User>[] = [
@@ -46,9 +47,19 @@ export const columns: ColumnDef<User>[] = [
     header: "Email",
   },
   {
-    accessorKey: "ticketCount",
+    accessorKey: "open",
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Tickets creados" />;
+      return (
+        <DataTableColumnHeader column={column} title="Tickets asignados" />
+      );
+    },
+  },
+  {
+    accessorKey: "closed",
+    header: ({ column }) => {
+      return (
+        <DataTableColumnHeader column={column} title="Tickets completados" />
+      );
     },
   },
 ];
