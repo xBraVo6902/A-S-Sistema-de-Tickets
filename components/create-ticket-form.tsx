@@ -21,6 +21,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import * as LucideIcons from "lucide-react";
@@ -57,6 +67,22 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
       priority: "",
     },
   });
+  const [isAlertOpen, setIsAlertOpen] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState("");
+  const [shouldRefresh, setShouldRefresh] = React.useState(false);
+
+  const showAlert = (message: string) => {
+    setAlertMessage(message);
+    setIsAlertOpen(true);
+  };
+
+  const handleAlertClose = () => {
+    setIsAlertOpen(false);
+    if (shouldRefresh) {
+      router.push("/");
+      setShouldRefresh(false);
+    }
+  };
 
   const formatRut = (value: string) => {
     let rutClean = value.replace(/[^0-9kK]/g, "");
@@ -97,6 +123,24 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
   };
 
   const onSubmit = async (data: FormInputs) => {
+    const { type, priority, ...rest } = data;
+    const typeName = (
+      props.ticketMetadata.types[
+        type as keyof typeof props.ticketMetadata.types
+      ] as { name: string }
+    ).name;
+    const priorityName = (
+      props.ticketMetadata.priorities[
+        priority as keyof typeof props.ticketMetadata.priorities
+      ] as { name: string }
+    ).name;
+
+    const formattedData = {
+      ...rest,
+      type: typeName,
+      priority: priorityName,
+    };
+
     let response;
 
     if (props.role === "Admin") {
@@ -114,7 +158,7 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formattedData),
       });
     } else {
       response = await fetch("/api/tickets", {
@@ -122,185 +166,201 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formattedData),
       });
     }
 
     const result = await response?.json();
     if (response?.ok) {
-      alert(result.message);
-      router.push("/");
+      setShouldRefresh(true);
+      showAlert("Ticket creado exitosamente");
     } else {
-      alert(result.message);
+      console.error(result.message);
+      showAlert("Hubo un error al crear el ticket");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-xl">Crear ticket de soporte</CardTitle>
-          <CardDescription>
-            {props.role === "Admin"
-              ? "Por favor, proporciona los detalles del problema del cliente."
-              : "Por favor, proporciona los detalles de tu problema para que podamos ayudarte mejor."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid w-full items-center gap-4">
-            {props.role === "Admin" && (
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <CardTitle className="text-xl">Crear ticket de soporte</CardTitle>
+            <CardDescription>
+              {props.role === "Admin"
+                ? "Por favor, proporciona los detalles del problema del cliente."
+                : "Por favor, proporciona los detalles de tu problema para que podamos ayudarte mejor."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid w-full items-center gap-4">
+              {props.role === "Admin" && (
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="title">RUT del cliente</Label>
+                  <Input
+                    id="rut"
+                    {...register("rut", {
+                      required: "El RUT es requerido",
+                      validate: {
+                        validFormat: (value) =>
+                          validateRut(value) || "RUT inválido",
+                      },
+                    })}
+                    placeholder="Escribe el RUT del cliente"
+                    onChange={(e) => {
+                      const formattedRut = formatRut(e.target.value);
+                      setValue("rut", formattedRut, { shouldValidate: true });
+                    }}
+                    maxLength={12}
+                    className={errors.rut ? "border-red-500" : ""}
+                  />
+                  {errors.rut && (
+                    <span className="text-sm text-red-500">
+                      {errors.rut.message}
+                    </span>
+                  )}
+                </div>
+              )}
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="title">RUT del cliente</Label>
+                <Label htmlFor="title">Título</Label>
                 <Input
-                  id="rut"
-                  {...register("rut", {
-                    required: "El RUT es requerido",
-                    validate: {
-                      validFormat: (value) =>
-                        validateRut(value) || "RUT inválido",
-                    },
+                  id="title"
+                  {...register("title", {
+                    required: "El título es requerido",
                   })}
-                  placeholder="Escribe el RUT del cliente"
-                  onChange={(e) => {
-                    const formattedRut = formatRut(e.target.value);
-                    setValue("rut", formattedRut, { shouldValidate: true });
-                  }}
-                  maxLength={12}
-                  className={errors.rut ? "border-red-500" : ""}
+                  placeholder="Resumen breve del problema"
+                  className={errors.title ? "border-red-500" : ""}
                 />
-                {errors.rut && (
+                {errors.title && (
                   <span className="text-sm text-red-500">
-                    {errors.rut.message}
+                    {errors.title.message}
                   </span>
                 )}
               </div>
-            )}
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="title">Título</Label>
-              <Input
-                id="title"
-                {...register("title", {
-                  required: "El título es requerido",
-                })}
-                placeholder="Resumen breve del problema"
-                className={errors.title ? "border-red-500" : ""}
-              />
-              {errors.title && (
-                <span className="text-sm text-red-500">
-                  {errors.title.message}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="type">Tipo de problema</Label>
-              <Controller
-                name="type"
-                control={control}
-                rules={{ required: "Debes seleccionar un tipo de problema" }}
-                render={({ field: { onChange, value } }) => (
-                  <Select value={value} onValueChange={onChange}>
-                    <SelectTrigger
-                      id="type"
-                      className={errors.type ? "border-red-500" : ""}
-                    >
-                      <SelectValue placeholder="Selecciona el tipo de problema" />
-                    </SelectTrigger>
-                    <SelectContent position="popper">
-                      {Object.entries(props.ticketMetadata.types).map(
-                        ([key, value]) => {
-                          const Icon = LucideIcons[
-                            value.lucideIcon as keyof typeof LucideIcons
-                          ] as LucideIcon;
-                          return (
-                            <SelectItem key={key} value={key}>
-                              <div className="flex items-center gap-2">
-                                <Icon
-                                  className="h-4 w-4"
-                                  style={{ color: value.hexColor }}
-                                />
-                                {value.name}
-                              </div>
-                            </SelectItem>
-                          );
-                        }
-                      )}
-                    </SelectContent>
-                  </Select>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="type">Tipo de problema</Label>
+                <Controller
+                  name="type"
+                  control={control}
+                  rules={{ required: "Debes seleccionar un tipo de problema" }}
+                  render={({ field: { onChange, value } }) => (
+                    <Select value={value} onValueChange={onChange}>
+                      <SelectTrigger
+                        id="type"
+                        className={errors.type ? "border-red-500" : ""}
+                      >
+                        <SelectValue placeholder="Selecciona el tipo de problema" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        {Object.entries(props.ticketMetadata.types).map(
+                          ([key, value]) => {
+                            const Icon = LucideIcons[
+                              value.lucideIcon as keyof typeof LucideIcons
+                            ] as LucideIcon;
+                            return (
+                              <SelectItem key={key} value={key}>
+                                <div className="flex items-center gap-2">
+                                  <Icon
+                                    className="h-4 w-4"
+                                    style={{ color: value.hexColor }}
+                                  />
+                                  {value.name}
+                                </div>
+                              </SelectItem>
+                            );
+                          }
+                        )}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.type && (
+                  <span className="text-sm text-red-500">
+                    {errors.type.message}
+                  </span>
                 )}
-              />
-              {errors.type && (
-                <span className="text-sm text-red-500">
-                  {errors.type.message}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="priority">Prioridad</Label>
-              <Controller
-                name="priority"
-                control={control}
-                rules={{ required: "Debes seleccionar una prioridad" }}
-                render={({ field: { onChange, value } }) => (
-                  <Select value={value} onValueChange={onChange}>
-                    <SelectTrigger
-                      id="priority"
-                      className={errors.priority ? "border-red-500" : ""}
-                    >
-                      <SelectValue placeholder="Selecciona la prioridad" />
-                    </SelectTrigger>
-                    <SelectContent position="popper">
-                      {Object.entries(props.ticketMetadata.priorities).map(
-                        ([key, value]) => {
-                          const Icon = LucideIcons[
-                            value.lucideIcon as keyof typeof LucideIcons
-                          ] as LucideIcon;
-                          return (
-                            <SelectItem key={key} value={key}>
-                              <div className="flex items-center gap-2">
-                                <Icon
-                                  className="h-4 w-4"
-                                  style={{ color: value.hexColor }}
-                                />
-                                {value.name}
-                              </div>
-                            </SelectItem>
-                          );
-                        }
-                      )}
-                    </SelectContent>
-                  </Select>
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="priority">Prioridad</Label>
+                <Controller
+                  name="priority"
+                  control={control}
+                  rules={{ required: "Debes seleccionar una prioridad" }}
+                  render={({ field: { onChange, value } }) => (
+                    <Select value={value} onValueChange={onChange}>
+                      <SelectTrigger
+                        id="priority"
+                        className={errors.priority ? "border-red-500" : ""}
+                      >
+                        <SelectValue placeholder="Selecciona la prioridad" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        {Object.entries(props.ticketMetadata.priorities).map(
+                          ([key, value]) => {
+                            const Icon = LucideIcons[
+                              value.lucideIcon as keyof typeof LucideIcons
+                            ] as LucideIcon;
+                            return (
+                              <SelectItem key={key} value={key}>
+                                <div className="flex items-center gap-2">
+                                  <Icon
+                                    className="h-4 w-4"
+                                    style={{ color: value.hexColor }}
+                                  />
+                                  {value.name}
+                                </div>
+                              </SelectItem>
+                            );
+                          }
+                        )}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.priority && (
+                  <span className="text-sm text-red-500">
+                    {errors.priority.message}
+                  </span>
                 )}
-              />
-              {errors.priority && (
-                <span className="text-sm text-red-500">
-                  {errors.priority.message}
-                </span>
-              )}
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="description">Descripción del problema</Label>
+                <Textarea
+                  id="description"
+                  {...register("description", {
+                    required: "La descripción es requerida",
+                  })}
+                  placeholder="Describe tu problema en detalle"
+                  className={errors.description ? "border-red-500" : ""}
+                />
+                {errors.description && (
+                  <span className="text-sm text-red-500">
+                    {errors.description.message}
+                  </span>
+                )}
+              </div>
             </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="description">Descripción del problema</Label>
-              <Textarea
-                id="description"
-                {...register("description", {
-                  required: "La descripción es requerida",
-                })}
-                placeholder="Describe tu problema en detalle"
-                className={errors.description ? "border-red-500" : ""}
-              />
-              {errors.description && (
-                <span className="text-sm text-red-500">
-                  {errors.description.message}
-                </span>
-              )}
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter className="">
-          <Button className="w-full" type="submit">
-            Crear ticket
-          </Button>
-        </CardFooter>
-      </Card>
-    </form>
+          </CardContent>
+          <CardFooter className="">
+            <Button className="w-full" type="submit">
+              Crear ticket
+            </Button>
+          </CardFooter>
+        </Card>
+      </form>
+      <AlertDialog open={isAlertOpen} onOpenChange={handleAlertClose}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Notificación</AlertDialogTitle>
+            <AlertDialogDescription>{alertMessage}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleAlertClose}>
+              Aceptar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

@@ -1,5 +1,4 @@
 import { authOptions } from "@/auth";
-import { getTicketMetadata } from "@/lib/actions";
 import prisma from "@/lib/db";
 import { getServerSession } from "next-auth";
 
@@ -7,10 +6,7 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const [session, ticketMetadata] = await Promise.all([
-    getServerSession(authOptions),
-    getTicketMetadata(),
-  ]);
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return new Response(JSON.stringify({ message: "Unauthorized" }), {
@@ -30,9 +26,15 @@ export async function GET(
         updatedAt: true,
         title: true,
         description: true,
-        statusId: true,
-        typeId: true,
-        priorityId: true,
+        status: {
+          select: { id: true, name: true, lucideIcon: true, hexColor: true },
+        },
+        type: {
+          select: { id: true, name: true, lucideIcon: true, hexColor: true },
+        },
+        priority: {
+          select: { id: true, name: true, lucideIcon: true, hexColor: true },
+        },
         user: {
           select: {
             id: true,
@@ -63,11 +65,8 @@ export async function GET(
       });
     }
 
-    const translatedTicket = {
+    const localizedTicket = {
       ...ticket,
-      priority: ticketMetadata.priorities[ticket.priorityId],
-      status: ticketMetadata.statuses[ticket.statusId],
-      type: ticketMetadata.types[ticket.typeId],
       createdAt: new Date(ticket.createdAt).toLocaleString("es-ES", {
         day: "2-digit",
         month: "2-digit",
@@ -84,7 +83,7 @@ export async function GET(
       }),
     };
 
-    return new Response(JSON.stringify(translatedTicket), {
+    return new Response(JSON.stringify(localizedTicket), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

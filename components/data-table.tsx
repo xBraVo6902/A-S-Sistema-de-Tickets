@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "./ui/button";
 import { Input } from "@/components/ui/input";
+import { TicketPriority, TicketStatus, TicketType } from "@/lib/types";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -46,6 +47,11 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
 
+  const isSearchingUnassigned = (search: string): boolean => {
+    const unassignedPattern = /^(sin|no|asign)/i;
+    return unassignedPattern.test(search);
+  };
+
   const table = useReactTable({
     data,
     columns,
@@ -63,30 +69,38 @@ export function DataTable<TData, TValue>({
       globalFilter,
     },
     globalFilterFn: (row, columnId, filterValue) => {
-      const searchTerm = String(filterValue).toLowerCase();
-      const exactMatchFields = ["estado", "tipo", "prioridad"];
+      const search = filterValue.toLowerCase();
 
-      return row.getAllCells().some((cell) => {
-        const columnId = cell.column.id;
-        const rawValue = cell.getValue();
+      const id = String(row.getValue("id")).toLowerCase();
+      if (id.includes(search)) return true;
 
-        let cellValue = "";
-        if (typeof rawValue === "object" && rawValue !== null) {
-          cellValue = String(
-            (rawValue as { text: string }).text ||
-              (rawValue as { firstName: string }).firstName ||
-              ""
-          ).toLowerCase();
-        } else {
-          cellValue = String(rawValue).toLowerCase();
-        }
+      const title = String(row.getValue("title")).toLowerCase();
+      if (title.includes(search)) return true;
 
-        if (exactMatchFields.includes(columnId)) {
-          return cellValue === searchTerm;
-        }
+      const status = row.getValue("status") as TicketStatus;
+      if (status?.name.toLowerCase().includes(search)) return true;
 
-        return cellValue.includes(searchTerm);
-      });
+      const type = row.getValue("type") as TicketType;
+      if (type?.name.toLowerCase().includes(search)) return true;
+
+      const priority = row.getValue("priority") as TicketPriority;
+      if (priority?.name.toLowerCase().includes(search)) return true;
+
+      const user = row.getValue("user") as {
+        firstName: string;
+        lastName: string;
+      } | null;
+
+      if (!user && isSearchingUnassigned(search)) {
+        return true;
+      }
+
+      if (user) {
+        const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+        if (fullName.includes(search)) return true;
+      }
+
+      return false;
     },
   });
 

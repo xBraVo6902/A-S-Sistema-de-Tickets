@@ -69,11 +69,13 @@ const priorities = [
 ];
 
 async function main() {
-  await prisma.ticket.deleteMany({});
-  await prisma.person.deleteMany({});
-  await prisma.status.deleteMany({});
-  await prisma.type.deleteMany({});
-  await prisma.priority.deleteMany({});
+  await prisma.$transaction([
+    prisma.ticket.deleteMany({}),
+    prisma.person.deleteMany({}),
+    prisma.status.deleteMany({}),
+    prisma.type.deleteMany({}),
+    prisma.priority.deleteMany({}),
+  ]);
 
   await prisma.$executeRaw`ALTER TABLE Person AUTO_INCREMENT = 1;`;
   await prisma.$executeRaw`ALTER TABLE Ticket AUTO_INCREMENT = 1;`;
@@ -81,17 +83,23 @@ async function main() {
   await prisma.$executeRaw`ALTER TABLE Type AUTO_INCREMENT = 1;`;
   await prisma.$executeRaw`ALTER TABLE Priority AUTO_INCREMENT = 1;`;
 
-  const statusRecords = await Promise.all(
-    statuses.map((status) => prisma.status.create({ data: status }))
-  );
+  const statusRecords = [];
+  for (const status of statuses) {
+    const record = await prisma.status.create({ data: status });
+    statusRecords.push(record);
+  }
 
-  const typeRecords = await Promise.all(
-    types.map((type) => prisma.type.create({ data: type }))
-  );
+  const typeRecords = [];
+  for (const type of types) {
+    const record = await prisma.type.create({ data: type });
+    typeRecords.push(record);
+  }
 
-  const priorityRecords = await Promise.all(
-    priorities.map((priority) => prisma.priority.create({ data: priority }))
-  );
+  const priorityRecords = [];
+  for (const priority of priorities) {
+    const record = await prisma.priority.create({ data: priority });
+    priorityRecords.push(record);
+  }
 
   for (const person of people) {
     const hashedPassword = await bcrypt.hash(person.password, 10);
