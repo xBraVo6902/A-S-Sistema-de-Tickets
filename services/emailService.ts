@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import "dotenv/config";
 
 interface EmailOptions {
   to: string;
@@ -12,9 +13,10 @@ class EmailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
+      service: process.env.SMTP_SERVICE || "Gmail",
       host: process.env.SMTP_HOST || "smtp.gmail.com",
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: false,
+      port: Number(process.env.SMTP_PORT) || 465,
+      secure: true,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -25,7 +27,7 @@ class EmailService {
   async sendEmail({ to, subject, text, html }: EmailOptions): Promise<void> {
     try {
       await this.transporter.sendMail({
-        from: process.env.SMTP_FROM || "your-email@domain.com",
+        from: process.env.SMTP_FROM,
         to,
         subject,
         text,
@@ -35,17 +37,6 @@ class EmailService {
       console.error("Error sending email:", error);
       throw new Error("Failed to send email");
     }
-  }
-
-  async sendTicketConfirmation(email: string, ticketId: string): Promise<void> {
-    const subject = `Ticket Confirmation #${ticketId}`;
-    const html = `
-      <h1>Ticket Confirmation</h1>
-      <p>Your ticket #${ticketId} has been created successfully.</p>
-      <p>We will process your request as soon as possible.</p>
-    `;
-
-    await this.sendEmail({ to: email, subject, html });
   }
 }
 
