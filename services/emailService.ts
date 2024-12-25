@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import "dotenv/config";
+import { loadTemplate } from "@/lib/templateLoader";
 
 interface EmailOptions {
   to: string;
@@ -24,7 +25,12 @@ class EmailService {
     });
   }
 
-  async sendEmail({ to, subject, text, html }: EmailOptions): Promise<void> {
+  private async sendEmail({
+    to,
+    subject,
+    text,
+    html,
+  }: EmailOptions): Promise<void> {
     try {
       await this.transporter.sendMail({
         from: process.env.SMTP_FROM,
@@ -37,6 +43,37 @@ class EmailService {
       console.error("Error sending email:", error);
       throw new Error("Failed to send email");
     }
+  }
+
+  async sendTicketCreatedEmail(
+    to: string,
+    data: {
+      ticketId: string;
+      userName: string;
+      status: string;
+    }
+  ): Promise<void> {
+    const html = await loadTemplate("ticket-created", data);
+    await this.sendEmail({
+      to,
+      subject: `Ticket #${data.ticketId} Created`,
+      html,
+    });
+  }
+
+  async sendResetPasswordEmail(
+    to: string,
+    data: {
+      firstName: string;
+      resetLink: string;
+    }
+  ): Promise<void> {
+    const html = await loadTemplate("reset-password", data);
+    await this.sendEmail({
+      to,
+      subject: "Reset Your Password",
+      html,
+    });
   }
 }
 

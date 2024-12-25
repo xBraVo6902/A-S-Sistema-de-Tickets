@@ -1,9 +1,12 @@
 import emailService from "./emailService";
 
-const mailOptions = {
-  to: "rakifih471@owube.com",
-  subject: "Hello from Nodemailer",
-  text: "This is a test email sent using Nodemailer.",
-};
+// await emailService.sendTicketCreatedEmail("rakifih471@owube.com", {
+//   ticketId: "TK-123",
+//   userName: "John Doe",
+//   status: "Open",
+// });
 
-await emailService.sendEmail(mailOptions);
+await emailService.sendResetPasswordEmail("rakifih471@owube.com", {
+  firstName: "John",
+  resetLink: "http://example.com/reset-password",
+});

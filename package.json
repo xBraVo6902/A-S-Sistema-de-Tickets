@@ -32,6 +32,7 @@
     "cmdk": "^1.0.4",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
+    "handlebars": "^4.7.8",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.453.0",
     "md5": "^2.3.0",
@@ -50,6 +51,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@maizzle/framework": "^5.0.0",
     "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.7",
