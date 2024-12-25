@@ -116,8 +116,6 @@ type CreatePersonInput = {
   email: string;
   phone: string;
   role: "User" | "Client";
-  temporaryToken: string;
-  tokenExpiry: Date;
 };
 
 export async function generateAvatarUrl(email: string) {
@@ -137,8 +135,6 @@ export async function createPerson(data: CreatePersonInput) {
         phone: data.phone,
         role: data.role,
         avatar: await generateAvatarUrl(data.email),
-        temporaryToken: data.temporaryToken,
-        tokenExpiry: data.tokenExpiry,
       },
     });
     revalidatePath("/admin/usuarios");
@@ -228,6 +224,35 @@ export async function sendResetEmail(email: string, resetLink: string) {
     return { success: true };
   } catch (error) {
     console.error("Failed to send reset email:", error);
+    return { success: false };
+  }
+}
+
+export async function sendWelcomeEmail(email: string, createLink: string) {
+  try {
+    const person = await prisma.person.findUnique({
+      where: { email },
+    });
+
+    if (!person) {
+      return { success: false };
+    }
+
+    const temporaryToken = crypto.randomBytes(32).toString("hex");
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await prisma.person.update({
+      where: { id: person?.id },
+      data: { temporaryToken, tokenExpiry },
+    });
+
+    await emailService.sendWelcomeEmail(email, {
+      firstName: person.firstName,
+      createLink: `${process.env.NEXT_PUBLIC_BASE_URL}/${createLink}?token=${temporaryToken}&firstLogin=true`,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send welcome email:", error);
     return { success: false };
   }
 }

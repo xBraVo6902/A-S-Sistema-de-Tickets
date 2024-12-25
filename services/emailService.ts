@@ -75,6 +75,21 @@ class EmailService {
       html,
     });
   }
+
+  async sendWelcomeEmail(
+    to: string,
+    data: {
+      firstName: string;
+      createLink: string;
+    }
+  ): Promise<void> {
+    const html = await loadTemplate("create-password", data);
+    await this.sendEmail({
+      to,
+      subject: "Bienvenido a la plataforma",
+      html,
+    });
+  }
 }
 
 const emailService = new EmailService();

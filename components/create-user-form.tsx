@@ -28,9 +28,9 @@ import {
   searchPersonByRut,
   emailExists,
   phoneExists,
+  sendWelcomeEmail,
 } from "@/lib/actions";
 
-import crypto from "crypto";
 import { useRouter } from "next/navigation";
 
 interface CreateTicketFormProps {
@@ -143,19 +143,15 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
     }
     if (error) return;
 
-    const temporaryToken = crypto.randomBytes(32).toString("hex");
-    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
     data.phone = "569" + data.phone.replace(/\s/g, "");
     const submitData = {
       ...data,
       role: userType,
-      temporaryToken,
-      tokenExpiry,
     };
 
     try {
       await createPerson(submitData);
+      await sendWelcomeEmail(data.email, "reset-password");
       setShouldRefresh(true);
       showAlert(
         `${userType === "Client" ? "Cliente" : "Usuario"} creado exitosamente`
