@@ -223,7 +223,7 @@ export async function sendResetEmail(email: string, resetLink: string) {
 
     await emailService.sendResetPasswordEmail(email, {
       firstName: person.firstName,
-      resetLink: `${process.env.NEXT_PUBLIC_BASE_URL}/${resetLink}?token=${person.temporaryToken}`,
+      resetLink: `${process.env.NEXT_PUBLIC_BASE_URL}/${resetLink}?token=${temporaryToken}`,
     });
     return { success: true };
   } catch (error) {

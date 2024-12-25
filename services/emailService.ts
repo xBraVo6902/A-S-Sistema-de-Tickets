@@ -71,7 +71,7 @@ class EmailService {
     const html = await loadTemplate("reset-password", data);
     await this.sendEmail({
       to,
-      subject: "Reset Your Password",
+      subject: "Reestablece tu contraseña",
       html,
     });
   }
