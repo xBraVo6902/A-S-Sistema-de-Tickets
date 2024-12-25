@@ -47,6 +47,11 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
 
+  const isSearchingUnassigned = (search: string): boolean => {
+    const unassignedPattern = /^(sin|no|asign)/i;
+    return unassignedPattern.test(search);
+  };
+
   const table = useReactTable({
     data,
     columns,
@@ -85,6 +90,11 @@ export function DataTable<TData, TValue>({
         firstName: string;
         lastName: string;
       } | null;
+
+      if (!user && isSearchingUnassigned(search)) {
+        return true;
+      }
+
       if (user) {
         const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
         if (fullName.includes(search)) return true;
