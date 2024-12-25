@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db";
 import md5 from "md5";
 import "dotenv/config";
+import emailService from "@/services/emailService";
+import crypto from "crypto";
 
 export async function assignUserToTicket(ticketId: string, userId: string) {
   try {
@@ -200,5 +202,32 @@ export async function getTicketsByPersonId(personId: string) {
   } catch (error) {
     console.error("Failed to get tickets by person id:", error);
     return [];
+  }
+}
+
+export async function sendResetEmail(email: string, resetLink: string) {
+  try {
+    const person = await prisma.person.findUnique({
+      where: { email },
+    });
+    if (!person) {
+      return { success: false };
+    }
+    const temporaryToken = crypto.randomBytes(32).toString("hex");
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await prisma.person.update({
+      where: { id: person.id },
+      data: { temporaryToken, tokenExpiry },
+    });
+
+    await emailService.sendResetPasswordEmail(email, {
+      firstName: person.firstName,
+      resetLink: `${process.env.NEXT_PUBLIC_BASE_URL}/${resetLink}?token=${person.temporaryToken}`,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send reset email:", error);
+    return { success: false };
   }
 }
