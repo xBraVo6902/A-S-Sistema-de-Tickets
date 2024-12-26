@@ -95,6 +95,24 @@ class EmailService {
       html,
     });
   }
+
+  async sendStatusChangeEmail(
+    to: string,
+    data: {
+      firstName: string;
+      ticketId: string;
+      prevStatus: { name: string; hexColor: string };
+      newStatus: { name: string; hexColor: string };
+      ticketLink: string;
+    }
+  ) {
+    const html = await loadTemplate("status-change", data);
+    await this.sendEmail({
+      to,
+      subject: `Ticket #${data.ticketId} actualizado`,
+      html,
+    });
+  }
 }
 
 const emailService = new EmailService();
