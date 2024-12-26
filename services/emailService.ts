@@ -81,7 +81,7 @@ class EmailService {
     });
   }
 
-  async sendWelcomeEmail(
+  async sendCreatePasswordEmail(
     to: string,
     data: {
       firstName: string;
@@ -111,6 +111,27 @@ class EmailService {
     await this.sendEmail({
       to,
       subject: `Ticket #${data.ticketId} actualizado`,
+      html,
+    });
+  }
+
+  async sendTicketAssignedEmail(
+    to: string,
+    data: {
+      ticketId: string;
+      firstName: string;
+      title: string;
+      description: string;
+      status: { name: string; hexColor: string };
+      priority: { name: string; hexColor: string };
+      type: { name: string; hexColor: string };
+      ticketLink: string;
+    }
+  ) {
+    const html = await loadTemplate("ticket-assigned", data);
+    await this.sendEmail({
+      to,
+      subject: `Ticket #${data.ticketId} asignado`,
       html,
     });
   }

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Estado del Ticket Actualizado</title>
+    <title>Ticket Asignado</title>
   </head>
 
   <body
@@ -20,7 +20,7 @@
           <h1
             style="color: #1f2937; font-size: 24px; font-weight: bold; margin-bottom: 24px;"
           >
-            Actualización de ticket #{{ticketId}}
+            Nuevo ticket asignado #{{ticketId}}
           </h1>
           <p
             style="color: #4b5563; font-size: 16px; line-height: 24px; margin-bottom: 24px;"
@@ -31,7 +31,7 @@
           <p
             style="color: #4b5563; font-size: 16px; line-height: 24px; margin-bottom: 24px;"
           >
-            El estado de tu ticket ha sido actualizado:
+            Se te ha asignado un nuevo ticket:
           </p>
           <div
             style="background-color: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 24px;"
@@ -42,23 +42,38 @@
               {{title}}
             </p>
             <p
+              style="color: #4b5563; font-size: 16px; line-height: 24px; margin: 0 0 16px 0;"
+            >
+              {{description}}
+            </p>
+            <p
               style="color: #4b5563; font-size: 16px; line-height: 24px; margin: 8px 0;"
             >
-              <strong>Estado anterior:</strong>
+              <strong>Estado:</strong>
               <span
-                style="background-color: {{prevStatus.hexColor}}; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 14px;"
+                style="background-color: {{status.hexColor}}; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 14px;"
               >
-                {{prevStatus.name}}
+                {{status.name}}
               </span>
             </p>
             <p
               style="color: #4b5563; font-size: 16px; line-height: 24px; margin: 8px 0;"
             >
-              <strong>Nuevo estado:</strong>
+              <strong>Prioridad:</strong>
               <span
-                style="background-color: {{newStatus.hexColor}}; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 14px;"
+                style="background-color: {{priority.hexColor}}; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 14px;"
               >
-                {{newStatus.name}}
+                {{priority.name}}
+              </span>
+            </p>
+            <p
+              style="color: #4b5563; font-size: 16px; line-height: 24px; margin: 8px 0;"
+            >
+              <strong>Tipo:</strong>
+              <span
+                style="background-color: {{type.hexColor}}; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 14px;"
+              >
+                {{type.name}}
               </span>
             </p>
           </div>

@@ -8,11 +8,67 @@ import emailService from "@/services/emailService";
 import crypto from "crypto";
 import { Ticket } from "@prisma/client";
 
+async function sendTicketAssignedEmail(
+  email: string,
+  data: {
+    ticketId: string;
+    firstName: string;
+    title: string;
+    description: string;
+    status: { name: string; hexColor: string };
+    priority: { name: string; hexColor: string };
+    type: { name: string; hexColor: string };
+    ticketLink: string;
+  }
+) {
+  try {
+    await emailService.sendTicketAssignedEmail(email, data);
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send ticket assigned email:", error);
+    return { success: false };
+  }
+}
+
 export async function assignUserToTicket(ticketId: string, userId: string) {
   try {
+    const [ticket, user] = await Promise.all([
+      prisma.ticket.findUnique({
+        where: { id: parseInt(ticketId) },
+        include: { type: true, priority: true, status: true },
+      }),
+      prisma.person.findUnique({
+        where: { id: parseInt(userId) },
+      }),
+    ]);
+
+    if (!ticket || !user) {
+      return { success: false };
+    }
+
     await prisma.ticket.update({
       where: { id: parseInt(ticketId) },
       data: { userId: parseInt(userId) },
+    });
+
+    await sendTicketAssignedEmail(user.email, {
+      ticketId: ticketId,
+      firstName: user.firstName,
+      title: ticket.title,
+      description: ticket.description,
+      status: {
+        name: ticket.status.name,
+        hexColor: ticket.status.hexColor,
+      },
+      priority: {
+        name: ticket.priority.name,
+        hexColor: ticket.priority.hexColor,
+      },
+      type: {
+        name: ticket.type.name,
+        hexColor: ticket.type.hexColor,
+      },
+      ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/user/ticket/${ticketId}`,
     });
 
     revalidatePath(`/admin/ticket/${ticketId}`);
@@ -58,6 +114,7 @@ export async function updateTicketStatus(ticketId: string, statusId: string) {
       data: { statusId: parseInt(statusId) },
       include: { status: true },
     });
+
     await sendStatusChangeEmail(ticket.client.email, {
       firstName: ticket.client.firstName,
       ticketId: ticketId,
@@ -290,7 +347,7 @@ export async function sendWelcomeEmail(email: string, createLink: string) {
       data: { temporaryToken, tokenExpiry },
     });
 
-    await emailService.sendWelcomeEmail(email, {
+    await emailService.sendCreatePasswordEmail(email, {
       firstName: person.firstName,
       createLink: `${process.env.NEXT_PUBLIC_BASE_URL}/${createLink}?token=${temporaryToken}&firstLogin=true`,
     });
