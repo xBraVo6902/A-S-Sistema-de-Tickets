@@ -14,6 +14,23 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 
@@ -31,6 +48,8 @@ const formSchema = z
 
 export default function ResetPasswordPage() {
   const router = useRouter();
+  const isFirstLogin =
+    new URLSearchParams(window.location.search).get("firstLogin") === "true";
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,6 +57,22 @@ export default function ResetPasswordPage() {
       confirmPassword: "",
     },
   });
+  const [isAlertOpen, setIsAlertOpen] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState("");
+  const [shouldRefresh, setShouldRefresh] = React.useState(false);
+
+  const showAlert = (message: string) => {
+    setAlertMessage(message);
+    setIsAlertOpen(true);
+  };
+
+  const handleAlertClose = () => {
+    setIsAlertOpen(false);
+    if (shouldRefresh) {
+      router.push("/");
+      setShouldRefresh(false);
+    }
+  };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
@@ -52,59 +87,94 @@ export default function ResetPasswordPage() {
         }),
       });
       if (response.ok) {
-        alert("Contraseña restablecida correctamente");
-        router.push("/login");
+        setShouldRefresh(true);
+        showAlert(
+          `Contraseña ${isFirstLogin ? "creada" : "restablecida"} correctamente`
+        );
       } else {
-        alert("Error restableciendo la contraseña");
+        showAlert(
+          `Hubo un error al ${
+            isFirstLogin ? "crear" : "restablecer"
+          } la contraseña`
+        );
       }
     } catch (error) {
       console.error(error);
-      alert("Error restableciendo la contraseña");
+      showAlert(
+        `Hubo un error al ${
+          isFirstLogin ? "crear" : "restablecer"
+        } la contraseña`
+      );
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="container mx-auto max-w-md py-10">
-        <h1 className="text-2xl font-bold mb-5">Restablecer contraseña</h1>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nueva contraseña</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Ingresa tu nueva contraseña (mínimo 8 caracteres).
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirmar contraseña</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Vuelve a ingresar tu nueva contraseña.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">Restablecer contraseña</Button>
-          </form>
-        </Form>
+    <>
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold">
+              {isFirstLogin ? "Crear contraseña" : "Restablecer contraseña"}
+            </CardTitle>
+            <CardDescription>Ingresa tu nueva contraseña</CardDescription>
+          </CardHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <CardContent className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nueva contraseña</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormDescription className="text-xs text-muted-foreground">
+                        La contraseña debe tener al menos 8 caracteres
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirmar contraseña</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+              <CardFooter>
+                <Button className="w-full">
+                  {isFirstLogin ? "Crear contraseña" : "Restablecer contraseña"}
+                </Button>
+              </CardFooter>
+            </form>
+            <AlertDialog open={isAlertOpen} onOpenChange={handleAlertClose}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Notificación</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {alertMessage}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogAction onClick={handleAlertClose}>
+                    Aceptar
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </Form>
+        </Card>
       </div>
-    </div>
+    </>
   );
 }

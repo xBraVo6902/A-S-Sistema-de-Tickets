@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function LoginForm() {
   const {
@@ -95,8 +96,14 @@ export default function LoginForm() {
               ))}
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex flex-col gap-3">
           <Button className="w-full">Iniciar sesión</Button>
+          <Link
+            href="/forgot-password"
+            className="text-sm text-muted-foreground hover:text-primary self-start"
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
         </CardFooter>
       </Card>
     </form>

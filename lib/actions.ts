@@ -4,12 +4,107 @@ import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db";
 import md5 from "md5";
 import "dotenv/config";
+import emailService from "@/services/emailService";
+import crypto from "crypto";
+import { Ticket } from "@prisma/client";
+
+export async function validateClientTicketOwnership(
+  ticketId: string,
+  clientEmail: string
+) {
+  const client = await prisma.person.findUnique({
+    where: { email: clientEmail },
+  });
+  if (!client) {
+    return false;
+  }
+
+  const ticket = await prisma.ticket.findUnique({
+    where: { id: parseInt(ticketId), clientId: client.id },
+  });
+
+  return !!ticket;
+}
+
+export async function validateUserTicketOwnership(
+  ticketId: string,
+  userEmail: string
+) {
+  const user = await prisma.person.findUnique({
+    where: { email: userEmail },
+  });
+  if (!user) {
+    return false;
+  }
+
+  const ticket = await prisma.ticket.findUnique({
+    where: { id: parseInt(ticketId), userId: user.id },
+  });
+
+  return !!ticket;
+}
+
+async function sendTicketAssignedEmail(
+  email: string,
+  data: {
+    ticketId: string;
+    firstName: string;
+    title: string;
+    description: string;
+    status: { name: string; hexColor: string };
+    priority: { name: string; hexColor: string };
+    type: { name: string; hexColor: string };
+    ticketLink: string;
+  }
+) {
+  try {
+    await emailService.sendTicketAssignedEmail(email, data);
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send ticket assigned email:", error);
+    return { success: false };
+  }
+}
 
 export async function assignUserToTicket(ticketId: string, userId: string) {
   try {
+    const [ticket, user] = await Promise.all([
+      prisma.ticket.findUnique({
+        where: { id: parseInt(ticketId) },
+        include: { type: true, priority: true, status: true },
+      }),
+      prisma.person.findUnique({
+        where: { id: parseInt(userId) },
+      }),
+    ]);
+
+    if (!ticket || !user) {
+      return { success: false };
+    }
+
     await prisma.ticket.update({
       where: { id: parseInt(ticketId) },
       data: { userId: parseInt(userId) },
+    });
+
+    await sendTicketAssignedEmail(user.email, {
+      ticketId: ticketId,
+      firstName: user.firstName,
+      title: ticket.title,
+      description: ticket.description,
+      status: {
+        name: ticket.status.name,
+        hexColor: ticket.status.hexColor,
+      },
+      priority: {
+        name: ticket.priority.name,
+        hexColor: ticket.priority.hexColor,
+      },
+      type: {
+        name: ticket.type.name,
+        hexColor: ticket.type.hexColor,
+      },
+      ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/user/ticket/${ticketId}`,
     });
 
     revalidatePath(`/admin/ticket/${ticketId}`);
@@ -20,11 +115,55 @@ export async function assignUserToTicket(ticketId: string, userId: string) {
   }
 }
 
+async function sendStatusChangeEmail(
+  email: string,
+  data: {
+    firstName: string;
+    ticketId: string;
+    title: string;
+    prevStatus: { name: string; hexColor: string };
+    newStatus: { name: string; hexColor: string };
+    ticketLink: string;
+  }
+) {
+  try {
+    await emailService.sendStatusChangeEmail(email, data);
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send status change email:", error);
+    return { success: false };
+  }
+}
+
 export async function updateTicketStatus(ticketId: string, statusId: string) {
   try {
-    await prisma.ticket.update({
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: parseInt(ticketId) },
+      include: { client: true, status: true },
+    });
+    if (!ticket) {
+      return { success: false };
+    }
+
+    const updatedTicket = await prisma.ticket.update({
       where: { id: parseInt(ticketId) },
       data: { statusId: parseInt(statusId) },
+      include: { status: true },
+    });
+
+    await sendStatusChangeEmail(ticket.client.email, {
+      firstName: ticket.client.firstName,
+      ticketId: ticketId,
+      title: ticket.title,
+      prevStatus: {
+        name: ticket.status.name,
+        hexColor: ticket.status.hexColor,
+      },
+      newStatus: {
+        name: updatedTicket.status.name,
+        hexColor: updatedTicket.status.hexColor,
+      },
+      ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/client/ticket/${ticketId}`,
     });
 
     revalidatePath(`/admin/ticket/${ticketId}`);
@@ -114,8 +253,6 @@ type CreatePersonInput = {
   email: string;
   phone: string;
   role: "User" | "Client";
-  temporaryToken: string;
-  tokenExpiry: Date;
 };
 
 export async function generateAvatarUrl(email: string) {
@@ -135,8 +272,6 @@ export async function createPerson(data: CreatePersonInput) {
         phone: data.phone,
         role: data.role,
         avatar: await generateAvatarUrl(data.email),
-        temporaryToken: data.temporaryToken,
-        tokenExpiry: data.tokenExpiry,
       },
     });
     revalidatePath("/admin/usuarios");
@@ -163,10 +298,10 @@ export async function getTicketMetadata() {
   return { statuses, types, priorities };
 }
 
-export async function getTicketsByPersonId(personId: string) {
+export async function getTicketsByUserId(userId: string) {
   try {
     const tickets = await prisma.ticket.findMany({
-      where: { userId: parseInt(personId) },
+      where: { userId: parseInt(userId) },
       select: {
         id: true,
         title: true,
@@ -200,5 +335,139 @@ export async function getTicketsByPersonId(personId: string) {
   } catch (error) {
     console.error("Failed to get tickets by person id:", error);
     return [];
+  }
+}
+
+export async function getTicketsByClientId(clientId: string) {
+  try {
+    const tickets = await prisma.ticket.findMany({
+      where: { clientId: parseInt(clientId) },
+      select: {
+        id: true,
+        title: true,
+        type: {
+          select: { id: true, name: true, hexColor: true, lucideIcon: true },
+        },
+        status: {
+          select: { id: true, name: true, hexColor: true, lucideIcon: true },
+        },
+        priority: {
+          select: { id: true, name: true, hexColor: true, lucideIcon: true },
+        },
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
+        client: {
+          select: {
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+
+    return tickets;
+  } catch (error) {
+    console.error("Failed to get tickets by person id:", error);
+    return [];
+  }
+}
+
+export async function sendResetEmail(email: string, resetLink: string) {
+  try {
+    const person = await prisma.person.findUnique({
+      where: { email },
+    });
+    if (!person) {
+      return { success: false };
+    }
+    const temporaryToken = crypto.randomBytes(32).toString("hex");
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await prisma.person.update({
+      where: { id: person.id },
+      data: { temporaryToken, tokenExpiry },
+    });
+
+    await emailService.sendResetPasswordEmail(email, {
+      firstName: person.firstName,
+      resetLink: `${process.env.NEXT_PUBLIC_BASE_URL}/${resetLink}?token=${temporaryToken}`,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send reset email:", error);
+    return { success: false };
+  }
+}
+
+export async function sendWelcomeEmail(email: string, createLink: string) {
+  try {
+    const person = await prisma.person.findUnique({
+      where: { email },
+    });
+
+    if (!person) {
+      return { success: false };
+    }
+
+    const temporaryToken = crypto.randomBytes(32).toString("hex");
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await prisma.person.update({
+      where: { id: person?.id },
+      data: { temporaryToken, tokenExpiry },
+    });
+
+    await emailService.sendCreatePasswordEmail(email, {
+      firstName: person.firstName,
+      createLink: `${process.env.NEXT_PUBLIC_BASE_URL}/${createLink}?token=${temporaryToken}&firstLogin=true`,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send welcome email:", error);
+    return { success: false };
+  }
+}
+
+export async function sendTicketCreatedEmail(ticket: Ticket) {
+  try {
+    const [client, type, priority, status] = await Promise.all([
+      prisma.person.findUnique({
+        where: { id: ticket.clientId },
+      }),
+      prisma.type.findUnique({
+        where: { id: ticket.typeId },
+      }),
+      prisma.priority.findUnique({
+        where: { id: ticket.priorityId },
+      }),
+      prisma.status.findUnique({
+        where: { id: ticket.statusId },
+      }),
+    ]);
+
+    if (!client || !type || !priority || !status) {
+      return { success: false };
+    }
+
+    await emailService.sendTicketCreatedEmail(client.email, {
+      ticketId: ticket.id.toString(),
+      firstName: client.firstName,
+      title: ticket.title,
+      description: ticket.description,
+      status: { name: status.name, hexColor: status.hexColor },
+      type: { name: type.name, hexColor: type.hexColor },
+      priority: { name: priority.name, hexColor: priority.hexColor },
+      ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/client/ticket/${ticket.id}`,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send ticket created email:", error);
+    return { success: false };
   }
 }

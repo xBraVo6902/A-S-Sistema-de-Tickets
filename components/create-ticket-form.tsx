@@ -36,7 +36,7 @@ import { useRouter } from "next/navigation";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
-import { searchClientByRut } from "@/lib/actions";
+import { searchClientByRut, sendTicketCreatedEmail } from "@/lib/actions";
 import { TicketMetadata } from "@/lib/types";
 
 interface CreateTicketFormProps {
@@ -171,6 +171,10 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
     }
 
     const result = await response?.json();
+    if (props.role === "Admin") {
+      await sendTicketCreatedEmail(result.ticket);
+    }
+
     if (response?.ok) {
       setShouldRefresh(true);
       showAlert("Ticket creado exitosamente");

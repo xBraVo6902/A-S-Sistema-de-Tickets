@@ -74,7 +74,7 @@ export async function POST(request: Request) {
       (s) => s.name === "Abierto"
     )?.id;
 
-    await prisma.ticket.create({
+    const ticket = await prisma.ticket.create({
       data: {
         title,
         description,
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     });
 
     return new Response(
-      JSON.stringify({ message: "Ticket creado con éxito" }),
+      JSON.stringify({ message: "Ticket creado con éxito", ticket }),
       { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
