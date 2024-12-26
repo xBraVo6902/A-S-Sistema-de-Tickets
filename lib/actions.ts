@@ -295,3 +295,22 @@ export async function sendTicketCreatedEmail(ticket: Ticket) {
     return { success: false };
   }
 }
+
+export async function sendStatusChangeEmail(
+  email: string,
+  data: {
+    firstName: string;
+    ticketId: string;
+    prevStatus: { name: string; hexColor: string };
+    newStatus: { name: string; hexColor: string };
+    ticketLink: string;
+  }
+) {
+  try {
+    await emailService.sendStatusChangeEmail(email, data);
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send status change email:", error);
+    return { success: false };
+  }
+}
