@@ -8,7 +8,7 @@ import emailService from "@/services/emailService";
 import crypto from "crypto";
 import { Ticket } from "@prisma/client";
 
-export async function validateTicketOwnership(
+export async function validateClientTicketOwnership(
   ticketId: string,
   clientEmail: string
 ) {
@@ -21,6 +21,24 @@ export async function validateTicketOwnership(
 
   const ticket = await prisma.ticket.findUnique({
     where: { id: parseInt(ticketId), clientId: client.id },
+  });
+
+  return !!ticket;
+}
+
+export async function validateUserTicketOwnership(
+  ticketId: string,
+  userEmail: string
+) {
+  const user = await prisma.person.findUnique({
+    where: { email: userEmail },
+  });
+  if (!user) {
+    return false;
+  }
+
+  const ticket = await prisma.ticket.findUnique({
+    where: { id: parseInt(ticketId), userId: user.id },
   });
 
   return !!ticket;

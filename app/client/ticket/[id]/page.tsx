@@ -1,7 +1,7 @@
 import { BackButton } from "@/components/back-button";
 import TicketInfo from "@/components/ticket-info";
 import { TicketInfoProps } from "@/components/ticket-info";
-import { validateTicketOwnership } from "@/lib/actions";
+import { validateClientTicketOwnership } from "@/lib/actions";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
@@ -37,7 +37,7 @@ export default async function TicketView({
   }
 
   const userEmail = session.user.email ?? "";
-  const isOwner = await validateTicketOwnership(id, userEmail);
+  const isOwner = await validateClientTicketOwnership(id, userEmail);
   if (!isOwner) {
     redirect("/unauthorized");
   }

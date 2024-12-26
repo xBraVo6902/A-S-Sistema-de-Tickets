@@ -1,6 +1,9 @@
 import { BackButton } from "@/components/back-button";
 import TicketInfo from "@/components/ticket-info";
 import { TicketInfoProps } from "@/components/ticket-info";
+import { validateUserTicketOwnership } from "@/lib/actions";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
 async function getTicket(params: {
   params: { id: string };
@@ -27,6 +30,17 @@ export default async function TicketView({
 }) {
   const id = (await params).id;
   const ticketData = await getTicket({ params: { id } });
+  const session = await getServerSession();
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  const userEmail = session.user.email ?? "";
+  const isOwner = await validateUserTicketOwnership(id, userEmail);
+  if (!isOwner) {
+    redirect("/unauthorized");
+  }
 
   return (
     <div className="container mx-auto py-10 md:px-10 space-y-6">
