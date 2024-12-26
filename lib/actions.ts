@@ -71,7 +71,7 @@ export async function assignUserToTicket(ticketId: string, userId: string) {
     const [ticket, user] = await Promise.all([
       prisma.ticket.findUnique({
         where: { id: parseInt(ticketId) },
-        include: { type: true, priority: true, status: true },
+        include: { type: true, priority: true, status: true, user: true },
       }),
       prisma.person.findUnique({
         where: { id: parseInt(userId) },
@@ -82,30 +82,42 @@ export async function assignUserToTicket(ticketId: string, userId: string) {
       return { success: false };
     }
 
-    await prisma.ticket.update({
-      where: { id: parseInt(ticketId) },
-      data: { userId: parseInt(userId) },
-    });
+    const prevUser =
+      `${ticket.user?.firstName} ${ticket.user?.lastName}` || "Sin asignar";
+    const newUser = `${user.firstName} ${user.lastName}`;
+    const noteMessage = `Usuario asignado de ${prevUser} a ${newUser}`;
 
-    await sendTicketAssignedEmail(user.email, {
-      ticketId: ticketId,
-      firstName: user.firstName,
-      title: ticket.title,
-      description: ticket.description,
-      status: {
-        name: ticket.status.name,
-        hexColor: ticket.status.hexColor,
-      },
-      priority: {
-        name: ticket.priority.name,
-        hexColor: ticket.priority.hexColor,
-      },
-      type: {
-        name: ticket.type.name,
-        hexColor: ticket.type.hexColor,
-      },
-      ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/user/ticket/${ticketId}`,
-    });
+    await Promise.all([
+      prisma.note.create({
+        data: {
+          content: noteMessage,
+          ticketId: parseInt(ticketId),
+        },
+      }),
+      prisma.ticket.update({
+        where: { id: parseInt(ticketId) },
+        data: { userId: parseInt(userId) },
+      }),
+      sendTicketAssignedEmail(user.email, {
+        ticketId: ticketId,
+        firstName: user.firstName,
+        title: ticket.title,
+        description: ticket.description,
+        status: {
+          name: ticket.status.name,
+          hexColor: ticket.status.hexColor,
+        },
+        priority: {
+          name: ticket.priority.name,
+          hexColor: ticket.priority.hexColor,
+        },
+        type: {
+          name: ticket.type.name,
+          hexColor: ticket.type.hexColor,
+        },
+        ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/user/ticket/${ticketId}`,
+      }),
+    ]);
 
     revalidatePath(`/admin/ticket/${ticketId}`);
     return { success: true };

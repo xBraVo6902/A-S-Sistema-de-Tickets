@@ -360,6 +360,29 @@ export default function TicketInfo(props: TicketInfoProps) {
                 </div>
               </>
             )}
+            <div className="space-y-4">
+              <h3 className="font-semibold">Historial de cambios</h3>
+
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <time className="text-xs">{props.data.updatedAt}</time>
+                  <p>Estado cambiado de Pendiente a En progreso</p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <time className="text-xs">{props.data.updatedAt}</time>
+                  <p>Usuario asignado de Sin asignar a Juan Pérez</p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <time className="text-xs">{props.data.createdAt}</time>
+                  <p>
+                    Ticket creado por {props.data.client.firstName}{" "}
+                    {props.data.client.lastName}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
