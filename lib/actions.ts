@@ -6,6 +6,7 @@ import md5 from "md5";
 import "dotenv/config";
 import emailService from "@/services/emailService";
 import crypto from "crypto";
+import { Ticket } from "@prisma/client";
 
 export async function assignUserToTicket(ticketId: string, userId: string) {
   try {
@@ -253,6 +254,44 @@ export async function sendWelcomeEmail(email: string, createLink: string) {
     return { success: true };
   } catch (error) {
     console.error("Failed to send welcome email:", error);
+    return { success: false };
+  }
+}
+
+export async function sendTicketCreatedEmail(ticket: Ticket) {
+  try {
+    const [client, type, priority, status] = await Promise.all([
+      prisma.person.findUnique({
+        where: { id: ticket.clientId },
+      }),
+      prisma.type.findUnique({
+        where: { id: ticket.typeId },
+      }),
+      prisma.priority.findUnique({
+        where: { id: ticket.priorityId },
+      }),
+      prisma.status.findUnique({
+        where: { id: ticket.statusId },
+      }),
+    ]);
+
+    if (!client || !type || !priority || !status) {
+      return { success: false };
+    }
+
+    await emailService.sendTicketCreatedEmail(client.email, {
+      ticketId: ticket.id.toString(),
+      firstName: client.firstName,
+      title: ticket.title,
+      description: ticket.description,
+      status: { name: status.name, hexColor: status.hexColor },
+      type: { name: type.name, hexColor: type.hexColor },
+      priority: { name: priority.name, hexColor: priority.hexColor },
+      ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/client/ticket/${ticket.id}`,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send ticket created email:", error);
     return { success: false };
   }
 }

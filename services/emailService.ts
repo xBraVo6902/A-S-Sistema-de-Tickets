@@ -49,14 +49,19 @@ class EmailService {
     to: string,
     data: {
       ticketId: string;
-      userName: string;
-      status: string;
+      firstName: string;
+      title: string;
+      description: string;
+      status: { name: string; hexColor: string };
+      type: { name: string; hexColor: string };
+      priority: { name: string; hexColor: string };
+      ticketLink: string;
     }
   ): Promise<void> {
     const html = await loadTemplate("ticket-created", data);
     await this.sendEmail({
       to,
-      subject: `Ticket #${data.ticketId} Created`,
+      subject: `Ticket #${data.ticketId} creado`,
       html,
     });
   }
@@ -71,7 +76,7 @@ class EmailService {
     const html = await loadTemplate("reset-password", data);
     await this.sendEmail({
       to,
-      subject: "Reestablece tu contraseña",
+      subject: "Restablece tu contraseña",
       html,
     });
   }
