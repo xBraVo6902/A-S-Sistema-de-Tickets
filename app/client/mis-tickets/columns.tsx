@@ -6,7 +6,7 @@ import * as Icons from "lucide-react";
 import { TicketPriority, TicketStatus, TicketType } from "@/lib/types";
 
 export type Ticket = {
-  id: string;
+  id: number;
   title: string;
   status: TicketStatus;
   type: TicketType;

@@ -8,6 +8,24 @@ import emailService from "@/services/emailService";
 import crypto from "crypto";
 import { Ticket } from "@prisma/client";
 
+export async function validateTicketOwnership(
+  ticketId: string,
+  clientEmail: string
+) {
+  const client = await prisma.person.findUnique({
+    where: { email: clientEmail },
+  });
+  if (!client) {
+    return false;
+  }
+
+  const ticket = await prisma.ticket.findUnique({
+    where: { id: parseInt(ticketId), clientId: client.id },
+  });
+
+  return !!ticket;
+}
+
 async function sendTicketAssignedEmail(
   email: string,
   data: {
@@ -262,10 +280,50 @@ export async function getTicketMetadata() {
   return { statuses, types, priorities };
 }
 
-export async function getTicketsByPersonId(personId: string) {
+export async function getTicketsByUserId(userId: string) {
   try {
     const tickets = await prisma.ticket.findMany({
-      where: { userId: parseInt(personId) },
+      where: { userId: parseInt(userId) },
+      select: {
+        id: true,
+        title: true,
+        type: {
+          select: { id: true, name: true, hexColor: true, lucideIcon: true },
+        },
+        status: {
+          select: { id: true, name: true, hexColor: true, lucideIcon: true },
+        },
+        priority: {
+          select: { id: true, name: true, hexColor: true, lucideIcon: true },
+        },
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
+        client: {
+          select: {
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+
+    return tickets;
+  } catch (error) {
+    console.error("Failed to get tickets by person id:", error);
+    return [];
+  }
+}
+
+export async function getTicketsByClientId(clientId: string) {
+  try {
+    const tickets = await prisma.ticket.findMany({
+      where: { clientId: parseInt(clientId) },
       select: {
         id: true,
         title: true,

@@ -3,13 +3,13 @@ import { columns } from "@/app/user/mis-tickets/columns";
 import { DataTable } from "@/components/data-table";
 import { authOptions } from "@/auth";
 import "dotenv/config";
-import { getTicketsByPersonId } from "@/lib/actions";
+import { getTicketsByUserId } from "@/lib/actions";
 
 export default async function Page() {
   const session: { user?: { id?: string } } | null = await getServerSession(
     authOptions
   );
-  const data = (await getTicketsByPersonId(session?.user?.id ?? "0")).map(
+  const data = (await getTicketsByUserId(session?.user?.id ?? "0")).map(
     (ticket) => ({
       id: ticket.id,
       title: ticket.title,

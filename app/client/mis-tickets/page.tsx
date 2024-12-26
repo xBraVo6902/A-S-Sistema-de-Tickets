@@ -1,30 +1,29 @@
 import { getServerSession } from "next-auth";
-import { Ticket, columns } from "@/app/client/mis-tickets/columns";
+import { columns } from "@/app/client/mis-tickets/columns";
 import { DataTable } from "@/components/data-table";
 import { authOptions } from "@/auth";
 import "dotenv/config";
-
-async function getTickets(): Promise<Ticket[]> {
-  const res = await import("@/app/api/tickets/route");
-  const session: { user?: { id?: string } } | null = await getServerSession(
-    authOptions
-  );
-  const request = new Request(
-    `${process.env.NEXTAUTH_URL}/api/tickets?clientId=${session?.user?.id}`,
-    {
-      method: "GET",
-    }
-  );
-
-  if (!(await res.GET(request)).ok) {
-    throw new Error("Failed to fetch data");
-  }
-
-  return await (await res.GET(request)).json();
-}
+import { redirect } from "next/navigation";
+import { getTicketsByClientId } from "@/lib/actions";
 
 export default async function Page() {
-  const data = await getTickets();
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect("/login");
+  }
+
+  const data = (await getTicketsByClientId(session.user.id ?? "")).map(
+    (ticket) => ({
+      id: ticket.id,
+      title: ticket.title,
+      status: ticket.status,
+      type: ticket.type,
+      priority: ticket.priority,
+      user: ticket.user,
+    })
+  );
+  console.log(session.user.id);
+
   return (
     <div className="container mx-auto py-10">
       <DataTable columns={columns} data={data} role="client" />
