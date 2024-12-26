@@ -101,6 +101,7 @@ class EmailService {
     data: {
       firstName: string;
       ticketId: string;
+      title: string;
       prevStatus: { name: string; hexColor: string };
       newStatus: { name: string; hexColor: string };
       ticketLink: string;

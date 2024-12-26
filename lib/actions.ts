@@ -23,11 +23,54 @@ export async function assignUserToTicket(ticketId: string, userId: string) {
   }
 }
 
+async function sendStatusChangeEmail(
+  email: string,
+  data: {
+    firstName: string;
+    ticketId: string;
+    title: string;
+    prevStatus: { name: string; hexColor: string };
+    newStatus: { name: string; hexColor: string };
+    ticketLink: string;
+  }
+) {
+  try {
+    await emailService.sendStatusChangeEmail(email, data);
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to send status change email:", error);
+    return { success: false };
+  }
+}
+
 export async function updateTicketStatus(ticketId: string, statusId: string) {
   try {
-    await prisma.ticket.update({
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: parseInt(ticketId) },
+      include: { client: true, status: true },
+    });
+    if (!ticket) {
+      return { success: false };
+    }
+
+    const updatedTicket = await prisma.ticket.update({
       where: { id: parseInt(ticketId) },
       data: { statusId: parseInt(statusId) },
+      include: { status: true },
+    });
+    await sendStatusChangeEmail(ticket.client.email, {
+      firstName: ticket.client.firstName,
+      ticketId: ticketId,
+      title: ticket.title,
+      prevStatus: {
+        name: ticket.status.name,
+        hexColor: ticket.status.hexColor,
+      },
+      newStatus: {
+        name: updatedTicket.status.name,
+        hexColor: updatedTicket.status.hexColor,
+      },
+      ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/client/ticket/${ticketId}`,
     });
 
     revalidatePath(`/admin/ticket/${ticketId}`);
@@ -292,25 +335,6 @@ export async function sendTicketCreatedEmail(ticket: Ticket) {
     return { success: true };
   } catch (error) {
     console.error("Failed to send ticket created email:", error);
-    return { success: false };
-  }
-}
-
-export async function sendStatusChangeEmail(
-  email: string,
-  data: {
-    firstName: string;
-    ticketId: string;
-    prevStatus: { name: string; hexColor: string };
-    newStatus: { name: string; hexColor: string };
-    ticketLink: string;
-  }
-) {
-  try {
-    await emailService.sendStatusChangeEmail(email, data);
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to send status change email:", error);
     return { success: false };
   }
 }
