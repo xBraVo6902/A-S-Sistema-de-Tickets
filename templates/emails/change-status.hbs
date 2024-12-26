@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado del Ticket Actualizado</title>
+</head>
+
+<body style="background-color: #f3f4f6; font-family: Arial, sans-serif; margin: 0; padding: 0;">
+    <table cellpadding="0" cellspacing="0" width="100%"
+        style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <tr>
+            <td style="padding: 40px;">
+                <h1 style="color: #1f2937; font-size: 24px; font-weight: bold; margin-bottom: 24px;">
+                    Actualización de Ticket #{{ticketId}}
+                </h1>
+                <p style="color: #4b5563; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
+                    Hola {{firstName}},
+                </p>
+                <p style="color: #4b5563; font-size: 16px; line-height: 24px; margin-bottom: 24px;">
+                    El estado de tu ticket ha sido actualizado:
+                </p>
+                <div style="background-color: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                    <p style="color: #1f2937; font-size: 18px; font-weight: 600; margin: 0 0 8px 0;">
+                        {{title}}
+                    </p>
+                    <p style="color: #4b5563; font-size: 16px; line-height: 24px; margin: 8px 0;">
+                        <strong>Estado anterior:</strong>
+                        <span
+                            style="background-color: {{oldStatus.hexColor}}; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 14px;">
+                            {{oldStatus.name}}
+                        </span>
+                    </p>
+                    <p style="color: #4b5563; font-size: 16px; line-height: 24px; margin: 8px 0;">
+                        <strong>Nuevo estado:</strong>
+                        <span
+                            style="background-color: {{newStatus.hexColor}}; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 14px;">
+                            {{newStatus.name}}
+                        </span>
+                    </p>
+                </div>
+                <table cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td align="center">
+                            <a href="{{ticketLink}}"
+                                style="display: inline-block; padding: 12px 24px; background-color: #000000; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 4px;">
+                                Ver Ticket
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                <p style="color: #4b5563; font-size: 16px; line-height: 24px; margin-top: 24px;">
+                    Saludos,<br>
+                    El equipo de soporte
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
