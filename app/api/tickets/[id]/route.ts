@@ -55,6 +55,12 @@ export async function GET(
             avatar: true,
           },
         },
+        notes: {
+          select: {
+            createdAt: true,
+            content: true,
+          },
+        },
       },
     });
 

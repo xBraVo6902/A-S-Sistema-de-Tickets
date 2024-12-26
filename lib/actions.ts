@@ -163,20 +163,32 @@ export async function updateTicketStatus(ticketId: string, statusId: string) {
       include: { status: true },
     });
 
-    await sendStatusChangeEmail(ticket.client.email, {
-      firstName: ticket.client.firstName,
-      ticketId: ticketId,
-      title: ticket.title,
-      prevStatus: {
-        name: ticket.status.name,
-        hexColor: ticket.status.hexColor,
-      },
-      newStatus: {
-        name: updatedTicket.status.name,
-        hexColor: updatedTicket.status.hexColor,
-      },
-      ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/client/ticket/${ticketId}`,
-    });
+    const prevStatus = ticket.status;
+    const newStatus = updatedTicket.status;
+    const noteMessage = `Estado cambiado de ${prevStatus.name} a ${newStatus.name}`;
+
+    await Promise.all([
+      prisma.note.create({
+        data: {
+          content: noteMessage,
+          ticketId: parseInt(ticketId),
+        },
+      }),
+      sendStatusChangeEmail(ticket.client.email, {
+        firstName: ticket.client.firstName,
+        ticketId: ticketId,
+        title: ticket.title,
+        prevStatus: {
+          name: ticket.status.name,
+          hexColor: ticket.status.hexColor,
+        },
+        newStatus: {
+          name: updatedTicket.status.name,
+          hexColor: updatedTicket.status.hexColor,
+        },
+        ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/client/ticket/${ticketId}`,
+      }),
+    ]);
 
     revalidatePath(`/admin/ticket/${ticketId}`);
     return { success: true };
