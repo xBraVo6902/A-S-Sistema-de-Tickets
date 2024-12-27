@@ -28,7 +28,6 @@ import {
   searchPersonByRut,
   emailExists,
   phoneExists,
-  sendWelcomeEmail,
 } from "@/lib/actions";
 
 import { useRouter } from "next/navigation";
@@ -151,7 +150,6 @@ export default function CreateUserForm(props: CreateTicketFormProps) {
 
     try {
       await createPerson(submitData);
-      await sendWelcomeEmail(data.email, "reset-password");
       setShouldRefresh(true);
       showAlert(
         `${userType === "Client" ? "Cliente" : "Usuario"} creado exitosamente`

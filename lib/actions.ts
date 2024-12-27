@@ -112,26 +112,6 @@ export async function assignUserToTicket(ticketId: string, userId: string) {
   }
 }
 
-async function sendStatusChangeEmail(
-  email: string,
-  data: {
-    firstName: string;
-    ticketId: string;
-    title: string;
-    prevStatus: { name: string; hexColor: string };
-    newStatus: { name: string; hexColor: string };
-    ticketLink: string;
-  }
-) {
-  try {
-    await emailService.sendStatusChangeEmail(email, data);
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to send status change email:", error);
-    return { success: false };
-  }
-}
-
 export async function updateTicketStatus(ticketId: string, statusId: string) {
   try {
     const ticket = await prisma.ticket.findUnique({
@@ -152,14 +132,17 @@ export async function updateTicketStatus(ticketId: string, statusId: string) {
     const newStatus = updatedTicket.status;
     const noteMessage = `Estado cambiado de ${prevStatus.name} a ${newStatus.name}`;
 
-    await Promise.all([
-      prisma.note.create({
-        data: {
-          content: noteMessage,
-          ticketId: parseInt(ticketId),
-        },
-      }),
-      sendStatusChangeEmail(ticket.client.email, {
+    await prisma.note.create({
+      data: {
+        content: noteMessage,
+        ticketId: parseInt(ticketId),
+      },
+    });
+
+    emailQueue.add({
+      type: "status-change",
+      to: ticket.client.email,
+      data: {
         firstName: ticket.client.firstName,
         ticketId: ticketId,
         title: ticket.title,
@@ -172,8 +155,8 @@ export async function updateTicketStatus(ticketId: string, statusId: string) {
           hexColor: updatedTicket.status.hexColor,
         },
         ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/client/ticket/${ticketId}`,
-      }),
-    ]);
+      },
+    });
 
     revalidatePath(`/admin/ticket/${ticketId}`);
     return { success: true };
@@ -271,6 +254,9 @@ export async function generateAvatarUrl(email: string) {
 
 export async function createPerson(data: CreatePersonInput) {
   try {
+    const temporaryToken = crypto.randomBytes(32).toString("hex");
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
     const user = await prisma.person.create({
       data: {
         companyRut: data.companyRut,
@@ -281,8 +267,20 @@ export async function createPerson(data: CreatePersonInput) {
         phone: data.phone,
         role: data.role,
         avatar: await generateAvatarUrl(data.email),
+        temporaryToken,
+        tokenExpiry,
       },
     });
+
+    emailQueue.add({
+      type: "create-password",
+      to: data.email,
+      data: {
+        firstName: data.firstName,
+        createLink: `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${temporaryToken}&firstLogin=true`,
+      },
+    });
+
     revalidatePath("/admin/usuarios");
     revalidatePath("/admin/clientes");
     return user;
@@ -387,7 +385,7 @@ export async function getTicketsByClientId(clientId: string) {
   }
 }
 
-export async function sendResetEmail(email: string, resetLink: string) {
+export async function sendResetEmail(email: string) {
   try {
     const person = await prisma.person.findUnique({
       where: { email },
@@ -403,42 +401,17 @@ export async function sendResetEmail(email: string, resetLink: string) {
       data: { temporaryToken, tokenExpiry },
     });
 
-    await emailService.sendResetPasswordEmail(email, {
-      firstName: person.firstName,
-      resetLink: `${process.env.NEXT_PUBLIC_BASE_URL}/${resetLink}?token=${temporaryToken}`,
+    emailQueue.add({
+      type: "reset-password",
+      to: email,
+      data: {
+        firstName: person.firstName,
+        resetLink: `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${temporaryToken}`,
+      },
     });
     return { success: true };
   } catch (error) {
     console.error("Failed to send reset email:", error);
-    return { success: false };
-  }
-}
-
-export async function sendWelcomeEmail(email: string, createLink: string) {
-  try {
-    const person = await prisma.person.findUnique({
-      where: { email },
-    });
-
-    if (!person) {
-      return { success: false };
-    }
-
-    const temporaryToken = crypto.randomBytes(32).toString("hex");
-    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-    await prisma.person.update({
-      where: { id: person?.id },
-      data: { temporaryToken, tokenExpiry },
-    });
-
-    await emailService.sendCreatePasswordEmail(email, {
-      firstName: person.firstName,
-      createLink: `${process.env.NEXT_PUBLIC_BASE_URL}/${createLink}?token=${temporaryToken}&firstLogin=true`,
-    });
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to send welcome email:", error);
     return { success: false };
   }
 }

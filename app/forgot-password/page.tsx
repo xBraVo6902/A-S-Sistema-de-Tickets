@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      await sendResetEmail(data.email, "reset-password");
+      await sendResetEmail(data.email);
       setShouldRefresh(true);
       showAlert(
         "Si el email ingresado corresponde a una cuenta existente, se enviará un correo con instrucciones para recuperar tu contraseña."
