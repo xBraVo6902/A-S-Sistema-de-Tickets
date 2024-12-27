@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, ChevronDown, ActivityIcon } from "lucide-react";
 import * as Icons from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -155,6 +155,8 @@ export default function TicketInfo(props: TicketInfoProps) {
       console.error("Error creating note:", error);
     }
   };
+
+  const [isHistoryExpanded, setIsHistoryExpanded] = React.useState(false);
 
   return (
     <>
@@ -384,30 +386,50 @@ export default function TicketInfo(props: TicketInfoProps) {
                 </div>
               </>
             )}
-            {props.data.notes.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="font-semibold">Historial de cambios</h3>
-
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  {props.data.notes.map((note) => (
-                    <div key={note.createdAt}>
-                      <div className="flex items-center gap-2">
-                        <time className="text-xs">
-                          {new Date(note.createdAt).toLocaleString("es-ES", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </time>
-                        <p>{note.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            <div className="space-y-2">
+              <div
+                className="flex items-center cursor-pointer select-none"
+                onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
+              >
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-200",
+                    isHistoryExpanded
+                      ? "transform rotate-0"
+                      : "transform -rotate-90"
+                  )}
+                />
+                <h3 className="text-lg font-semibold ml-2">
+                  Historial de cambios
+                </h3>
               </div>
-            )}
+
+              <div
+                className={cn(
+                  "transition-all duration-200 space-y-4 overflow-hidden",
+                  isHistoryExpanded
+                    ? "max-h-[1000px] opacity-100"
+                    : "max-h-0 opacity-0"
+                )}
+              >
+                {props.data.notes.map((note) => (
+                  <div
+                    key={note.createdAt}
+                    className="flex items-start space-x-4 text-sm"
+                  >
+                    <div className="w-4 h-4 mt-0.5">
+                      <ActivityIcon className="w-4 h-4 text-gray-500" />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <p className="text-sm text-gray-700">{note.content}</p>
+                      <p className="text-xs text-gray-500">
+                        {formatDate(note.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
