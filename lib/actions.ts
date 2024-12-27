@@ -7,6 +7,7 @@ import "dotenv/config";
 import emailService from "@/services/emailService";
 import crypto from "crypto";
 import { Ticket } from "@prisma/client";
+import { emailQueue } from "@/services/queueService";
 
 export async function validateClientTicketOwnership(
   ticketId: string,
@@ -44,28 +45,6 @@ export async function validateUserTicketOwnership(
   return !!ticket;
 }
 
-async function sendTicketAssignedEmail(
-  email: string,
-  data: {
-    ticketId: string;
-    firstName: string;
-    title: string;
-    description: string;
-    status: { name: string; hexColor: string };
-    priority: { name: string; hexColor: string };
-    type: { name: string; hexColor: string };
-    ticketLink: string;
-  }
-) {
-  try {
-    await emailService.sendTicketAssignedEmail(email, data);
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to send ticket assigned email:", error);
-    return { success: false };
-  }
-}
-
 export async function assignUserToTicket(ticketId: string, userId: string) {
   try {
     const [ticket, user] = await Promise.all([
@@ -98,7 +77,12 @@ export async function assignUserToTicket(ticketId: string, userId: string) {
         where: { id: parseInt(ticketId) },
         data: { userId: parseInt(userId) },
       }),
-      sendTicketAssignedEmail(user.email, {
+    ]);
+
+    emailQueue.add({
+      type: "ticket-assigned",
+      to: user.email,
+      data: {
         ticketId: ticketId,
         firstName: user.firstName,
         title: ticket.title,
@@ -116,8 +100,8 @@ export async function assignUserToTicket(ticketId: string, userId: string) {
           hexColor: ticket.type.hexColor,
         },
         ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/user/ticket/${ticketId}`,
-      }),
-    ]);
+      },
+    });
 
     revalidatePath(`/admin/ticket/${ticketId}`);
     return { success: true };
