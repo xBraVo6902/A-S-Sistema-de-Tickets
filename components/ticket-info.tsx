@@ -55,6 +55,10 @@ export type TicketInfoProps = {
       avatar: string;
       phone: string;
     };
+    notes: {
+      createdAt: string;
+      content: string;
+    }[];
   };
   role: "User" | "Client" | "Admin";
   users?: {
@@ -67,8 +71,6 @@ export type TicketInfoProps = {
 };
 
 export default function TicketInfo(props: TicketInfoProps) {
-  console.log(props.data);
-
   const phone =
     props.role === "User" ? props.data.client.phone : props.data.user?.phone;
 
@@ -359,6 +361,30 @@ export default function TicketInfo(props: TicketInfoProps) {
                   )}
                 </div>
               </>
+            )}
+            {props.data.notes.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="font-semibold">Historial de cambios</h3>
+
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  {props.data.notes.map((note) => (
+                    <div key={note.createdAt}>
+                      <div className="flex items-center gap-2">
+                        <time className="text-xs">
+                          {new Date(note.createdAt).toLocaleString("es-ES", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </time>
+                        <p>{note.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </CardContent>

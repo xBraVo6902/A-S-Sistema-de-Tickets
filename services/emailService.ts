@@ -1,6 +1,13 @@
 import nodemailer from "nodemailer";
 import "dotenv/config";
 import { loadTemplate } from "@/lib/templateLoader";
+import {
+  CreatePasswordEmailData,
+  ResetPasswordEmailData,
+  StatusChangeEmailData,
+  TicketAssignedEmailData,
+  TicketCreatedEmailData,
+} from "./types";
 
 interface EmailOptions {
   to: string;
@@ -47,16 +54,7 @@ class EmailService {
 
   async sendTicketCreatedEmail(
     to: string,
-    data: {
-      ticketId: string;
-      firstName: string;
-      title: string;
-      description: string;
-      status: { name: string; hexColor: string };
-      type: { name: string; hexColor: string };
-      priority: { name: string; hexColor: string };
-      ticketLink: string;
-    }
+    data: TicketCreatedEmailData
   ): Promise<void> {
     const html = await loadTemplate("ticket-created", data);
     await this.sendEmail({
@@ -68,10 +66,7 @@ class EmailService {
 
   async sendResetPasswordEmail(
     to: string,
-    data: {
-      firstName: string;
-      resetLink: string;
-    }
+    data: ResetPasswordEmailData
   ): Promise<void> {
     const html = await loadTemplate("reset-password", data);
     await this.sendEmail({
@@ -83,10 +78,7 @@ class EmailService {
 
   async sendCreatePasswordEmail(
     to: string,
-    data: {
-      firstName: string;
-      createLink: string;
-    }
+    data: CreatePasswordEmailData
   ): Promise<void> {
     const html = await loadTemplate("create-password", data);
     await this.sendEmail({
@@ -98,15 +90,8 @@ class EmailService {
 
   async sendStatusChangeEmail(
     to: string,
-    data: {
-      firstName: string;
-      ticketId: string;
-      title: string;
-      prevStatus: { name: string; hexColor: string };
-      newStatus: { name: string; hexColor: string };
-      ticketLink: string;
-    }
-  ) {
+    data: StatusChangeEmailData
+  ): Promise<void> {
     const html = await loadTemplate("status-change", data);
     await this.sendEmail({
       to,
@@ -117,17 +102,8 @@ class EmailService {
 
   async sendTicketAssignedEmail(
     to: string,
-    data: {
-      ticketId: string;
-      firstName: string;
-      title: string;
-      description: string;
-      status: { name: string; hexColor: string };
-      priority: { name: string; hexColor: string };
-      type: { name: string; hexColor: string };
-      ticketLink: string;
-    }
-  ) {
+    data: TicketAssignedEmailData
+  ): Promise<void> {
     const html = await loadTemplate("ticket-assigned", data);
     await this.sendEmail({
       to,

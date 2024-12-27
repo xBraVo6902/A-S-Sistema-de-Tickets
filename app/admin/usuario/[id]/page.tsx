@@ -12,8 +12,6 @@ export default async function UserPage({
     getUserById(id),
     getTicketMetadata(),
   ]);
-  console.log(user);
-  console.log(ticketMetadata);
 
   const formatPhone = (phone: string) => {
     const countryCode = phone.slice(0, 2);

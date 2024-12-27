@@ -22,7 +22,6 @@ export default async function Page() {
       user: ticket.user,
     })
   );
-  console.log(session.user.id);
 
   return (
     <div className="container mx-auto py-10">

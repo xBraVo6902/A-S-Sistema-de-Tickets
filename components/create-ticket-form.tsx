@@ -36,7 +36,7 @@ import { useRouter } from "next/navigation";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
-import { searchClientByRut, sendTicketCreatedEmail } from "@/lib/actions";
+import { createTicket, searchClientByRut } from "@/lib/actions";
 import { TicketMetadata } from "@/lib/types";
 
 interface CreateTicketFormProps {
@@ -141,8 +141,6 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
       priority: priorityName,
     };
 
-    let response;
-
     if (props.role === "Admin") {
       const client = await searchClientByRut(data.rut);
       if (!client) {
@@ -152,34 +150,16 @@ export default function CreateTicketForm(props: CreateTicketFormProps) {
         });
         return;
       }
-
-      response = await fetch(`/api/tickets?clientId=${client.id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formattedData),
-      });
-    } else {
-      response = await fetch("/api/tickets", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formattedData),
-      });
     }
 
-    const result = await response?.json();
-    if (props.role === "Admin") {
-      await sendTicketCreatedEmail(result.ticket);
-    }
-
-    if (response?.ok) {
-      setShouldRefresh(true);
+    const ticket = await createTicket(
+      formattedData,
+      props.role === "Admin" ? true : false
+    );
+    if (ticket) {
       showAlert("Ticket creado exitosamente");
+      setShouldRefresh(true);
     } else {
-      console.error(result.message);
       showAlert("Hubo un error al crear el ticket");
     }
   };
