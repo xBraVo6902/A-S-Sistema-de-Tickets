@@ -58,7 +58,9 @@ export async function GET(
         notes: {
           select: {
             createdAt: true,
-            content: true,
+            prevValue: true,
+            newValue: true,
+            type: true,
           },
         },
       },

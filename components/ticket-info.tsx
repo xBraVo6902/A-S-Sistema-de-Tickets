@@ -1,7 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown, ChevronDown, ActivityIcon } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  ChevronDown,
+  ActivityIcon,
+  SquarePen,
+  UserRoundPen,
+} from "lucide-react";
 import * as Icons from "lucide-react";
 
 import { cn, formatDate } from "@/lib/utils";
@@ -60,7 +67,9 @@ export type TicketInfoProps = {
     };
     notes: {
       createdAt: string;
-      content: string;
+      prevValue: string;
+      newValue: string;
+      type: "user-change" | "status-change";
     }[];
   };
   role: "User" | "Client" | "Admin";
@@ -157,6 +166,14 @@ export default function TicketInfo(props: TicketInfoProps) {
   };
 
   const [isHistoryExpanded, setIsHistoryExpanded] = React.useState(false);
+
+  function getStatusStyle(statusName: string, statuses: TicketStatus[]) {
+    const status = statuses.find((s) => s.name === statusName);
+    return {
+      backgroundColor: status?.hexColor || "#F3F4F6",
+      color: status ? "#FFFFFF" : "#4B5563",
+    };
+  }
 
   return (
     <>
@@ -418,10 +435,56 @@ export default function TicketInfo(props: TicketInfoProps) {
                     className="flex items-start space-x-4 text-sm"
                   >
                     <div className="w-4 h-4 mt-0.5">
-                      <ActivityIcon className="w-4 h-4 text-gray-500" />
+                      {note.type === "user-change" ? (
+                        <UserRoundPen className="w-4 h-4 text-gray-500" />
+                      ) : (
+                        <SquarePen className="w-4 h-4 text-gray-500" />
+                      )}
                     </div>
                     <div className="flex-1 space-y-1">
-                      <p className="text-sm text-gray-700">{note.content}</p>
+                      <p className="text-sm text-gray-700">
+                        {note.type === "user-change" ? (
+                          <>
+                            El usuario cambió de{" "}
+                            <span
+                              className="inline-flex items-center rounded-full mx-1 px-2 py-1 text-xs font-medium"
+                              style={{
+                                backgroundColor: "#F3F4F6",
+                                color: "#4B5563",
+                              }}
+                            >
+                              {note.prevValue}
+                            </span>{" "}
+                            a{" "}
+                            <span
+                              className="inline-flex items-center rounded-full px-2 ml-1 py-1 text-xs font-medium"
+                              style={{
+                                backgroundColor: "#F3F4F6",
+                                color: "#4B5563",
+                              }}
+                            >
+                              {note.newValue}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            El estado cambió de{" "}
+                            <span
+                              className="inline-flex items-center rounded-full px-2 mx-1 py-1 text-xs font-medium"
+                              style={getStatusStyle(note.prevValue, statuses)}
+                            >
+                              {note.prevValue}
+                            </span>{" "}
+                            a{" "}
+                            <span
+                              className="inline-flex items-center rounded-full px-2 ml-1 py-1 text-xs font-medium"
+                              style={getStatusStyle(note.newValue, statuses)}
+                            >
+                              {note.newValue}
+                            </span>
+                          </>
+                        )}
+                      </p>
                       <p className="text-xs text-gray-500">
                         {formatDate(note.createdAt)}
                       </p>
