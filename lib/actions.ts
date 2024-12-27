@@ -8,6 +8,8 @@ import emailService from "@/services/emailService";
 import crypto from "crypto";
 import { Ticket } from "@prisma/client";
 import { emailQueue } from "@/services/queueService";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth";
 
 export async function validateClientTicketOwnership(
   ticketId: string,
@@ -286,6 +288,81 @@ export async function createPerson(data: CreatePersonInput) {
     return user;
   } catch (error) {
     console.error("Failed to create user:", error);
+    return null;
+  }
+}
+
+type CreateTicketInput = {
+  rut: string;
+  title: string;
+  description: string;
+  type: string;
+  priority: string;
+};
+
+export async function createTicket(data: CreateTicketInput, isAdmin: boolean) {
+  try {
+    let clientId;
+    if (isAdmin) {
+      const client = await prisma.person.findFirst({
+        where: { rut: data.rut, role: "Client" },
+      });
+      if (!client) {
+        return null;
+      }
+      clientId = client.id;
+    } else {
+      const session = await getServerSession(authOptions);
+      if (!session) {
+        return null;
+      }
+      clientId = session.user.id;
+    }
+
+    const [type, priority, status, client] = await Promise.all([
+      prisma.type.findFirst({ where: { name: data.type } }),
+      prisma.priority.findFirst({ where: { name: data.priority } }),
+      prisma.status.findFirst({ where: { name: "Abierto" } }),
+      prisma.person.findUnique({ where: { id: parseInt(clientId as string) } }),
+    ]);
+
+    if (!type || !priority || !status || !client) {
+      return null;
+    }
+
+    const ticket = await prisma.ticket.create({
+      data: {
+        title: data.title,
+        description: data.description,
+        type: { connect: { id: type.id } },
+        priority: { connect: { id: priority.id } },
+        status: { connect: { id: status.id } },
+        client: { connect: { id: parseInt(clientId as string) } },
+      },
+    });
+
+    if (isAdmin) {
+      emailQueue.add({
+        type: "ticket-created",
+        to: client.email,
+        data: {
+          ticketId: ticket.id.toString(),
+          firstName: client.firstName,
+          title: ticket.title,
+          description: ticket.description,
+          status: { name: status.name, hexColor: status.hexColor },
+          type: { name: type.name, hexColor: type.hexColor },
+          priority: { name: priority.name, hexColor: priority.hexColor },
+          ticketLink: `${process.env.NEXT_PUBLIC_BASE_URL}/client/ticket/${ticket.id}`,
+        },
+      });
+    }
+
+    revalidatePath("/admin/tickets");
+    revalidatePath("/client/mis-tickets/");
+    return ticket;
+  } catch (error) {
+    console.error("Failed to create ticket:", error);
     return null;
   }
 }
