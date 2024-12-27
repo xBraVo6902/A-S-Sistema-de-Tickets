@@ -61,8 +61,9 @@ export async function assignUserToTicket(ticketId: string, userId: string) {
       return { success: false };
     }
 
-    const prevUser =
-      `${ticket.user?.firstName} ${ticket.user?.lastName}` || "Sin asignar";
+    const prevUser = ticket.user
+      ? `${ticket.user.firstName} ${ticket.user.lastName}`
+      : "Sin asignar";
     const newUser = `${user.firstName} ${user.lastName}`;
     const noteMessage = `Usuario asignado de ${prevUser} a ${newUser}`;
 
