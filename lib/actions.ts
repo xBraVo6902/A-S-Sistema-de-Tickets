@@ -67,12 +67,13 @@ export async function assignUserToTicket(ticketId: string, userId: string) {
       ? `${ticket.user.firstName} ${ticket.user.lastName}`
       : "Sin asignar";
     const newUser = `${user.firstName} ${user.lastName}`;
-    const noteMessage = `Usuario asignado de ${prevUser} a ${newUser}`;
 
     await Promise.all([
       prisma.note.create({
         data: {
-          content: noteMessage,
+          prevValue: prevUser,
+          newValue: newUser,
+          type: "user-change",
           ticketId: parseInt(ticketId),
         },
       }),
@@ -132,11 +133,12 @@ export async function updateTicketStatus(ticketId: string, statusId: string) {
 
     const prevStatus = ticket.status;
     const newStatus = updatedTicket.status;
-    const noteMessage = `Estado cambiado de ${prevStatus.name} a ${newStatus.name}`;
 
     await prisma.note.create({
       data: {
-        content: noteMessage,
+        prevValue: prevStatus.name,
+        newValue: newStatus.name,
+        type: "status-change",
         ticketId: parseInt(ticketId),
       },
     });
@@ -363,6 +365,35 @@ export async function createTicket(data: CreateTicketInput, isAdmin: boolean) {
     return ticket;
   } catch (error) {
     console.error("Failed to create ticket:", error);
+    return null;
+  }
+}
+
+export async function createMessage(
+  content: string,
+  ticketId: string,
+  userId: string | null
+) {
+  try {
+    if (!userId) {
+      return null;
+    }
+    const message = await prisma.message.create({
+      data: {
+        content,
+        ticket: { connect: { id: parseInt(ticketId) } },
+        user: { connect: { id: parseInt(userId) } },
+      },
+    });
+    if (!message) {
+      return null;
+    }
+
+    revalidatePath(`/admin/ticket/${ticketId}`);
+    revalidatePath(`/user/ticket/${ticketId}`);
+    revalidatePath(`/client/ticket/${ticketId}`);
+  } catch (error) {
+    console.error("Failed to create note:", error);
     return null;
   }
 }

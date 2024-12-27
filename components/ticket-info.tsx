@@ -1,10 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  ChevronDown,
+  SquarePen,
+  UserRoundPen,
+} from "lucide-react";
 import * as Icons from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -28,8 +34,10 @@ import {
   assignUserToTicket,
   updateTicketStatus,
   getTicketMetadata,
+  createMessage,
 } from "@/lib/actions";
 import { TicketPriority, TicketStatus, TicketType } from "@/lib/types";
+import { Input } from "./ui/input";
 
 export type TicketInfoProps = {
   data: {
@@ -42,6 +50,7 @@ export type TicketInfoProps = {
     type: TicketType;
     priority: TicketPriority;
     user: {
+      id: string;
       firstName: string;
       lastName: string;
       email: string;
@@ -57,7 +66,18 @@ export type TicketInfoProps = {
     };
     notes: {
       createdAt: string;
+      prevValue: string;
+      newValue: string;
+      type: "user-change" | "status-change";
+    }[];
+    messages: {
+      createdAt: string;
       content: string;
+      user: {
+        firstName: string;
+        lastName: string;
+        avatar: string;
+      };
     }[];
   };
   role: "User" | "Client" | "Admin";
@@ -133,6 +153,35 @@ export default function TicketInfo(props: TicketInfoProps) {
       }
     }
   };
+
+  const [noteContent, setNoteContent] = React.useState("");
+
+  const handleNoteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!noteContent.trim()) return;
+
+    try {
+      console.log(noteContent, props.data.id, props.data.user?.id);
+      await createMessage(
+        noteContent,
+        props.data.id,
+        props.data.user ? props.data.user.id : null
+      );
+      setNoteContent("");
+    } catch (error) {
+      console.error("Error creating note:", error);
+    }
+  };
+
+  const [isHistoryExpanded, setIsHistoryExpanded] = React.useState(false);
+
+  function getStatusStyle(statusName: string, statuses: TicketStatus[]) {
+    const status = statuses.find((s) => s.name === statusName);
+    return {
+      backgroundColor: status?.hexColor || "#F3F4F6",
+      color: status ? "#FFFFFF" : "#4B5563",
+    };
+  }
 
   return (
     <>
@@ -362,33 +411,144 @@ export default function TicketInfo(props: TicketInfoProps) {
                 </div>
               </>
             )}
-            {props.data.notes.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="font-semibold">Historial de cambios</h3>
-
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  {props.data.notes.map((note) => (
-                    <div key={note.createdAt}>
-                      <div className="flex items-center gap-2">
-                        <time className="text-xs">
-                          {new Date(note.createdAt).toLocaleString("es-ES", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </time>
-                        <p>{note.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            <div className="space-y-2">
+              <div
+                className="flex items-center cursor-pointer select-none"
+                onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
+              >
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-200",
+                    isHistoryExpanded
+                      ? "transform rotate-0"
+                      : "transform -rotate-90"
+                  )}
+                />
+                <h3 className="text-lg font-semibold ml-2">
+                  Historial de cambios
+                </h3>
               </div>
-            )}
+
+              <div
+                className={cn(
+                  "transition-all duration-200 space-y-4 overflow-hidden",
+                  isHistoryExpanded
+                    ? "max-h-[1000px] opacity-100"
+                    : "max-h-0 opacity-0"
+                )}
+              >
+                {props.data.notes.map((note) => (
+                  <div
+                    key={note.createdAt}
+                    className="flex items-start space-x-4 text-sm"
+                  >
+                    <div className="w-4 h-4 mt-0.5">
+                      {note.type === "user-change" ? (
+                        <UserRoundPen className="w-4 h-4 text-gray-500" />
+                      ) : (
+                        <SquarePen className="w-4 h-4 text-gray-500" />
+                      )}
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <p className="text-sm text-gray-700">
+                        {note.type === "user-change" ? (
+                          <>
+                            El usuario cambió de{" "}
+                            <span
+                              className="inline-flex items-center rounded-full mx-1 px-2 py-1 text-xs font-medium"
+                              style={{
+                                backgroundColor: "#F3F4F6",
+                                color: "#4B5563",
+                              }}
+                            >
+                              {note.prevValue}
+                            </span>{" "}
+                            a{" "}
+                            <span
+                              className="inline-flex items-center rounded-full px-2 ml-1 py-1 text-xs font-medium"
+                              style={{
+                                backgroundColor: "#F3F4F6",
+                                color: "#4B5563",
+                              }}
+                            >
+                              {note.newValue}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            El estado cambió de{" "}
+                            <span
+                              className="inline-flex items-center rounded-full px-2 mx-1 py-1 text-xs font-medium"
+                              style={getStatusStyle(note.prevValue, statuses)}
+                            >
+                              {note.prevValue}
+                            </span>{" "}
+                            a{" "}
+                            <span
+                              className="inline-flex items-center rounded-full px-2 ml-1 py-1 text-xs font-medium"
+                              style={getStatusStyle(note.newValue, statuses)}
+                            >
+                              {note.newValue}
+                            </span>
+                          </>
+                        )}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {formatDate(note.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
+      <div className="space-y-4 mt-6">
+        <h3 className="text-lg font-semibold">Notas</h3>
+
+        {props.role !== "Client" && (
+          <form onSubmit={handleNoteSubmit} className="flex gap-2">
+            <Input
+              value={noteContent}
+              onChange={(e) => setNoteContent(e.target.value)}
+              placeholder="Escribe un mensaje..."
+              className="flex-1"
+            />
+            <Button type="submit">Enviar</Button>
+          </form>
+        )}
+
+        <div className="space-y-4">
+          {props.data.messages.map((message, index) => (
+            <div key={message.createdAt}>
+              <div className="flex space-x-3 bg-white p-4 rounded-lg">
+                <Avatar>
+                  <AvatarImage
+                    src={message.user.avatar}
+                    alt={`${message.user.firstName}'s avatar`}
+                  />
+                  <AvatarFallback>
+                    {message.user.firstName[0]}
+                    {message.user.lastName[0]}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="flex-1">
+                  <div className="flex justify-between">
+                    <p className="font-medium">{`${message.user.firstName} ${message.user.lastName}`}</p>
+                    <time className="text-sm text-muted-foreground">
+                      {formatDate(message.createdAt)}
+                    </time>
+                  </div>
+                  <p className="mt-1 text-sm">{message.content}</p>
+                </div>
+              </div>
+              {index < props.data.messages.length - 1 && <Separator />}
+            </div>
+          ))}
+        </div>
+      </div>
     </>
   );
 }

@@ -24,6 +24,7 @@ model Person {
   companyRut     String?
   temporaryToken String?
   tokenExpiry    DateTime?
+  Message        Message[]
 }
 
 enum Role {
@@ -33,29 +34,43 @@ enum Role {
 }
 
 model Ticket {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  title       String   @db.Text
-  description String   @db.Text
-  status      Status   @relation(fields: [statusId], references: [id])
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String    @db.Text
+  description String    @db.Text
+  status      Status    @relation(fields: [statusId], references: [id])
   statusId    Int
-  type        Type     @relation(fields: [typeId], references: [id])
+  type        Type      @relation(fields: [typeId], references: [id])
   typeId      Int
-  priority    Priority @relation(fields: [priorityId], references: [id])
+  priority    Priority  @relation(fields: [priorityId], references: [id])
   priorityId  Int
-  user        Person?  @relation(name: "UserToTicket", fields: [userId], references: [id])
+  user        Person?   @relation(name: "UserToTicket", fields: [userId], references: [id])
   userId      Int?
-  client      Person   @relation(name: "ClientToTicket", fields: [clientId], references: [id])
+  client      Person    @relation(name: "ClientToTicket", fields: [clientId], references: [id])
   clientId    Int
   notes       Note[]
+  messages    Message[]
 }
 
 model Note {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  prevValue String   @db.Text
+  newValue  String   @db.Text
+  type      String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  ticketId  Int
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   content   String   @db.Text
+  user      Person   @relation(fields: [userId], references: [id])
+  userId    Int
   ticket    Ticket   @relation(fields: [ticketId], references: [id])
   ticketId  Int
 }

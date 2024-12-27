@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import * as Icons from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { TicketPriority, TicketStatus, TicketType } from "@/lib/types";
 
 export type Ticket = {
@@ -85,6 +86,36 @@ export const columns: ColumnDef<Ticket>[] = [
         <div className="flex items-center gap-2">
           <Icon className="h-4 w-4" style={{ color: priority.hexColor }} />
           <span>{priority.name}</span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "user",
+    header: "Asignado a",
+    cell: ({ row }) => {
+      const user = row.getValue("user") as {
+        avatar: string;
+        firstName: string;
+        lastName: string;
+      } | null;
+
+      if (!user)
+        return <span className="text-muted-foreground">Sin asignar</span>;
+
+      return (
+        <div className="flex items-center gap-2">
+          <Avatar className="h-8 w-8">
+            <AvatarImage
+              src={user.avatar}
+              alt={`${user.firstName} ${user.lastName}`}
+            />
+            <AvatarFallback>
+              {user.firstName.charAt(0)}
+              {user.lastName.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <span>{user.firstName}</span>
         </div>
       );
     },

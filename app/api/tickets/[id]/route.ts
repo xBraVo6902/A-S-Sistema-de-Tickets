@@ -58,7 +58,22 @@ export async function GET(
         notes: {
           select: {
             createdAt: true,
+            prevValue: true,
+            newValue: true,
+            type: true,
+          },
+        },
+        messages: {
+          select: {
+            createdAt: true,
             content: true,
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                avatar: true,
+              },
+            },
           },
         },
       },
