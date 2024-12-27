@@ -48,8 +48,14 @@ const formSchema = z
 
 export default function ResetPasswordPage() {
   const router = useRouter();
-  const isFirstLogin =
-    new URLSearchParams(window.location.search).get("firstLogin") === "true";
+  const isFirstLogin = React.useMemo(() => {
+    if (typeof window !== "undefined") {
+      return (
+        new URLSearchParams(window.location.search).get("firstLogin") === "true"
+      );
+    }
+    return false;
+  }, []);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

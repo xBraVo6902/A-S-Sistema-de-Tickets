@@ -186,7 +186,9 @@ async function getByCategory() {
     });
 
     const result = ticketsByCategory.map((item) => ({
-      type: ticketMetadata.types.find((t) => t.id === item.typeId)?.name || "Unknown",
+      type:
+        ticketMetadata.types.find((t) => t.id === item.typeId)?.name ||
+        "Unknown",
       _count: item._count,
     }));
 
@@ -230,14 +232,16 @@ async function getTechnicianPerformance() {
         const completedTickets = await prisma.ticket.count({
           where: {
             userId: item.userId,
-            statusId: ticketMetadata.statuses.find((s) => s.name === "Cerrado")?.id,
+            statusId: ticketMetadata.statuses.find((s) => s.name === "Cerrado")
+              ?.id,
           },
         });
 
         const pendingTickets = await prisma.ticket.count({
           where: {
             userId: item.userId,
-            statusId: ticketMetadata.statuses.find((s) => s.name === "Abierto")?.id,
+            statusId: ticketMetadata.statuses.find((s) => s.name === "Abierto")
+              ?.id,
           },
         });
 
@@ -284,13 +288,15 @@ async function getCompanySummary() {
         const completedTickets = await prisma.ticket.count({
           where: {
             clientId: item.clientId,
-            statusId: ticketMetadata.statuses.find((s: any) => s.name === "Cerrado")?.id,
+            statusId: ticketMetadata.statuses.find((s) => s.name === "Cerrado")
+              ?.id,
           },
         });
         const pendingTickets = await prisma.ticket.count({
           where: {
             clientId: item.clientId,
-            statusId: ticketMetadata.statuses.find((s: any) => s.name === "Abierto")?.id,
+            statusId: ticketMetadata.statuses.find((s) => s.name === "Abierto")
+              ?.id,
           },
         });
         return {
@@ -313,5 +319,5 @@ async function getCompanySummary() {
       }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
-  } 
+  }
 }

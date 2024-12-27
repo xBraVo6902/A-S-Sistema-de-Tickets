@@ -58,12 +58,10 @@ interface CompanySummaryItem {
 async function fetchDashboardData(): Promise<DashboardData> {
   const [
     summary,
-    resolutionRate,
     monthlySummary,
     byCategory,
     technicianPerformance,
     companySummary,
-    ticketMetadata,
   ] = await Promise.all([
     fetch("/api/dashboard-routes?route=summary").then((res) => res.json()),
     fetch("/api/dashboard-routes?route=resolution-rate").then((res) =>
