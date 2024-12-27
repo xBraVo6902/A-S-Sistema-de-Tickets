@@ -507,15 +507,17 @@ export default function TicketInfo(props: TicketInfoProps) {
       <div className="space-y-4 mt-6">
         <h3 className="text-lg font-semibold">Notas</h3>
 
-        <form onSubmit={handleNoteSubmit} className="flex gap-2">
-          <Input
-            value={noteContent}
-            onChange={(e) => setNoteContent(e.target.value)}
-            placeholder="Escribe un mensaje..."
-            className="flex-1"
-          />
-          <Button type="submit">Enviar</Button>
-        </form>
+        {props.role !== "Client" && (
+          <form onSubmit={handleNoteSubmit} className="flex gap-2">
+            <Input
+              value={noteContent}
+              onChange={(e) => setNoteContent(e.target.value)}
+              placeholder="Escribe un mensaje..."
+              className="flex-1"
+            />
+            <Button type="submit">Enviar</Button>
+          </form>
+        )}
 
         <div className="space-y-4">
           {props.data.messages.map((message, index) => (
@@ -542,9 +544,7 @@ export default function TicketInfo(props: TicketInfoProps) {
                   <p className="mt-1 text-sm">{message.content}</p>
                 </div>
               </div>
-              {index < props.data.messages.length - 1 && (
-                <Separator className="my-2" />
-              )}
+              {index < props.data.messages.length - 1 && <Separator />}
             </div>
           ))}
         </div>
