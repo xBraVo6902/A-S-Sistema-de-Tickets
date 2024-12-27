@@ -367,6 +367,35 @@ export async function createTicket(data: CreateTicketInput, isAdmin: boolean) {
   }
 }
 
+export async function createMessage(
+  content: string,
+  ticketId: string,
+  userId: string | null
+) {
+  try {
+    if (!userId) {
+      return null;
+    }
+    const message = await prisma.message.create({
+      data: {
+        content,
+        ticket: { connect: { id: parseInt(ticketId) } },
+        user: { connect: { id: parseInt(userId) } },
+      },
+    });
+    if (!message) {
+      return null;
+    }
+
+    revalidatePath(`/admin/ticket/${ticketId}`);
+    revalidatePath(`/user/ticket/${ticketId}`);
+    revalidatePath(`/client/ticket/${ticketId}`);
+  } catch (error) {
+    console.error("Failed to create note:", error);
+    return null;
+  }
+}
+
 export async function getPeople() {
   const people = await prisma.person.findMany();
   return people;

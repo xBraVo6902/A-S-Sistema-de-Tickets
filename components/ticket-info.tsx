@@ -28,8 +28,10 @@ import {
   assignUserToTicket,
   updateTicketStatus,
   getTicketMetadata,
+  createMessage,
 } from "@/lib/actions";
 import { TicketPriority, TicketStatus, TicketType } from "@/lib/types";
+import { Input } from "./ui/input";
 
 export type TicketInfoProps = {
   data: {
@@ -42,6 +44,7 @@ export type TicketInfoProps = {
     type: TicketType;
     priority: TicketPriority;
     user: {
+      id: string;
       firstName: string;
       lastName: string;
       email: string;
@@ -131,6 +134,25 @@ export default function TicketInfo(props: TicketInfoProps) {
         console.error("Error updating status:", error);
         setStatusValue(statusValue);
       }
+    }
+  };
+
+  const [noteContent, setNoteContent] = React.useState("");
+
+  const handleNoteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!noteContent.trim()) return;
+
+    try {
+      console.log(noteContent, props.data.id, props.data.user?.id);
+      await createMessage(
+        noteContent,
+        props.data.id,
+        props.data.user ? props.data.user.id : null
+      );
+      setNoteContent("");
+    } catch (error) {
+      console.error("Error creating note:", error);
     }
   };
 
@@ -389,6 +411,21 @@ export default function TicketInfo(props: TicketInfoProps) {
           </div>
         </CardContent>
       </Card>
+      <div className="mt-4">
+        <form onSubmit={handleNoteSubmit} className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Agregar una nota..."
+              value={noteContent}
+              onChange={(e) => setNoteContent(e.target.value)}
+              className="flex-1"
+            />
+            <Button type="submit" disabled={!noteContent.trim()}>
+              Agregar nota
+            </Button>
+          </div>
+        </form>
+      </div>
     </>
   );
 }
