@@ -50,7 +50,6 @@ class EmailQueue {
         batch.map(async (job) => {
           try {
             await this.sendEmail(job);
-            console.log(`Email sent successfully: ${job.id}`);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
           } catch (error) {
             if (job.attempts < this.maxRetries) {

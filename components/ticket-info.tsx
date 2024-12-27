@@ -161,7 +161,6 @@ export default function TicketInfo(props: TicketInfoProps) {
     if (!noteContent.trim()) return;
 
     try {
-      console.log(noteContent, props.data.id, props.data.user?.id);
       await createMessage(
         noteContent,
         props.data.id,
