@@ -69,16 +69,16 @@ const priorities = [
 ];
 
 async function main() {
-  await prisma.$transaction([
-    prisma.ticket.deleteMany({}),
-    prisma.person.deleteMany({}),
-    prisma.status.deleteMany({}),
-    prisma.type.deleteMany({}),
-    prisma.priority.deleteMany({}),
-  ]);
+  await prisma.note.deleteMany({});
+  await prisma.ticket.deleteMany({});
+  await prisma.person.deleteMany({});
+  await prisma.status.deleteMany({});
+  await prisma.type.deleteMany({});
+  await prisma.priority.deleteMany({});
 
-  await prisma.$executeRaw`ALTER TABLE Person AUTO_INCREMENT = 1;`;
+  await prisma.$executeRaw`ALTER TABLE Note AUTO_INCREMENT = 1;`;
   await prisma.$executeRaw`ALTER TABLE Ticket AUTO_INCREMENT = 1;`;
+  await prisma.$executeRaw`ALTER TABLE Person AUTO_INCREMENT = 1;`;
   await prisma.$executeRaw`ALTER TABLE Status AUTO_INCREMENT = 1;`;
   await prisma.$executeRaw`ALTER TABLE Type AUTO_INCREMENT = 1;`;
   await prisma.$executeRaw`ALTER TABLE Priority AUTO_INCREMENT = 1;`;
