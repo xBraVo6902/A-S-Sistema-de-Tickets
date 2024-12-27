@@ -5,7 +5,6 @@ import {
   Check,
   ChevronsUpDown,
   ChevronDown,
-  ActivityIcon,
   SquarePen,
   UserRoundPen,
 } from "lucide-react";
@@ -70,6 +69,15 @@ export type TicketInfoProps = {
       prevValue: string;
       newValue: string;
       type: "user-change" | "status-change";
+    }[];
+    messages: {
+      createdAt: string;
+      content: string;
+      user: {
+        firstName: string;
+        lastName: string;
+        avatar: string;
+      };
     }[];
   };
   role: "User" | "Client" | "Admin";
@@ -496,20 +504,50 @@ export default function TicketInfo(props: TicketInfoProps) {
           </div>
         </CardContent>
       </Card>
-      <div className="mt-4">
-        <form onSubmit={handleNoteSubmit} className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Agregar una nota..."
-              value={noteContent}
-              onChange={(e) => setNoteContent(e.target.value)}
-              className="flex-1"
-            />
-            <Button type="submit" disabled={!noteContent.trim()}>
-              Agregar nota
-            </Button>
-          </div>
+      <div className="space-y-4 mt-6">
+        <h3 className="text-lg font-semibold">Notas</h3>
+
+        <form onSubmit={handleNoteSubmit} className="flex gap-2">
+          <Input
+            value={noteContent}
+            onChange={(e) => setNoteContent(e.target.value)}
+            placeholder="Escribe un mensaje..."
+            className="flex-1"
+          />
+          <Button type="submit">Enviar</Button>
         </form>
+
+        <div className="space-y-4">
+          {props.data.messages.map((message, index) => (
+            <div key={message.createdAt}>
+              <div className="flex space-x-3 bg-white p-4 rounded-lg">
+                <Avatar>
+                  <AvatarImage
+                    src={message.user.avatar}
+                    alt={`${message.user.firstName}'s avatar`}
+                  />
+                  <AvatarFallback>
+                    {message.user.firstName[0]}
+                    {message.user.lastName[0]}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="flex-1">
+                  <div className="flex justify-between">
+                    <p className="font-medium">{`${message.user.firstName} ${message.user.lastName}`}</p>
+                    <time className="text-sm text-muted-foreground">
+                      {formatDate(message.createdAt)}
+                    </time>
+                  </div>
+                  <p className="mt-1 text-sm">{message.content}</p>
+                </div>
+              </div>
+              {index < props.data.messages.length - 1 && (
+                <Separator className="my-2" />
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );

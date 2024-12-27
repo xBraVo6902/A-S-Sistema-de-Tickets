@@ -63,6 +63,19 @@ export async function GET(
             type: true,
           },
         },
+        messages: {
+          select: {
+            createdAt: true,
+            content: true,
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                avatar: true,
+              },
+            },
+          },
+        },
       },
     });
 
